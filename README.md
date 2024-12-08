@@ -32,7 +32,7 @@
 <div align="center">
   <a href="https://github.com/mal2ai/laravel-react-blockchain">
     <img src="images/react.png" alt="Logo" width="170" height="100">
-    +
+    <img src="images/plus.png" alt="Logo" width="170" height="100">
     <img src="images/laravel.png" alt="Logo" width="170" height="100">
   </a>
 
