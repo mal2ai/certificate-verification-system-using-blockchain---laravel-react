@@ -30,11 +30,11 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/react.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/mal2ai/laravel-react-blockchain">
+    <img src="images/react.png" alt="Logo" width="170" height="100">
   </a>
 
-  <h3 align="center">Best-README-Template</h3>
+  <h3 align="center">React</h3>
 
   <p align="center">
     An awesome README template to jumpstart your projects!
@@ -82,8 +82,6 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
 
