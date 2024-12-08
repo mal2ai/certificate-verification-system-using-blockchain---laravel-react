@@ -30,8 +30,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/react.png" alt="Logo" width="140" height="80">
+  <a href="https://github.com/mal2ai/laravel-react-blockchain">
+    <img src="images/react.png" alt="Logo" width="170" height="100">
   </a>
 
   <h3 align="center">Best-README-Template</h3>
