@@ -36,7 +36,7 @@
     <img src="images/laravel.png" width="170" height="100">
   </a>
 
-  <h3 align="center">React</h3>
+  <h3 align="center">React & Laravel</h3>
 
   <p align="center">
     An awesome README template to jumpstart your projects!
