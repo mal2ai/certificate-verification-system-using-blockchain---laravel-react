@@ -49,4 +49,44 @@ contract CertificateRegistry {
 
         return (serialNumbers, names, cids);
     }
+
+    // Update an existing certificate's name and CID by serial number
+    function updateCertificate(
+        string memory serialNumber,
+        string memory newName,
+        string memory newCid
+    ) public {
+        Certificate storage cert = certificates[serialNumber];
+        
+        // Check if the certificate exists
+        require(bytes(cert.serialNumber).length > 0, "Certificate not found");
+
+        // Update the certificate details
+        cert.name = newName;
+        cert.cid = newCid;
+    }
+
+    // Delete a certificate by serial number
+    function deleteCertificate(string memory serialNumber) public {
+        // Check if the certificate exists
+        require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
+
+        // Delete the certificate from the mapping
+        delete certificates[serialNumber];
+
+        // Find the index of the serial number in the array
+        uint256 indexToDelete = certificateSerialNumbers.length;
+        for (uint256 i = 0; i < certificateSerialNumbers.length; i++) {
+            if (keccak256(abi.encodePacked(certificateSerialNumbers[i])) == keccak256(abi.encodePacked(serialNumber))) {
+                indexToDelete = i;
+                break;
+            }
+        }
+
+        // If the serial number was found, remove it from the array
+        if (indexToDelete < certificateSerialNumbers.length) {
+            certificateSerialNumbers[indexToDelete] = certificateSerialNumbers[certificateSerialNumbers.length - 1];
+            certificateSerialNumbers.pop(); // Remove the last element
+        }
+    }
 }

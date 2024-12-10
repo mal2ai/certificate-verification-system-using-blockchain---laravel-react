@@ -42,6 +42,7 @@ import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have thi
 
 //routers
 import AddCertificates from "layouts/certificates/addcertificates";
+import EditCertificates from "layouts/certificates/editcertificates";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -205,6 +206,7 @@ export default function App() {
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
         <Route path="/certificates/add" element={<AddCertificates />} />
+        <Route path="/edit-certificate/:serialNumber" element={<EditCertificates />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
       </Routes>

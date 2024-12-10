@@ -3,7 +3,7 @@ import Web3 from "web3";
 // Connect to Ganache (Local Ethereum Node)
 const web3 = new Web3("http://127.0.0.1:7545"); // Replace with your Ganache RPC URL
 
-const contractAddress = "0x2A902d0dD927Fa57777df7c39e3fC221088Ae638";
+const contractAddress = "0x6e97c39D4440128c8f454B773a7A9460bA4Cfd11";
 const contractABI = [
   {
     inputs: [
@@ -56,7 +56,6 @@ const contractABI = [
     ],
     stateMutability: "view",
     type: "function",
-    constant: true,
   },
   {
     inputs: [],
@@ -80,7 +79,42 @@ const contractABI = [
     ],
     stateMutability: "view",
     type: "function",
-    constant: true,
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "serialNumber",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "newName",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "newCid",
+        type: "string",
+      },
+    ],
+    name: "updateCertificate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "serialNumber",
+        type: "string",
+      },
+    ],
+    name: "deleteCertificate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ];
 

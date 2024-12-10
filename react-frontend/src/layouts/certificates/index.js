@@ -28,14 +28,23 @@ CIDCell.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-// Define the Actions column Cell Component
 const ActionsCell = ({ row }) => {
   const navigate = useNavigate();
+
+  const handleEdit = () => {
+    const serialNumber = row.original.serialNumber; // Use the serialNumber instead of ID
+    if (serialNumber) {
+      navigate(`/edit-certificate/${serialNumber}`); // Navigate to the edit page with the serial number
+    } else {
+      console.error("Certificate serial number not found.");
+    }
+  };
+
   return (
     <MDButton
       variant="gradient"
       color="info"
-      onClick={() => navigate(`/certificates/edit/${row.original.id}`)} // Navigate to the edit page
+      onClick={handleEdit} // Use handleEdit function
     >
       Edit
     </MDButton>
@@ -103,7 +112,7 @@ function Certificates() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                bgColor="dark"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
