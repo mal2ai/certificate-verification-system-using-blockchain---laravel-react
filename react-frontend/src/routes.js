@@ -6,6 +6,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
+import Certificates from "layouts/certificates";
 
 // Import ProtectedRoute
 import ProtectedRoute from "components/ProtectedRoute";
@@ -26,6 +27,18 @@ const routes = [
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Certificates",
+    key: "certificates",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/certificates",
+    component: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Certificates />
       </ProtectedRoute>
     ),
   },
@@ -92,24 +105,7 @@ const routes = [
   // Public routes (Sign In/Sign Up)
   ...(isAuthenticated
     ? [] // Hide Sign In/Sign Up if logged in
-    : [
-        {
-          type: "collapse",
-          name: "Sign In",
-          key: "sign-in",
-          icon: <Icon fontSize="small">login</Icon>,
-          route: "/authentication/sign-in",
-          component: <SignIn />,
-        },
-        {
-          type: "collapse",
-          name: "Sign Up",
-          key: "sign-up",
-          icon: <Icon fontSize="small">assignment</Icon>,
-          route: "/authentication/sign-up",
-          component: <SignUp />,
-        },
-      ]),
+    : []),
 ];
 
 export default routes;

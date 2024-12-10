@@ -40,6 +40,11 @@ import brandDark from "assets/images/logo.png";
 // ProtectedRoute component
 import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
 
+//routers
+import AddCertificates from "layouts/certificates/addcertificates";
+import SignIn from "layouts/authentication/sign-in";
+import SignUp from "layouts/authentication/sign-up";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -198,7 +203,10 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
-        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+        <Route path="*" element={<Navigate to="/sign-in" />} />
+        <Route path="/certificates/add" element={<AddCertificates />} />
+        <Route path="sign-in" element={<SignIn />} />
+        <Route path="sign-up" element={<SignUp />} />
       </Routes>
     </ThemeProvider>
   );
