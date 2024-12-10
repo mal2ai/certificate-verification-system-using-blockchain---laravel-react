@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+//ui
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -16,6 +19,7 @@ import { uploadToIPFS } from "utils/ipfs";
 import { getBlockchain } from "utils/blockchain";
 
 function AddCertificates() {
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
@@ -42,6 +46,7 @@ function AddCertificates() {
       });
 
       alert("Certificate registered successfully!");
+      navigate("/certificates");
     } catch (error) {
       console.error("Error uploading or registering the certificate:", error);
       alert("An error occurred while uploading or registering the certificate.");
