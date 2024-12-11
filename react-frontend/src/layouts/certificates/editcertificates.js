@@ -80,8 +80,7 @@ function EditCertificate() {
         gas: 3000000, // Set an appropriate gas limit
       });
 
-      alert("Certificate updated successfully!");
-      navigate("/certificates"); // Navigate to the certificates page after update
+      navigate("/certificates", { state: { successMessage: "Certificate Updated Successfully!" } });
     } catch (error) {
       console.error("Error updating the certificate:", error);
       alert("An error occurred while updating the certificate. Please try again.");
@@ -103,7 +102,7 @@ function EditCertificate() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                bgColor="dark"
                 borderRadius="lg"
                 coloredShadow="info"
               >
@@ -145,16 +144,22 @@ function EditCertificate() {
                       Existing Certificate:
                     </MDTypography>
                     {cid ? (
-                      <MDTypography
-                        variant="body2"
+                      <MDButton
+                        variant="gradient"
                         color="info"
+                        size="small"
+                        sx={{
+                          padding: "4px 8px", // Adjust padding to make it smaller
+                          fontSize: "0.75rem", // Reduce font size
+                          marginLeft: "8px", // Adds space between the text and the button
+                        }}
                         component="a"
                         href={`http://127.0.0.1:8080/ipfs/${cid}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        View/Download Existing Certificate
-                      </MDTypography>
+                        View
+                      </MDButton>
                     ) : (
                       <MDTypography variant="body2" color="text">
                         No existing certificate available.

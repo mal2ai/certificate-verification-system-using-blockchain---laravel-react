@@ -41,6 +41,7 @@ import brandDark from "assets/images/logo.png";
 import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
 
 //routers
+import Certificates from "layouts/certificates/index";
 import AddCertificates from "layouts/certificates/addcertificates";
 import EditCertificates from "layouts/certificates/editcertificates";
 import DeleteCertificate from "layouts/certificates/deleteCertificates";
@@ -209,6 +210,7 @@ export default function App() {
         <Route path="/certificates/add" element={<AddCertificates />} />
         <Route path="/edit-certificate/:serialNumber" element={<EditCertificates />} />
         <Route path="/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
+        <Route path="/certificates" element={<Certificates />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
       </Routes>

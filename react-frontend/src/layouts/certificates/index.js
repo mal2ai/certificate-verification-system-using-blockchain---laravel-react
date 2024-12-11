@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 
-//ui
+// UI
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -12,11 +12,14 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// utils
+// Utils
 import { getBlockchain } from "utils/blockchain";
 
-// data
+// Data
 import DataTable from "examples/Tables/DataTable";
+
+// Notification
+import MDSnackbar from "components/MDSnackbar";
 
 // Define the CID Cell Component
 const CIDCell = ({ value }) => (
@@ -25,7 +28,6 @@ const CIDCell = ({ value }) => (
   </a>
 );
 
-// Add PropTypes validation for the CIDCell component
 CIDCell.propTypes = {
   value: PropTypes.string.isRequired,
 };
@@ -34,9 +36,9 @@ const ActionsCell = ({ row }) => {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    const serialNumber = row.original.serialNumber; // Use the serialNumber instead of ID
+    const serialNumber = row.original.serialNumber;
     if (serialNumber) {
-      navigate(`/edit-certificate/${serialNumber}`); // Navigate to the edit page with the serial number
+      navigate(`/edit-certificate/${serialNumber}`);
     } else {
       console.error("Certificate serial number not found.");
     }
@@ -45,7 +47,7 @@ const ActionsCell = ({ row }) => {
   const handleDelete = () => {
     const serialNumber = row.original.serialNumber;
     if (serialNumber) {
-      navigate(`/delete-certificate/${serialNumber}`); // Redirect to DeleteCertificate page
+      navigate(`/delete-certificate/${serialNumber}`);
     } else {
       console.error("Certificate serial number not found.");
     }
@@ -53,12 +55,7 @@ const ActionsCell = ({ row }) => {
 
   return (
     <div>
-      <MDButton
-        variant="gradient"
-        color="info"
-        onClick={handleEdit}
-        sx={{ marginRight: 1 }} // Add right margin for the gap between buttons
-      >
+      <MDButton variant="gradient" color="info" onClick={handleEdit} sx={{ marginRight: 1 }}>
         Edit
       </MDButton>
       <MDButton variant="gradient" color="error" onClick={handleDelete}>
@@ -68,15 +65,27 @@ const ActionsCell = ({ row }) => {
   );
 };
 
-// Add PropTypes validation for the ActionsCell component
 ActionsCell.propTypes = {
-  row: PropTypes.object.isRequired, // row should be an object
+  row: PropTypes.object.isRequired,
 };
 
 function Certificates() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [certificates, setCertificates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Notification state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false); // Close the snackbar
+  };
+
+  // Track if the certificate is added successfully
+  const [certificateAdded, setCertificateAdded] = useState(false);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -84,7 +93,6 @@ function Certificates() {
         const { contract } = await getBlockchain();
         const data = await contract.methods.getAllCertificates().call();
 
-        // Map contract data into rows format
         const rows = data[0].map((_, index) => ({
           serialNumber: data[0][index],
           name: data[1][index],
@@ -101,20 +109,40 @@ function Certificates() {
     };
 
     fetchCertificates();
-  }, []);
+  }, [certificateAdded]); // Refresh certificates when certificate is added
 
-  // Define columns for the table
+  useEffect(() => {
+    // Show notification if there is a success message passed via state
+    if (location.state?.successMessage) {
+      setSnackbarMessage(location.state.successMessage);
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+    }
+  }, [location.state]);
+
   const columns = [
     { Header: "Serial Number", accessor: "serialNumber", align: "left" },
     { Header: "Name", accessor: "name", align: "left" },
     { Header: "CID", accessor: "cid", align: "left", Cell: CIDCell },
     {
       Header: "Actions",
-      accessor: "id", // This should reference the row id to link actions
-      Cell: ActionsCell, // Use the ActionsCell component
+      accessor: "id",
+      Cell: ActionsCell,
       align: "center",
     },
   ];
+
+  const handleAddCertificate = async () => {
+    try {
+      // Simulate the certificate addition logic
+      setCertificateAdded(true); // Set state to refresh the table with the new certificate
+      navigate("/certificates/add"); // Navigate first
+    } catch (error) {
+      setSnackbarMessage("Failed to add certificate!");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -142,7 +170,7 @@ function Certificates() {
                 <MDButton
                   variant="gradient"
                   color="success"
-                  onClick={() => navigate("/certificates/add")}
+                  onClick={handleAddCertificate} // Trigger certificate add and navigate
                 >
                   Add Certificate
                 </MDButton>
@@ -167,6 +195,18 @@ function Certificates() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* MDSnackbar to show the notifications */}
+      <MDSnackbar
+        color={snackbarType}
+        icon={snackbarType === "success" ? "check_circle" : "error"} // Choose icon based on type
+        title={snackbarType === "success" ? "Success" : "Error"}
+        content={snackbarMessage}
+        open={openSnackbar}
+        onClose={handleCloseSnackbar}
+        closeColor="white"
+        bgWhite
+      />
     </DashboardLayout>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-//ui
+// UI
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -13,6 +13,9 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+
+// Notification components
+import MDSnackbar from "components/MDSnackbar";
 
 // Utility functions
 import { uploadToIPFS } from "utils/ipfs";
@@ -45,8 +48,8 @@ function AddCertificates() {
         gas: 3000000, // Set an appropriate gas limit
       });
 
-      alert("Certificate registered successfully!");
-      navigate("/certificates");
+      // Redirect after success
+      navigate("/certificates", { state: { successMessage: "Certificate Added Successfully!" } });
     } catch (error) {
       console.error("Error uploading or registering the certificate:", error);
       alert("An error occurred while uploading or registering the certificate.");
@@ -68,7 +71,7 @@ function AddCertificates() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                bgColor="dark"
                 borderRadius="lg"
                 coloredShadow="info"
               >
