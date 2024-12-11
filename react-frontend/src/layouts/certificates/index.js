@@ -21,6 +21,9 @@ import DataTable from "examples/Tables/DataTable";
 // Notification
 import MDSnackbar from "components/MDSnackbar";
 
+// Material-UI loading spinner
+import CircularProgress from "@mui/material/CircularProgress";
+
 // Define the CID Cell Component
 const CIDCell = ({ value }) => (
   <a href={`http://127.0.0.1:8080/ipfs/${value}`} target="_blank" rel="noopener noreferrer">
@@ -88,7 +91,7 @@ function Certificates() {
   const navigate = useNavigate();
   const location = useLocation();
   const [certificates, setCertificates] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Notification state
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -105,6 +108,7 @@ function Certificates() {
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
+        setLoading(true);
         const { contract } = await getBlockchain();
         const data = await contract.methods.getAllCertificates().call();
 
@@ -116,10 +120,10 @@ function Certificates() {
         }));
 
         setCertificates(rows);
-        setIsLoading(false);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching certificates:", error);
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -191,10 +195,10 @@ function Certificates() {
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {isLoading ? (
-                  <MDTypography variant="h6" align="center">
-                    Loading...
-                  </MDTypography>
+                {loading ? ( // Show loading spinner while data is being fetched
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
                 ) : (
                   <DataTable
                     table={{ columns, rows: certificates }}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types"; // Import PropTypes
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -40,6 +41,36 @@ function Status() {
     { Header: "Email", accessor: "email" },
     { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Status", accessor: "status" },
+    {
+      Header: "Actions",
+      accessor: "actions",
+      Cell: ({ row }) => (
+        <div>
+          {/* Edit button */}
+          <MDButton
+            variant="outlined"
+            color="info"
+            onClick={() => handleEdit(row.original)}
+            style={{ marginRight: "10px" }}
+            size="small"
+            disabled={row.original.status === "approved"} // Disable the edit button if status is "approved"
+          >
+            Edit
+          </MDButton>
+
+          {/* View button */}
+          <MDButton
+            variant="outlined"
+            color="success"
+            onClick={() => handleView(row.original)}
+            size="small"
+            disabled={row.original.status === "pending" || row.original.status === "rejected"} // Disable the view button if status is "pending" or "rejected"
+          >
+            View
+          </MDButton>
+        </div>
+      ),
+    },
   ];
 
   // Fetch status data when the component mounts
@@ -69,6 +100,16 @@ function Status() {
   // Handle verify button click
   const handleVerify = () => {
     navigate("/verify"); // Navigate to verification page
+  };
+
+  // Handle Edit button click
+  const handleEdit = (rowData) => {
+    navigate(`/edit-status/${rowData.id}`, { state: { rowData } });
+  };
+
+  // Handle View button click
+  const handleView = (rowData) => {
+    navigate(`/view-status/${rowData.id}`, { state: { rowData } });
   };
 
   return (
@@ -125,5 +166,18 @@ function Status() {
     </DashboardLayout>
   );
 }
+
+// Define PropTypes for the component
+Status.propTypes = {
+  row: PropTypes.shape({
+    original: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      serial_number: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+    }),
+  }),
+};
 
 export default Status;
