@@ -34,6 +34,13 @@ function VerifyCertificate() {
     setIsLoading(true);
     setErrorMessage("");
 
+    // Check if required fields are empty
+    if (!name || !serialNumber) {
+      setStatusMessage("Please fill in all required fields.");
+      setIsLoading(false);
+      return; // Stop the function if required fields are empty
+    }
+
     const token = localStorage.getItem("token"); // Get token from localStorage
     const email = localStorage.getItem("email");
 
@@ -78,6 +85,16 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
+                {statusMessage && (
+                  <MDBox mt={2}>
+                    <MDTypography
+                      variant="body2"
+                      color={statusMessage.includes("successfully") ? "green" : "red"}
+                    >
+                      {statusMessage}
+                    </MDTypography>
+                  </MDBox>
+                )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
@@ -87,6 +104,7 @@ function VerifyCertificate() {
                       value={name}
                       onChange={(e) => handleInputChange(e, setName)}
                       sx={{ mb: 2 }}
+                      required
                     />
                     <MDInput
                       label="Enter Your Email"
@@ -103,6 +121,7 @@ function VerifyCertificate() {
                       value={serialNumber}
                       onChange={(e) => handleInputChange(e, setSerialNumber)}
                       sx={{ mb: 2 }}
+                      required
                     />
                     <MDButton
                       variant="gradient"
@@ -115,20 +134,10 @@ function VerifyCertificate() {
                       }}
                       disabled={isLoading}
                     >
-                      {isLoading ? "Saving..." : "Store Status"}
+                      {isLoading ? "Saving..." : "Sent Request"}
                     </MDButton>
                   </MDBox>
                 </form>
-                {statusMessage && (
-                  <MDBox mt={2}>
-                    <MDTypography
-                      variant="body2"
-                      color={statusMessage.includes("successfully") ? "green" : "red"}
-                    >
-                      {statusMessage}
-                    </MDTypography>
-                  </MDBox>
-                )}
               </MDBox>
             </Card>
           </Grid>

@@ -31,10 +31,8 @@ const Basic = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true); // Keep it always true
   const navigate = useNavigate(); // Initialize useNavigate
-
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   useEffect(() => {
     // Check if the token and role are present in localStorage
@@ -59,16 +57,10 @@ const Basic = () => {
         const token = response.data.token;
         const role = response.data.role;
 
-        // Store token in localStorage or sessionStorage based on "Remember Me"
-        if (rememberMe) {
-          localStorage.setItem("token", token);
-          localStorage.setItem("email", email);
-          localStorage.setItem("role", role);
-        } else {
-          sessionStorage.setItem("token", token);
-          sessionStorage.setItem("email", email);
-          sessionStorage.setItem("role", role);
-        }
+        // Always store token, role, and email in localStorage (no sessionStorage)
+        localStorage.setItem("token", token);
+        localStorage.setItem("email", email);
+        localStorage.setItem("role", role);
 
         // Redirect based on role
         if (role === "user") {
@@ -133,13 +125,15 @@ const Basic = () => {
               />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
+              <Switch
+                checked={rememberMe} // Keep it always checked
+                onChange={(e) => setRememberMe(e.target.checked)} // Allow toggling
+              />
               <MDTypography
                 variant="button"
                 fontWeight="regular"
                 color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+                sx={{ userSelect: "none", ml: -1 }}
               >
                 &nbsp;&nbsp;Remember me
               </MDTypography>

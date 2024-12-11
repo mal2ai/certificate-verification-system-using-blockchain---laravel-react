@@ -27,6 +27,7 @@ function AddCertificates() {
   const [name, setName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
   const handleNameChange = (e) => setName(e.target.value);
@@ -35,6 +36,13 @@ function AddCertificates() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Step 1: Validate if the required fields are filled
+    if (!serialNumber || !name || !file) {
+      setStatusMessage("Please fill in all required fields (Name, Serial Number, and File).");
+      setLoading(false);
+      return; // Stop the function if any required field is missing
+    }
 
     try {
       // Step 1: Upload PDF to IPFS
@@ -82,6 +90,16 @@ function AddCertificates() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
+                {statusMessage && (
+                  <MDBox mt={2}>
+                    <MDTypography
+                      variant="body2"
+                      color={statusMessage.includes("successfully") ? "green" : "red"}
+                    >
+                      {statusMessage}
+                    </MDTypography>
+                  </MDBox>
+                )}
                 <form onSubmit={handleSubmit}>
                   <MDBox mb={2}>
                     <MDInput
