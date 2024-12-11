@@ -183,9 +183,10 @@ function Certificates() {
                 ) : (
                   <DataTable
                     table={{ columns, rows: certificates }}
-                    isSorted={false}
-                    entriesPerPage={false}
-                    showTotalEntries={false}
+                    isSorted={true}
+                    entriesPerPage={5}
+                    showTotalEntries={true}
+                    search={true}
                     noEndBorder
                   />
                 )}

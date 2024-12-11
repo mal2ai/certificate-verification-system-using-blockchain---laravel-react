@@ -81,7 +81,7 @@ function DataTable({
   } = tableInstance;
 
   // Set the default value for the entries per page when component mounts
-  useEffect(() => setPageSize(defaultValue || 10), [defaultValue]);
+  useEffect(() => setPageSize(defaultValue || 5), [defaultValue]);
 
   // Set the entries per page value based on the select value
   const setEntriesPerPage = (value) => setPageSize(value);
@@ -149,24 +149,6 @@ function DataTable({
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
         <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-          {entriesPerPage && (
-            <MDBox display="flex" alignItems="center">
-              <Autocomplete
-                disableClearable
-                value={pageSize.toString()}
-                options={entries}
-                onChange={(event, newValue) => {
-                  setEntriesPerPage(parseInt(newValue, 10));
-                }}
-                size="small"
-                sx={{ width: "5rem" }}
-                renderInput={(params) => <MDInput {...params} />}
-              />
-              <MDTypography variant="caption" color="secondary">
-                &nbsp;&nbsp;entries per page
-              </MDTypography>
-            </MDBox>
-          )}
           {canSearch && (
             <MDBox width="12rem" ml="auto">
               <MDInput
@@ -227,6 +209,33 @@ function DataTable({
         flexDirection={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
         alignItems={{ xs: "flex-start", sm: "center" }}
+        p={2}
+        mt={0} // Remove any top margin
+      >
+        {entriesPerPage && (
+          <MDBox display="flex" alignItems="center">
+            <Autocomplete
+              disableClearable
+              value={pageSize.toString()}
+              options={entries}
+              onChange={(event, newValue) => {
+                setEntriesPerPage(parseInt(newValue, 10));
+              }}
+              size="small"
+              sx={{ width: "5rem" }}
+              renderInput={(params) => <MDInput {...params} />}
+            />
+            <MDTypography variant="caption" color="secondary">
+              &nbsp;&nbsp;entries per page
+            </MDTypography>
+          </MDBox>
+        )}
+      </MDBox>
+      <MDBox
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
         p={!showTotalEntries && pageOptions.length === 1 ? 0 : 3}
       >
         {showTotalEntries && (
@@ -236,6 +245,7 @@ function DataTable({
             </MDTypography>
           </MDBox>
         )}
+
         {pageOptions.length > 1 && (
           <MDPagination
             variant={pagination.variant ? pagination.variant : "gradient"}
