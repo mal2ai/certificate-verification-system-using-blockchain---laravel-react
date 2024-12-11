@@ -130,14 +130,17 @@ function Certificates() {
     fetchCertificates();
   }, [certificateAdded]); // Refresh certificates when certificate is added
 
+  // Handle success message if present in the location state
   useEffect(() => {
-    // Show notification if there is a success message passed via state
     if (location.state?.successMessage) {
       setSnackbarMessage(location.state.successMessage);
       setSnackbarType("success");
       setOpenSnackbar(true);
+
+      // Clear the success message from location state to prevent it from showing again
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]);
+  }, [location.state, navigate]);
 
   const columns = [
     { Header: "Serial Number", accessor: "serialNumber", align: "left" },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types"; // Import PropTypes
+import { useNavigate, useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -23,14 +23,27 @@ import { getStatusByEmail } from "utils/api";
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
 
+// Notification
+import MDSnackbar from "components/MDSnackbar";
+
 function Status() {
   const navigate = useNavigate();
+  const location = useLocation(); // Use location to access state for success message
 
   // State to hold the status data
   const [statusData, setStatusData] = useState([]);
 
   // State to manage loading state
   const [loading, setLoading] = useState(false);
+
+  // Notification state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false); // Close the snackbar
+  };
 
   // Get the email from localStorage
   const email = localStorage.getItem("email");
@@ -88,6 +101,9 @@ function Status() {
           }
         } catch (error) {
           console.error("Error fetching status data:", error.response || error);
+          setSnackbarMessage("Failed to fetch status data!");
+          setSnackbarType("error");
+          setOpenSnackbar(true); // Show error message
         } finally {
           setLoading(false); // Set loading to false after the request completes
         }
@@ -95,7 +111,19 @@ function Status() {
 
       fetchStatus();
     }
-  }, [email]);
+  }, [email]); // Only fetch data when email changes
+
+  // Handle success message if present in the location state
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      setSnackbarMessage(location.state.successMessage);
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+
+      // Clear the success message from location state to prevent it from showing again
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
 
   // Handle verify button click
   const handleVerify = () => {
@@ -163,6 +191,18 @@ function Status() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* MDSnackbar to show the notifications */}
+      <MDSnackbar
+        color={snackbarType}
+        icon={snackbarType === "success" ? "check_circle" : "error"} // Choose icon based on type
+        title={snackbarType === "success" ? "Success" : "Error"}
+        content={snackbarMessage}
+        open={openSnackbar}
+        onClose={handleCloseSnackbar}
+        closeColor="white"
+        bgWhite
+      />
     </DashboardLayout>
   );
 }
