@@ -99,7 +99,7 @@ function Status() {
 
   // Handle verify button click
   const handleVerify = () => {
-    navigate("/verify"); // Navigate to verification page
+    navigate("/add-verify"); // Navigate to verification page
   };
 
   // Handle Edit button click
