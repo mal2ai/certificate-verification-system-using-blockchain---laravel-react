@@ -170,6 +170,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     localStorage.removeItem("token");
                     sessionStorage.removeItem("token");
                     localStorage.removeItem("role");
+                    localStorage.removeItem("email");
                     window.location.href = "/authentication/sign-in/basic"; // Redirect to login page
                   }
                 }}

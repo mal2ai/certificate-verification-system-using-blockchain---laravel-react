@@ -67,6 +67,26 @@ class StatusController extends Controller
         }
     }
 
+    // Get status by email
+    public function getStatusByEmail($email)
+    {
+        try {
+            // Find the status by email
+            $status = Status::where('email', $email)->get();
+
+            // If status exists, return it
+            if ($status->isNotEmpty()) {
+                return response()->json($status);
+            }
+
+            // If no status found, return a 404 error
+            return response()->json(['message' => 'Status not found for the provided email'], 404);
+        } catch (Exception $e) {
+            // Return a 500 error in case of unexpected exceptions
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
     // Update the status of a certificate (approved or rejected) based on serial_number
     public function updateStatus(Request $request, $serialNumber)
     {

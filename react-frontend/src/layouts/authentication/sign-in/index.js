@@ -62,9 +62,11 @@ const Basic = () => {
         // Store token in localStorage or sessionStorage based on "Remember Me"
         if (rememberMe) {
           localStorage.setItem("token", token);
+          localStorage.setItem("email", email);
           localStorage.setItem("role", role);
         } else {
           sessionStorage.setItem("token", token);
+          sessionStorage.setItem("email", email);
           sessionStorage.setItem("role", role);
         }
 

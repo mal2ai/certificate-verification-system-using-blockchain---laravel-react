@@ -17,4 +17,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/status', [StatusController::class, 'store']); // Create a new status request (pending)
     Route::get('/status/{serialNumber}', [StatusController::class, 'getStatus']); // Get status by serial number
     Route::put('/status/{serialNumber}', [StatusController::class, 'updateStatus']);
+    Route::get('/status/email/{email}', [StatusController::class, 'getStatusByEmail']);
 });
