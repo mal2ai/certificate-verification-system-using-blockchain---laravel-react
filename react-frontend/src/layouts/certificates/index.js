@@ -55,11 +55,26 @@ const ActionsCell = ({ row }) => {
 
   return (
     <div>
-      <MDButton variant="gradient" color="info" onClick={handleEdit} sx={{ marginRight: 1 }}>
+      <MDButton
+        variant="gradient"
+        color="info"
+        size="small"
+        onClick={handleEdit}
+        sx={{ marginRight: 1 }}
+      >
         Edit
       </MDButton>
-      <MDButton variant="gradient" color="error" onClick={handleDelete}>
+      <MDButton
+        variant="gradient"
+        color="error"
+        size="small"
+        onClick={handleDelete}
+        sx={{ marginRight: 1 }}
+      >
         Delete
+      </MDButton>
+      <MDButton variant="gradient" color="success" size="small">
+        View
       </MDButton>
     </div>
   );

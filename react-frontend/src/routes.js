@@ -3,8 +3,8 @@ import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+// import SignIn from "layouts/authentication/sign-in";
+// import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
 import Certificates from "layouts/certificates";
 
@@ -34,7 +34,7 @@ const routes = [
     type: "collapse",
     name: "Certificates",
     key: "certificates",
-    icon: <Icon fontSize="small">table_view</Icon>,
+    icon: <Icon fontSize="small">description</Icon>,
     route: "/certificates",
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
@@ -42,42 +42,42 @@ const routes = [
       </ProtectedRoute>
     ),
   },
-  {
-    type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <Tables />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <Billing />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <Notifications />
-      </ProtectedRoute>
-    ),
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Tables",
+  //   key: "tables",
+  //   icon: <Icon fontSize="small">table_view</Icon>,
+  //   route: "/tables",
+  //   component: (
+  //     <ProtectedRoute allowedRoles={["admin"]}>
+  //       <Tables />
+  //     </ProtectedRoute>
+  //   ),
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Billing",
+  //   key: "billing",
+  //   icon: <Icon fontSize="small">receipt_long</Icon>,
+  //   route: "/billing",
+  //   component: (
+  //     <ProtectedRoute allowedRoles={["admin"]}>
+  //       <Billing />
+  //     </ProtectedRoute>
+  //   ),
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Notifications",
+  //   key: "notifications",
+  //   icon: <Icon fontSize="small">notifications</Icon>,
+  //   route: "/notifications",
+  //   component: (
+  //     <ProtectedRoute allowedRoles={["admin"]}>
+  //       <Notifications />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     type: "collapse",
     name: "Profile",
