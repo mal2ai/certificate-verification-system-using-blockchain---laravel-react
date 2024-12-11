@@ -132,7 +132,11 @@ function VerifyCertificate() {
                       variant="gradient"
                       color="info"
                       onClick={handleVerify}
-                      sx={{ width: "100%" }}
+                      sx={{
+                        width: "200px", // Set a fixed width for the button
+                        display: "block", // Make the button a block element to center it
+                        margin: "0 auto", // Center the button horizontally
+                      }}
                       disabled={isLoading}
                     >
                       {isLoading ? "Verifying..." : "Verify Certificate"}
