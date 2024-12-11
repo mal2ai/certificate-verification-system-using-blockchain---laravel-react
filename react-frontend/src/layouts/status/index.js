@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -11,14 +14,19 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
+import MDButton from "components/MDButton";
 
 // Data
 import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 
 function Status() {
+  const navigate = useNavigate();
   const { columns, rows } = authorsTableData();
-  const { columns: pColumns, rows: pRows } = projectsTableData();
+
+  const handleVerify = async () => {
+    navigate("/verify"); // Navigate first
+  };
 
   return (
     <DashboardLayout>
@@ -33,13 +41,23 @@ function Status() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="info"
+                bgColor="dark"
                 borderRadius="lg"
                 coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
                   Status
                 </MDTypography>
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={handleVerify} // Trigger certificate add and navigate
+                >
+                  New Verify
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
                 <DataTable

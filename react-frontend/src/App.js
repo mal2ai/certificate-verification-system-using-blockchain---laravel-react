@@ -45,6 +45,7 @@ import Certificates from "layouts/certificates/index";
 import AddCertificates from "layouts/certificates/addcertificates";
 import EditCertificates from "layouts/certificates/editcertificates";
 import DeleteCertificate from "layouts/certificates/deleteCertificates";
+import Verify from "layouts/status/verify";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -211,6 +212,7 @@ export default function App() {
         <Route path="/edit-certificate/:serialNumber" element={<EditCertificates />} />
         <Route path="/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
         <Route path="/certificates" element={<Certificates />} />
+        <Route path="/verify" element={<Verify />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
       </Routes>
