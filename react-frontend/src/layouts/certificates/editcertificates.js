@@ -29,8 +29,6 @@ function EditCertificate() {
 
   // Fetch existing certificate data using the serialNumber
   useEffect(() => {
-    console.log("Fetching data for Serial Number:", serialNumber); // Log serialNumber
-
     if (!serialNumber) {
       console.error("Serial Number is missing.");
       return;
@@ -39,20 +37,21 @@ function EditCertificate() {
     const fetchCertificateData = async () => {
       try {
         const { accounts, contract } = await getBlockchain();
+        //console.log("Serial Number:", serialNumber); // Ensure serialNumber is being passed correctly
+
         const certificate = await contract.methods.getCertificate(serialNumber).call();
-        console.log("Fetched Certificate:", certificate); // Log fetched certificate data
+        //console.log("Fetched Certificate:", certificate); // Log the certificate data
 
         if (certificate) {
-          // Ensure that the name and cid are set correctly
-          setName(certificate.name || ""); // Make sure name is set or default to empty string
-          setCid(certificate.cid || ""); // Ensure cid is set
+          setName(certificate[1] || ""); // Use the correct index for `name`
+          setCid(certificate[2] || ""); // Use the correct index for `cid`
         }
 
-        setIsLoading(false); // Set isLoading to false once data is loaded
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching certificate:", error);
+        //console.error("Error fetching certificate details:", error);
         alert("Error fetching certificate details.");
-        setIsLoading(false); // Set isLoading to false if there's an error
+        setIsLoading(false);
       }
     };
 
@@ -119,9 +118,9 @@ function EditCertificate() {
                       type="text"
                       label="Name"
                       fullWidth
-                      value={isLoading ? "Loading..." : name} // Show loading state while fetching the data, then the actual name
+                      value={isLoading ? "Loading..." : name} // Show "Loading..." until the name is fetched
                       onChange={handleNameChange}
-                      disabled={isLoading} // Disable the input while loading
+                      disabled={isLoading} // Prevent editing during loading
                     />
                   </MDBox>
                   <MDBox mb={2}>
@@ -140,6 +139,27 @@ function EditCertificate() {
                       fullWidth
                       onChange={handleFileChange}
                     />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDTypography variant="caption" color="text">
+                      Existing Certificate:
+                    </MDTypography>
+                    {cid ? (
+                      <MDTypography
+                        variant="body2"
+                        color="info"
+                        component="a"
+                        href={`http://127.0.0.1:8080/ipfs/${cid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View/Download Existing Certificate
+                      </MDTypography>
+                    ) : (
+                      <MDTypography variant="body2" color="text">
+                        No existing certificate available.
+                      </MDTypography>
+                    )}
                   </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
                     <MDButton

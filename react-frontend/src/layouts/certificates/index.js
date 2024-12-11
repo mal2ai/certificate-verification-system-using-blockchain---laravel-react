@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types"; // Import PropTypes for validation
+import PropTypes from "prop-types";
+
+//ui
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -40,14 +42,29 @@ const ActionsCell = ({ row }) => {
     }
   };
 
+  const handleDelete = () => {
+    const serialNumber = row.original.serialNumber;
+    if (serialNumber) {
+      navigate(`/delete-certificate/${serialNumber}`); // Redirect to DeleteCertificate page
+    } else {
+      console.error("Certificate serial number not found.");
+    }
+  };
+
   return (
-    <MDButton
-      variant="gradient"
-      color="info"
-      onClick={handleEdit} // Use handleEdit function
-    >
-      Edit
-    </MDButton>
+    <div>
+      <MDButton
+        variant="gradient"
+        color="info"
+        onClick={handleEdit}
+        sx={{ marginRight: 1 }} // Add right margin for the gap between buttons
+      >
+        Edit
+      </MDButton>
+      <MDButton variant="gradient" color="error" onClick={handleDelete}>
+        Delete
+      </MDButton>
+    </div>
   );
 };
 

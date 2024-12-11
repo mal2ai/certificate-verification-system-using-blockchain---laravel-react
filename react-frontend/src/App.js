@@ -43,6 +43,7 @@ import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have thi
 //routers
 import AddCertificates from "layouts/certificates/addcertificates";
 import EditCertificates from "layouts/certificates/editcertificates";
+import DeleteCertificate from "layouts/certificates/deleteCertificates";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -207,6 +208,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/sign-in" />} />
         <Route path="/certificates/add" element={<AddCertificates />} />
         <Route path="/edit-certificate/:serialNumber" element={<EditCertificates />} />
+        <Route path="/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
       </Routes>
