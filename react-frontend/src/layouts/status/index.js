@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -16,16 +16,59 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 import MDButton from "components/MDButton";
 
-// Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-import projectsTableData from "layouts/tables/data/projectsTableData";
+// API function to get status by email
+import { getStatusByEmail } from "utils/api";
+
+// Material-UI loading spinner
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Status() {
   const navigate = useNavigate();
-  const { columns, rows } = authorsTableData();
 
-  const handleVerify = async () => {
-    navigate("/verify"); // Navigate first
+  // State to hold the status data
+  const [statusData, setStatusData] = useState([]);
+
+  // State to manage loading state
+  const [loading, setLoading] = useState(false);
+
+  // Get the email from localStorage
+  const email = localStorage.getItem("email");
+
+  // Columns for the DataTable (you can adjust this based on your data)
+  const columns = [
+    { Header: "Name", accessor: "name" },
+    { Header: "Email", accessor: "email" },
+    { Header: "Serial Number", accessor: "serial_number" },
+    { Header: "Status", accessor: "status" },
+  ];
+
+  // Fetch status data when the component mounts
+  useEffect(() => {
+    if (email) {
+      const fetchStatus = async () => {
+        setLoading(true); // Set loading to true before the request
+
+        try {
+          const response = await getStatusByEmail(email, localStorage.getItem("token"));
+          console.log("API Response:", response); // Log the response
+
+          if (response && response.data) {
+            setStatusData(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching status data:", error.response || error);
+        } finally {
+          setLoading(false); // Set loading to false after the request completes
+        }
+      };
+
+      fetchStatus();
+    }
+  }, [email]);
+
+  // Handle verify button click
+  const handleVerify = () => {
+    navigate("/verify"); // Navigate to verification page
   };
 
   return (
@@ -60,13 +103,19 @@ function Status() {
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {loading ? ( // Show loading spinner while data is being fetched
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <DataTable
+                    table={{ columns, rows: statusData }} // Pass the fetched status data as rows
+                    isSorted={true}
+                    entriesPerPage={true}
+                    showTotalEntries={true}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>
