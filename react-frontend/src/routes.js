@@ -23,7 +23,7 @@ const routes = [
     name: "Dashboard",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
+    route: "/admin/dashboard",
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Dashboard />
@@ -35,7 +35,7 @@ const routes = [
     name: "Certificates",
     key: "certificates",
     icon: <Icon fontSize="small">description</Icon>,
-    route: "/certificates",
+    route: "/admin/certificates",
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Certificates />

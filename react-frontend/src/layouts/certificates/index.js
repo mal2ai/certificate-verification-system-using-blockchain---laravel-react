@@ -41,7 +41,7 @@ const ActionsCell = ({ row }) => {
   const handleEdit = () => {
     const serialNumber = row.original.serialNumber;
     if (serialNumber) {
-      navigate(`/edit-certificate/${serialNumber}`);
+      navigate(`/admin/edit-certificate/${serialNumber}`);
     } else {
       console.error("Certificate serial number not found.");
     }
@@ -50,7 +50,7 @@ const ActionsCell = ({ row }) => {
   const handleDelete = () => {
     const serialNumber = row.original.serialNumber;
     if (serialNumber) {
-      navigate(`/delete-certificate/${serialNumber}`);
+      navigate(`/admin/delete-certificate/${serialNumber}`);
     } else {
       console.error("Certificate serial number not found.");
     }
@@ -158,7 +158,7 @@ function Certificates() {
     try {
       // Simulate the certificate addition logic
       setCertificateAdded(true); // Set state to refresh the table with the new certificate
-      navigate("/certificates/add"); // Navigate first
+      navigate("/admin/certificates/add"); // Navigate first
     } catch (error) {
       setSnackbarMessage("Failed to add certificate!");
       setSnackbarType("error");

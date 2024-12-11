@@ -74,7 +74,7 @@ const Basic = () => {
         if (role === "user") {
           navigate("/status"); // Redirect to /status if role is user
         } else {
-          navigate("/dashboard"); // Redirect to /dashboard if role is admin or other
+          navigate("/admin/dashboard"); // Redirect to /dashboard if role is admin or other
         }
       } else {
         // If the response doesn't contain a token, handle it as an error

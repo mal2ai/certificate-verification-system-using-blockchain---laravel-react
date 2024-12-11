@@ -49,7 +49,9 @@ function AddCertificates() {
       });
 
       // Redirect after success
-      navigate("/certificates", { state: { successMessage: "Certificate Added Successfully!" } });
+      navigate("/admin/certificates", {
+        state: { successMessage: "Certificate Added Successfully!" },
+      });
     } catch (error) {
       console.error("Error uploading or registering the certificate:", error);
       alert("An error occurred while uploading or registering the certificate.");

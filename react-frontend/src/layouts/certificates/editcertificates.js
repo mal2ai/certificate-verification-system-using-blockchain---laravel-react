@@ -80,7 +80,9 @@ function EditCertificate() {
         gas: 3000000, // Set an appropriate gas limit
       });
 
-      navigate("/certificates", { state: { successMessage: "Certificate Updated Successfully!" } });
+      navigate("/admin/certificates", {
+        state: { successMessage: "Certificate Updated Successfully!" },
+      });
     } catch (error) {
       console.error("Error updating the certificate:", error);
       alert("An error occurred while updating the certificate. Please try again.");

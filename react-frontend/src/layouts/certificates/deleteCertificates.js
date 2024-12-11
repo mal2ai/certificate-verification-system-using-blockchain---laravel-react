@@ -81,7 +81,9 @@ function DeleteCertificate() {
       console.log(`Certificate with serial number ${serialNumber} deleted`);
 
       // After successful deletion, navigate to the certificates page and pass the success message
-      navigate("/certificates", { state: { successMessage: "Certificate Deleted Successfully!" } });
+      navigate("/admin/certificates", {
+        state: { successMessage: "Certificate Deleted Successfully!" },
+      });
     } catch (error) {
       console.error("Error deleting certificate:", error);
       alert("Failed to delete certificate. Please try again.");
@@ -165,7 +167,7 @@ function DeleteCertificate() {
                   <MDButton
                     variant="gradient"
                     color="info"
-                    onClick={() => navigate("/certificates")}
+                    onClick={() => navigate("/admin/certificates")}
                     sx={{ width: "48%", marginRight: "4%" }}
                   >
                     Cancel

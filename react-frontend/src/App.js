@@ -209,10 +209,10 @@ export default function App() {
       <Routes>
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
-        <Route path="/certificates/add" element={<AddCertificates />} />
-        <Route path="/edit-certificate/:serialNumber" element={<EditCertificates />} />
-        <Route path="/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
-        <Route path="/certificates" element={<Certificates />} />
+        <Route path="/admin/certificates/add" element={<AddCertificates />} />
+        <Route path="/admin/edit-certificate/:serialNumber" element={<EditCertificates />} />
+        <Route path="/admin/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
+        <Route path="/admin/certificates" element={<Certificates />} />
         <Route path="/add-verify" element={<AddVerify />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="sign-in" element={<SignIn />} />

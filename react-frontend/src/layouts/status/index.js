@@ -66,7 +66,7 @@ function Status() {
             onClick={() => handleEdit(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "approved"} // Disable the edit button if status is "approved"
+            disabled={row.original.status === "approved" || row.original.status === "rejected"} // Disable the edit button if status is "approved"
           >
             Edit
           </MDButton>
