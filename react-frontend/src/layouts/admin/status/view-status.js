@@ -12,8 +12,8 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// API function to get user details by email
-import { getUserDetailsByEmail } from "utils/api";
+// API function to get user details by email and delete status
+import { getUserDetailsByEmail, deleteStatus } from "utils/api";
 
 function VerifyCertificate() {
   const navigate = useNavigate();
@@ -56,6 +56,24 @@ function VerifyCertificate() {
   // Handle the View Certificate button click
   const handleViewCertificate = () => {
     navigate(`/admin/view-certificate/${serial_number}`);
+  };
+
+  // Handle Delete Certificate button click
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("token"); // Get token from localStorage
+      await deleteStatus(serial_number, token); // Call delete function
+      setIsLoading(false);
+
+      // Navigate back with a success message
+      navigate("/admin/request", {
+        state: { successMessage: `Request ${serial_number} Deleted Successfully!` },
+      });
+    } catch (error) {
+      setIsLoading(false);
+      setErrorMessage(error.message || "Error deleting request");
+    }
   };
 
   return (
@@ -191,8 +209,16 @@ function VerifyCertificate() {
           </Grid>
         </Grid>
 
-        {/* View Certificate Button */}
-        <MDBox mt={3} display="flex" justifyContent="center">
+        {/* View Certificate & Delete Buttons */}
+        <MDBox mt={3} display="flex" justifyContent="center" gap={2}>
+          <MDButton
+            variant="contained"
+            color="error"
+            sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
+            onClick={handleDelete}
+          >
+            Delete Request
+          </MDButton>
           <MDButton
             variant="contained"
             color="primary"

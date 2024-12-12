@@ -140,4 +140,32 @@ class StatusController extends Controller
         }
     }
 
+    // Delete a status by serial number
+    public function deleteStatus(Request $request, $serialNumber)
+    {
+        try {
+            // Check if the authenticated user is an admin
+            if ($request->user()->role !== 'admin') {
+                return response()->json(['message' => 'You are not authorized to view user details.'], 403);
+            }
+
+            // Find the status by serial number
+            $status = Status::where('serial_number', $serialNumber)->first();
+
+            // If status not found, return a 404 error
+            if (!$status) {
+                return response()->json(['message' => 'Status not found'], 404);
+            }
+
+            // Delete the status
+            $status->delete();
+
+            // Return a success message
+            return response()->json(['message' => 'Status deleted successfully']);
+        } catch (Exception $e) {
+            // Catch any other exceptions and return a 500 error
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
 }

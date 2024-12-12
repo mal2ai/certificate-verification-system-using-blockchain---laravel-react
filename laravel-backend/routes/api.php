@@ -22,4 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // New route to get user details by email, only accessible to admin
     Route::get('/user/details/{email}', [AuthController::class, 'getUserDetailsByEmail']);
+
+    // Delete status route (only accessible by admin)
+    Route::delete('/status/{serialNumber}', [StatusController::class, 'deleteStatus']);
 });

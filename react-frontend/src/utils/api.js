@@ -85,4 +85,13 @@ export const getUserDetailsByEmail = (email, token) => {
   });
 };
 
+// New Status-related API to delete a status by serial number (admin only)
+export const deleteStatus = (serialNumber, token) => {
+  return api.delete(`/status/${serialNumber}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;
