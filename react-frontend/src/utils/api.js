@@ -94,4 +94,13 @@ export const deleteStatus = (serialNumber, token) => {
   });
 };
 
+// New Status-related API to update name, email, and serial_number
+export const updateDetails = (serialNumber, email, statusData, token) => {
+  return api.patch(`/status/update-details/${serialNumber}/${email}`, statusData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

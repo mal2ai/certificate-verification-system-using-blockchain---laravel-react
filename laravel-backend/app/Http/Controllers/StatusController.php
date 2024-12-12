@@ -168,4 +168,51 @@ class StatusController extends Controller
         }
     }
 
+    // Update name, email, and serial number by serial number and email
+    public function updateDetails(Request $request, $serialNumber, $email)
+    {
+        try {
+            // Validate the incoming request data
+            $validated = $request->validate([
+                'name' => 'nullable|string|max:255', // Name is optional
+                'email' => 'nullable|email', // Email is optional
+                'serial_number' => 'nullable|string|max:255', // Serial number is optional
+            ]);
+
+            // Find the status by serial_number and email
+            $status = Status::where('serial_number', $serialNumber)
+                            ->where('email', $email)
+                            ->first();
+
+            // If status not found, return a 404 error
+            if (!$status) {
+                return response()->json(['message' => 'Status not found'], 404);
+            }
+
+            // Update fields if they are provided
+            if (isset($validated['name'])) {
+                $status->name = $validated['name'];
+            }
+            if (isset($validated['email'])) {
+                $status->email = $validated['email'];
+            }
+            if (isset($validated['serial_number'])) {
+                $status->serial_number = $validated['serial_number'];
+            }
+
+            // Save the updated status
+            $status->save();
+
+            // Return the updated status
+            return response()->json([
+                'message' => 'Details updated successfully',
+                'status' => $status
+            ]);
+        } catch (Exception $e) {
+            // Catch any other exceptions and return a 500 error
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
+
 }

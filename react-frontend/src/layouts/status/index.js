@@ -134,7 +134,7 @@ function Status() {
 
   // Handle Edit button click
   const handleEdit = (rowData) => {
-    navigate(`/edit-status/${rowData.id}`, { state: { rowData } });
+    navigate(`/edit-verify`, { state: { rowData } });
   };
 
   // Handle View button click
