@@ -94,13 +94,19 @@ function Status() {
 
         try {
           const response = await getStatusByEmail(email, localStorage.getItem("token"));
+
           if (response && response.data) {
-            setStatusData(response.data);
+            if (response.data.length === 0) {
+              // If the data is empty, display a message in the table
+              setStatusData([{ status: "No request", name: "", email: "", serial_number: "" }]);
+            } else {
+              setStatusData(response.data);
+            }
           }
         } catch (error) {
+          // Handle the error, but don't show an error message if data is empty
           setSnackbarMessage("Failed to fetch status data!");
           setSnackbarType("error");
-          setOpenSnackbar(true);
         } finally {
           setLoading(false);
         }

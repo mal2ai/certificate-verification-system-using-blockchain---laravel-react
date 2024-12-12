@@ -221,8 +221,8 @@ export default function App() {
         <Route path="/admin/view-certificate/:serialNumber" element={<AdminViewCertificate />} />
         <Route path="/admin/view-request" element={<ViewRequest />} />
         <Route path="/verify" element={<Verify />} />
-        <Route path="sign-in" element={<SignIn />} />
-        <Route path="sign-up" element={<SignUp />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
       </Routes>
     </ThemeProvider>
   );

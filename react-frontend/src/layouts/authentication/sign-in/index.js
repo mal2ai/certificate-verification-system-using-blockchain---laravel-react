@@ -148,7 +148,7 @@ const Basic = () => {
                 Don&apos;t have an account?{" "}
                 <MDButton
                   component={MuiLink}
-                  href="/authentication/sign-up" // Navigate to sign-up page
+                  href="/sign-up" // Navigate to sign-up page
                   variant="button"
                   color="info"
                   fontWeight="medium"

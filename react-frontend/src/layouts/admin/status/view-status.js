@@ -212,7 +212,7 @@ function VerifyCertificate() {
         {/* View Certificate & Delete Buttons */}
         <MDBox mt={3} display="flex" justifyContent="center" gap={2}>
           <MDButton
-            variant="contained"
+            variant="gradient"
             color="error"
             sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
             onClick={handleDelete}
@@ -221,7 +221,7 @@ function VerifyCertificate() {
           </MDButton>
           <MDButton
             variant="contained"
-            color="primary"
+            color="info"
             sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
             onClick={handleViewCertificate}
           >

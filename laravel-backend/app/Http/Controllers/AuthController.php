@@ -56,17 +56,18 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        // Create the user
+        // Create the user with the default role of 'user'
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']), // Hash the password
+            'role' => 'user', // Set the role to 'user'
         ]);
 
         // Return response with the user data (excluding password)
         return response()->json([
             'message' => 'User created successfully',
-            'user' => $user->only('id', 'name', 'email')
+            'user' => $user->only('id', 'name', 'email', 'role')
         ], 201);
     }
 

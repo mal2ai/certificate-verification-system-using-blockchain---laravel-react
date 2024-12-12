@@ -140,7 +140,7 @@ function Cover() {
                 href="#"
                 variant="button"
                 fontWeight="bold"
-                color="info"
+                color="dark"
                 textGradient
               >
                 Terms and Conditions
@@ -156,9 +156,9 @@ function Cover() {
                 Already have an account?{" "}
                 <MDTypography
                   component={Link}
-                  to="/authentication/sign-in"
+                  to="/sign-in"
                   variant="button"
-                  color="info"
+                  color="dark"
                   fontWeight="medium"
                   textGradient
                 >
