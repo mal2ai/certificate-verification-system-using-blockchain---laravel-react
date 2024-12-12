@@ -68,7 +68,7 @@ const ActionsCell = ({ row }) => {
   return (
     <div>
       <MDButton
-        variant="gradient"
+        variant="outlined"
         color="info"
         size="small"
         onClick={handleEdit}
@@ -77,7 +77,7 @@ const ActionsCell = ({ row }) => {
         Edit
       </MDButton>
       <MDButton
-        variant="gradient"
+        variant="outlined"
         color="error"
         size="small"
         onClick={handleDelete}
@@ -86,7 +86,7 @@ const ActionsCell = ({ row }) => {
         Delete
       </MDButton>
       <MDButton
-        variant="gradient"
+        variant="outlined"
         color="success"
         size="small"
         onClick={handleView}

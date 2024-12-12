@@ -41,14 +41,14 @@ import brandDark from "assets/images/logo.png";
 import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
 
 //routers
-import Certificates from "layouts/certificates/index";
-import AddCertificates from "layouts/certificates/addcertificates";
-import EditCertificates from "layouts/certificates/editcertificates";
-import DeleteCertificate from "layouts/certificates/deleteCertificates";
+import Certificates from "layouts/admin/certificates/index";
+import AddCertificates from "layouts/admin/certificates/addcertificates";
+import EditCertificates from "layouts/admin/certificates/editcertificates";
+import DeleteCertificate from "layouts/admin/certificates/deleteCertificates";
 import AddVerify from "layouts/status/addVerify";
 import Verify from "layouts/status/verify";
 import ViewCertificate from "layouts/status/view-certificate";
-import AdminViewCertificate from "layouts/certificates/view-certificate";
+import AdminViewCertificate from "layouts/admin/certificates/view-certificate";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 

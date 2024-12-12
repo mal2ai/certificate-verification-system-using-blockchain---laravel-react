@@ -67,4 +67,13 @@ export const getStatusByEmail = (email, token) => {
   });
 };
 
+// New Status-related API to get all statuses
+export const getAllStatuses = (token) => {
+  return api.get(`/statuses`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

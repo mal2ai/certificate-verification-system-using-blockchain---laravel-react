@@ -6,7 +6,8 @@ import Profile from "layouts/profile";
 // import SignIn from "layouts/authentication/sign-in";
 // import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
-import Certificates from "layouts/certificates";
+import Certificates from "layouts/admin/certificates";
+import AdminStatus from "layouts/admin/status";
 
 // Import ProtectedRoute
 import ProtectedRoute from "components/ProtectedRoute";
@@ -39,6 +40,18 @@ const routes = [
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Certificates />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    type: "collapse",
+    name: "Status",
+    key: "status",
+    icon: <Icon fontSize="small">description</Icon>,
+    route: "/admin/status",
+    component: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <AdminStatus />
       </ProtectedRoute>
     ),
   },
