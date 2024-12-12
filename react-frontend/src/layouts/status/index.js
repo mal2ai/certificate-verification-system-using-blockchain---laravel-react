@@ -28,7 +28,7 @@ import MDSnackbar from "components/MDSnackbar";
 
 function Status() {
   const navigate = useNavigate();
-  const location = useLocation(); // Use location to access state for success message
+  const location = useLocation();
 
   // State to hold the status data
   const [statusData, setStatusData] = useState([]);
@@ -48,7 +48,7 @@ function Status() {
   // Get the email from localStorage
   const email = localStorage.getItem("email");
 
-  // Columns for the DataTable (you can adjust this based on your data)
+  // Columns for the DataTable
   const columns = [
     { Header: "Name", accessor: "name" },
     { Header: "Email", accessor: "email" },
@@ -66,7 +66,7 @@ function Status() {
             onClick={() => handleEdit(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"} // Disable the edit button if status is "approved"
+            disabled={row.original.status === "approved" || row.original.status === "rejected"}
           >
             Edit
           </MDButton>
@@ -77,7 +77,7 @@ function Status() {
             color="success"
             onClick={() => handleView(row.original)}
             size="small"
-            disabled={row.original.status === "pending" || row.original.status === "rejected"} // Disable the view button if status is "pending" or "rejected"
+            disabled={row.original.status === "pending" || row.original.status === "rejected"}
           >
             View
           </MDButton>
@@ -90,28 +90,25 @@ function Status() {
   useEffect(() => {
     if (email) {
       const fetchStatus = async () => {
-        setLoading(true); // Set loading to true before the request
+        setLoading(true);
 
         try {
           const response = await getStatusByEmail(email, localStorage.getItem("token"));
-          console.log("API Response:", response); // Log the response
-
           if (response && response.data) {
             setStatusData(response.data);
           }
         } catch (error) {
-          console.error("Error fetching status data:", error.response || error);
           setSnackbarMessage("Failed to fetch status data!");
           setSnackbarType("error");
-          setOpenSnackbar(true); // Show error message
+          setOpenSnackbar(true);
         } finally {
-          setLoading(false); // Set loading to false after the request completes
+          setLoading(false);
         }
       };
 
       fetchStatus();
     }
-  }, [email]); // Only fetch data when email changes
+  }, [email]);
 
   // Handle success message if present in the location state
   useEffect(() => {
@@ -120,14 +117,13 @@ function Status() {
       setSnackbarType("success");
       setOpenSnackbar(true);
 
-      // Clear the success message from location state to prevent it from showing again
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate]);
 
   // Handle verify button click
   const handleVerify = () => {
-    navigate("/add-verify"); // Navigate to verification page
+    navigate("/add-verify");
   };
 
   // Handle Edit button click
@@ -137,7 +133,14 @@ function Status() {
 
   // Handle View button click
   const handleView = (rowData) => {
-    navigate(`/view-status/${rowData.id}`, { state: { rowData } });
+    navigate(`/view-certificate`, {
+      state: {
+        name: rowData.name,
+        email: rowData.email,
+        serial_number: rowData.serial_number,
+        status: rowData.status,
+      },
+    });
   };
 
   return (
@@ -153,32 +156,28 @@ function Status() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="dark"
+                bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h6" color="dark">
                   Status
                 </MDTypography>
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  onClick={handleVerify} // Trigger certificate add and navigate
-                >
+                <MDButton variant="gradient" color="success" onClick={handleVerify}>
                   New Verify
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {loading ? ( // Show loading spinner while data is being fetched
+                {loading ? (
                   <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
                     <CircularProgress />
                   </div>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: statusData }} // Pass the fetched status data as rows
+                    table={{ columns, rows: statusData }}
                     isSorted={true}
                     entriesPerPage={true}
                     showTotalEntries={true}
@@ -192,10 +191,9 @@ function Status() {
       </MDBox>
       <Footer />
 
-      {/* MDSnackbar to show the notifications */}
       <MDSnackbar
         color={snackbarType}
-        icon={snackbarType === "success" ? "check_circle" : "error"} // Choose icon based on type
+        icon={snackbarType === "success" ? "check_circle" : "error"}
         title={snackbarType === "success" ? "Success" : "Error"}
         content={snackbarMessage}
         open={openSnackbar}
@@ -207,7 +205,6 @@ function Status() {
   );
 }
 
-// Define PropTypes for the component
 Status.propTypes = {
   row: PropTypes.shape({
     original: PropTypes.shape({
