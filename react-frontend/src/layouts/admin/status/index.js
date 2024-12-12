@@ -64,7 +64,7 @@ function Status() {
             onClick={() => handleView(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "pending" || row.original.status === "rejected"}
+            disabled={row.original.status === "approved" || row.original.status === "rejected"}
           >
             Reject
           </MDButton>
@@ -76,7 +76,7 @@ function Status() {
             onClick={() => handleView(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "pending" || row.original.status === "rejected"}
+            disabled={row.original.status === "approved" || row.original.status === "rejected"}
           >
             Approved
           </MDButton>
@@ -87,7 +87,6 @@ function Status() {
             color="info"
             onClick={() => handleEdit(row.original)}
             size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"}
           >
             Info
           </MDButton>
@@ -185,7 +184,7 @@ function Status() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="dark">
-                  Status
+                  Verify Request
                 </MDTypography>
                 <MDButton variant="gradient" color="success" onClick={handleVerify}>
                   New Verify

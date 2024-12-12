@@ -45,10 +45,10 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Status",
-    key: "status",
-    icon: <Icon fontSize="small">description</Icon>,
-    route: "/admin/status",
+    name: "Request",
+    key: "request",
+    icon: <Icon fontSize="small">rate_review</Icon>,
+    route: "/admin/request",
     component: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <AdminStatus />
