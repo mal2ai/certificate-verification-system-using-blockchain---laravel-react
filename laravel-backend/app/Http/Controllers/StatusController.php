@@ -120,4 +120,24 @@ class StatusController extends Controller
         }
     }
 
+    //get all status for admin
+    public function getAllStatuses()
+    {
+        try {
+            // Retrieve all statuses, you can paginate or return all records as needed
+            $statuses = Status::all();
+
+            // If there are statuses, return them
+            if ($statuses->isNotEmpty()) {
+                return response()->json($statuses);
+            }
+
+            // If no statuses found, return a 404 error
+            return response()->json(['message' => 'No statuses found'], 404);
+        } catch (Exception $e) {
+            // Catch any other exceptions and return a 500 error
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
 }
