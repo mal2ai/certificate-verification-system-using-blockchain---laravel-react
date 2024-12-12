@@ -133,14 +133,27 @@ function Status() {
 
   // Handle View button click
   const handleView = (rowData) => {
-    navigate(`/view-certificate`, {
-      state: {
-        name: rowData.name,
-        email: rowData.email,
-        serial_number: rowData.serial_number,
-        status: rowData.status,
-      },
-    });
+    // Check if the status is "approved"
+    if (rowData.status === "approved") {
+      // If approved, navigate to the view certificate page
+      navigate(`/view-certificate`, {
+        state: {
+          name: rowData.name,
+          email: rowData.email,
+          serial_number: rowData.serial_number,
+          status: rowData.status,
+        },
+      });
+    } else {
+      // If status is not "approved", show an error message in the snackbar
+      setSnackbarMessage(
+        <>
+          Your request has not been approved yet <br /> or has been rejected.
+        </>
+      );
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    }
   };
 
   return (

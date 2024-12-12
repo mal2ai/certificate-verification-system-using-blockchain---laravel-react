@@ -38,20 +38,28 @@ function VerifyCertificate() {
     try {
       setIsLoading(true);
       const { accounts, contract } = await getBlockchain();
-      // Fetch certificate data from the blockchain
-      const certificate = await contract.methods.getCertificate(serialNumber).call();
 
-      if (certificate) {
-        const newCertificate = {
-          serialNumber,
-          name: certificate[1] || "",
-          cid: certificate[2] || "",
-        };
+      // Check if the status is "approved"
+      if (status === "approved") {
+        // If approved, fetch the certificate data
+        const certificate = await contract.methods.getCertificate(serialNumber).call();
 
-        setCertificateDetails(newCertificate);
+        if (certificate) {
+          const newCertificate = {
+            serialNumber,
+            name: certificate[1] || "",
+            cid: certificate[2] || "",
+          };
+
+          setCertificateDetails(newCertificate);
+        } else {
+          setCertificateDetails(null);
+          setErrorMessage("Certificate not found.");
+        }
       } else {
+        // If status is not "approved", show an error message
         setCertificateDetails(null);
-        setErrorMessage("Certificate not found.");
+        setErrorMessage("Your request not approved yet.");
       }
 
       setIsLoading(false);
@@ -87,6 +95,11 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
+                {verificationAttempted && !certificateDetails && !isLoading && (
+                  <MDTypography variant="body2" color="error">
+                    {errorMessage}
+                  </MDTypography>
+                )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
@@ -115,11 +128,6 @@ function VerifyCertificate() {
                     />
                   </MDBox>
                 </form>
-                {verificationAttempted && !certificateDetails && !isLoading && (
-                  <MDTypography variant="body2" color="error">
-                    {errorMessage}
-                  </MDTypography>
-                )}
               </MDBox>
             </Card>
           </Grid>
