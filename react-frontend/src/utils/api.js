@@ -33,6 +33,47 @@ export const logout = (token) => {
   );
 };
 
+// Manage Users (Admin-only APIs)
+export const getAllUsers = (token) => {
+  return api.get("/users", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getUserById = (id, token) => {
+  return api.get(`/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const createUser = (data, token) => {
+  return api.post("/users", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateUser = (id, data, token) => {
+  return api.put(`/users/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const deleteUser = (id, token) => {
+  return api.delete(`/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // Status-related APIs
 export const getStatusBySerialNumber = (serialNumber, token) => {
   return api.get(`/status/${serialNumber}`, {

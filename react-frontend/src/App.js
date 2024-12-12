@@ -169,7 +169,7 @@ export default function App() {
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
               brandName={
-                <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+                <Link to="/admin/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
                   &nbsp;CERTIFY
                 </Link>
               }
@@ -197,7 +197,7 @@ export default function App() {
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
             brandName={
-              <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+              <Link to="/admin/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
                 &nbsp;CERTIFY
               </Link>
             }

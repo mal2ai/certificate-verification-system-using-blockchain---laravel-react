@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\UserController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -28,4 +29,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Delete status route (only accessible by admin)
     Route::delete('/status/{serialNumber}', [StatusController::class, 'deleteStatus']);
+
+    // User management routes (only accessible by admin)
+    Route::get('/users', [UserController::class, 'index']); // View all users
+    Route::get('/users/{id}', [UserController::class, 'show']); // View a single user by ID
+    Route::post('/users', [UserController::class, 'store']); // Add a new user
+    Route::put('/users/{id}', [UserController::class, 'update']); // Update user details
+    Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete a user
 });
