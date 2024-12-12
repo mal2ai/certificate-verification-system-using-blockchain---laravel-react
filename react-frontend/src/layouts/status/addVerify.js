@@ -55,7 +55,19 @@ function VerifyCertificate() {
     try {
       await storeStatus(data, token); // Call storeStatus API function
       setStatusMessage("Status stored successfully.");
-      navigate("/status", { state: { successMessage: "Request Sent Successfully!" } });
+
+      // Check the role from localStorage
+      const role = localStorage.getItem("role"); // Get the role from localStorage
+
+      // Conditionally navigate based on the role
+      if (role === "admin") {
+        navigate("/admin/request", { state: { successMessage: "Request Sent Successfully!" } });
+      } else if (role === "user") {
+        navigate("/status", { state: { successMessage: "Request Sent Successfully!" } });
+      } else {
+        // Optional: handle if role is not found (e.g., redirect to login)
+        navigate("/login");
+      }
     } catch (error) {
       setStatusMessage("Failed to store status.");
     } finally {
