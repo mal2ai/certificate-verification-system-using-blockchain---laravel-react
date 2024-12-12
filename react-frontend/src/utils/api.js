@@ -76,4 +76,13 @@ export const getAllStatuses = (token) => {
   });
 };
 
+// New User-related API to get user details by email (admin only)
+export const getUserDetailsByEmail = (email, token) => {
+  return api.get(`/user/details/${email}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

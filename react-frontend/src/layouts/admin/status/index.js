@@ -17,8 +17,8 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 import MDButton from "components/MDButton";
 
-// API function to get all statuses
-import { getAllStatuses } from "utils/api";
+// API function to get all statuses and update status
+import { getAllStatuses, updateStatus } from "utils/api";
 
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
@@ -61,7 +61,7 @@ function Status() {
           <MDButton
             variant="outlined"
             color="error"
-            onClick={() => handleView(row.original)}
+            onClick={() => handleReject(row.original)} // Update here
             style={{ marginRight: "10px" }}
             size="small"
             disabled={row.original.status === "approved" || row.original.status === "rejected"}
@@ -69,23 +69,23 @@ function Status() {
             Reject
           </MDButton>
 
-          {/* View button */}
+          {/* Approve button */}
           <MDButton
             variant="outlined"
             color="success"
-            onClick={() => handleView(row.original)}
+            onClick={() => handleApprove(row.original)} // Update here
             style={{ marginRight: "10px" }}
             size="small"
             disabled={row.original.status === "approved" || row.original.status === "rejected"}
           >
-            Approved
+            Approve
           </MDButton>
 
           {/* Edit button */}
           <MDButton
             variant="outlined"
             color="info"
-            onClick={() => handleEdit(row.original)}
+            onClick={() => handleInfo(row.original)}
             size="small"
           >
             Info
@@ -128,21 +128,25 @@ function Status() {
     }
   }, [location.state, navigate]);
 
-  // Handle verify button click
+  // Handle Verify button click
   const handleVerify = () => {
     navigate("/add-verify");
   };
 
-  // Handle Edit button click
-  const handleEdit = (rowData) => {
-    navigate(`/edit-status/${rowData.id}`, { state: { rowData } });
+  const handleInfo = (rowData) => {
+    navigate(`/admin/view-request`, {
+      state: {
+        name: rowData.name,
+        email: rowData.email,
+        serial_number: rowData.serial_number,
+        status: rowData.status,
+      },
+    });
   };
 
   // Handle View button click
   const handleView = (rowData) => {
-    // Check if the status is "approved"
     if (rowData.status === "approved") {
-      // If approved, navigate to the view certificate page
       navigate(`/view-certificate`, {
         state: {
           name: rowData.name,
@@ -152,12 +156,59 @@ function Status() {
         },
       });
     } else {
-      // If status is not "approved", show an error message in the snackbar
-      setSnackbarMessage(
-        <>
-          Your request has not been approved yet <br /> or has been rejected.
-        </>
-      );
+      setSnackbarMessage("Your request has not been approved yet or has been rejected.");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Handle Reject button click
+  const handleReject = async (rowData) => {
+    const token = localStorage.getItem("token");
+    const updatedStatus = {
+      status: "rejected",
+    };
+
+    try {
+      const response = await updateStatus(rowData.serial_number, updatedStatus, token);
+      if (response.data) {
+        setStatusData((prevData) =>
+          prevData.map((item) =>
+            item.serial_number === rowData.serial_number ? { ...item, status: "rejected" } : item
+          )
+        );
+        setSnackbarMessage("Request has been rejected successfully.");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      setSnackbarMessage("Failed to reject the request.");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Handle Approve button click
+  const handleApprove = async (rowData) => {
+    const token = localStorage.getItem("token");
+    const updatedStatus = {
+      status: "approved", // Change status to "approved"
+    };
+
+    try {
+      const response = await updateStatus(rowData.serial_number, updatedStatus, token);
+      if (response.data) {
+        setStatusData((prevData) =>
+          prevData.map((item) =>
+            item.serial_number === rowData.serial_number ? { ...item, status: "approved" } : item
+          )
+        );
+        setSnackbarMessage("Request has been approved successfully.");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      setSnackbarMessage("Failed to approve the request.");
       setSnackbarType("error");
       setOpenSnackbar(true);
     }

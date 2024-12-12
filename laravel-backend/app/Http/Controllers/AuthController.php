@@ -87,4 +87,24 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    // Function to get user details by email, only accessible to "admin"
+    public function getUserDetailsByEmail($email, Request $request)
+    {
+        // Check if the authenticated user is an admin
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'You are not authorized to view user details.'], 403);
+        }
+
+        // Retrieve user details by email
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Return user details excluding password
+        return response()->json($user->only('id', 'name', 'email', 'role'), 200);
+    }
+
 }

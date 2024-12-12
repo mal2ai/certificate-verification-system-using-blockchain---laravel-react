@@ -55,7 +55,7 @@ function VerifyCertificate() {
         setVerificationAttempted(true);
       } catch (error) {
         setCertificateDetails(null);
-        setErrorMessage("Error fetching certificate.");
+        setErrorMessage("Certificate not found");
         setIsLoading(false);
         setVerificationAttempted(true);
       }

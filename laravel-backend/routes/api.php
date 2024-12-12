@@ -19,4 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/status/{serialNumber}', [StatusController::class, 'updateStatus']);
     Route::get('/status/email/{email}', [StatusController::class, 'getStatusByEmail']);
     Route::get('/statuses', [StatusController::class, 'getAllStatuses']);
+
+    // New route to get user details by email, only accessible to admin
+    Route::get('/user/details/{email}', [AuthController::class, 'getUserDetailsByEmail']);
 });
