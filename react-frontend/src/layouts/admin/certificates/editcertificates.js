@@ -8,6 +8,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -141,29 +142,40 @@ function EditCertificate() {
                       onChange={handleFileChange}
                     />
                   </MDBox>
-                  <MDBox mb={2}>
+                  <MDBox mb={2} display="flex" alignItems="center">
                     <MDTypography variant="caption" color="text">
                       Existing Certificate:
                     </MDTypography>
                     {cid ? (
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        size="small"
-                        sx={{
-                          padding: "4px 8px", // Adjust padding to make it smaller
-                          fontSize: "0.75rem", // Reduce font size
-                          marginLeft: "8px", // Adds space between the text and the button
-                        }}
-                        component="a"
-                        href={`http://127.0.0.1:8080/ipfs/${cid}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View
-                      </MDButton>
+                      <MDBox display="flex" alignItems="center" ml={1}>
+                        <Icon
+                          fontSize="small"
+                          color="dark"
+                          sx={{
+                            cursor: "pointer",
+                          }}
+                          component="a"
+                          href={`http://127.0.0.1:8080/ipfs/${cid}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          picture_as_pdf
+                        </Icon>
+                        <MDTypography
+                          variant="button"
+                          fontWeight="bold"
+                          color="dark"
+                          component="a"
+                          href={`http://127.0.0.1:8080/ipfs/${cid}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{ ml: 0.5 }} // Margin between icon and label
+                        >
+                          PDF
+                        </MDTypography>
+                      </MDBox>
                     ) : (
-                      <MDTypography variant="body2" color="text">
+                      <MDTypography variant="body2" color="text" ml={1}>
                         No existing certificate available.
                       </MDTypography>
                     )}
