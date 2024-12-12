@@ -81,11 +81,11 @@ function AddCertificates() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="dark"
+                bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h6" color="dark">
                   Add Certificate
                 </MDTypography>
               </MDBox>

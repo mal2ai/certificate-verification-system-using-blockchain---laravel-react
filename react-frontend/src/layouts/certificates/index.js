@@ -56,6 +56,15 @@ const ActionsCell = ({ row }) => {
     }
   };
 
+  const handleView = () => {
+    const serialNumber = row.original.serialNumber;
+    if (serialNumber) {
+      navigate(`/admin/view-certificate/${serialNumber}`);
+    } else {
+      console.error("Certificate serial number not found.");
+    }
+  };
+
   return (
     <div>
       <MDButton
@@ -76,7 +85,13 @@ const ActionsCell = ({ row }) => {
       >
         Delete
       </MDButton>
-      <MDButton variant="gradient" color="success" size="small">
+      <MDButton
+        variant="gradient"
+        color="success"
+        size="small"
+        onClick={handleView}
+        sx={{ marginRight: 1 }}
+      >
         View
       </MDButton>
     </div>
@@ -179,14 +194,14 @@ function Certificates() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="dark"
+                bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h6" color="dark">
                   Certificates
                 </MDTypography>
                 <MDButton

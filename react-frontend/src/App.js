@@ -48,6 +48,7 @@ import DeleteCertificate from "layouts/certificates/deleteCertificates";
 import AddVerify from "layouts/status/addVerify";
 import Verify from "layouts/status/verify";
 import ViewCertificate from "layouts/status/view-certificate";
+import AdminViewCertificate from "layouts/certificates/view-certificate";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -216,6 +217,7 @@ export default function App() {
         <Route path="/admin/certificates" element={<Certificates />} />
         <Route path="/add-verify" element={<AddVerify />} />
         <Route path="/view-certificate" element={<ViewCertificate />} />
+        <Route path="/admin/view-certificate/:serialNumber" element={<AdminViewCertificate />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />

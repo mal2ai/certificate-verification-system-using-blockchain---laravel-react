@@ -103,14 +103,14 @@ function DeleteCertificate() {
                 py={3}
                 px={2}
                 variant="gradient"
-                bgColor="dark"
+                bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h6" color="dark">
                   Are you sure you want to delete this certificate?
                 </MDTypography>
               </MDBox>
