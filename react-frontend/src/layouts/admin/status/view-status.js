@@ -82,7 +82,7 @@ function VerifyCertificate() {
       <MDBox pt={6} pb={3}>
         <Grid container spacing={3}>
           {/* Certificate Details Card */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
               <MDBox
                 mx={2}
@@ -146,7 +146,7 @@ function VerifyCertificate() {
           </Grid>
 
           {/* Account Info Card */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
               <MDBox
                 mx={2}

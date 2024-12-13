@@ -78,7 +78,7 @@ function VerifyCertificate() {
       <MDBox pt={6} pb={3}>
         <Grid container spacing={3}>
           {/* Certificate Details Card */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
               <MDBox
                 mx={2}
@@ -130,59 +130,7 @@ function VerifyCertificate() {
                 </form>
               </MDBox>
             </Card>
-          </Grid>
-
-          {/* Certificate PDF Preview Card */}
-          <Grid item xs={12} md={6}>
-            {" "}
-            {/* Reduce the card width by changing md={6} to md={4} */}
-            <Card>
-              <MDBox
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Certificate PDF Preview
-                </MDTypography>
-              </MDBox>
-              <MDBox p={3}>
-                {certificateDetails && certificateDetails.cid ? (
-                  <div
-                    style={{
-                      border: "1px solid #ccc",
-                      height: "300px", // Reduced height for a smaller preview
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      backgroundColor: "#f5f5f5",
-                    }}
-                  >
-                    {/* Use an iframe to display the PDF from IPFS */}
-                    <iframe
-                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.cid}`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: "none" }}
-                      title="Certificate PDF"
-                    />
-                  </div>
-                ) : (
-                  <MDTypography variant="body2" color="textSecondary">
-                    No certificate data to display.
-                  </MDTypography>
-                )}
-              </MDBox>
-            </Card>
-          </Grid>
-
-          {/* Requester Details Card */}
-          <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
                 mt={-3}
@@ -226,6 +174,54 @@ function VerifyCertificate() {
                     />
                   </MDBox>
                 </form>
+              </MDBox>
+            </Card>
+          </Grid>
+
+          {/* Certificate PDF Preview Card */}
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            {" "}
+            {/* Reduce the card width by changing md={6} to md={4} */}
+            <Card>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Certificate PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {certificateDetails && certificateDetails.cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "300px", // Reduced height for a smaller preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.cid}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate data to display.
+                  </MDTypography>
+                )}
               </MDBox>
             </Card>
           </Grid>
