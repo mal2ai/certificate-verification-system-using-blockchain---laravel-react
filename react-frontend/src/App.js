@@ -52,6 +52,7 @@ import AdminViewCertificate from "layouts/admin/certificates/view-certificate";
 import ViewRequest from "layouts/admin/status/view-status";
 import ManageUser from "layouts/admin/manage-user/index";
 import EditUser from "layouts/admin/manage-user/edit-user";
+import DeleteUser from "layouts/admin/manage-user/delete-user";
 import EditVerify from "layouts/status/editVerify";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -278,6 +279,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <EditUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/delete-user/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <DeleteUser />
             </ProtectedRoute>
           }
         />

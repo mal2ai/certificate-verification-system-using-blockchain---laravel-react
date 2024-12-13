@@ -150,23 +150,9 @@ function ManageUser() {
     navigate(`/admin/edit-user/${rowData.id}`);
   };
 
-  const handleDelete = async (rowData) => {
-    // Delete user API call
-    const token = localStorage.getItem("token");
-    try {
-      const response = await deleteUser(rowData.id, token);
-      if (response.status === 200) {
-        // Refresh the users list after successful deletion
-        setUserData((prevData) => prevData.filter((user) => user.id !== rowData.id));
-        setSnackbarMessage("User deleted successfully!");
-        setSnackbarType("success");
-        setOpenSnackbar(true);
-      }
-    } catch (error) {
-      setSnackbarMessage("Failed to delete user!");
-      setSnackbarType("error");
-      setOpenSnackbar(true);
-    }
+  const handleDelete = (rowData) => {
+    // Navigate to the delete user page with the user ID
+    navigate(`/admin/delete-user/${rowData.id}`);
   };
 
   return (
