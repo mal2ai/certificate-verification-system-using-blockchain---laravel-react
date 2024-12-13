@@ -66,7 +66,7 @@ function DeleteUser() {
 
       // After successful deletion, navigate to the users page and pass the success message
       navigate("/admin/manage-user", {
-        state: { successMessage: "User Deleted Successfully!" },
+        state: { successMessage: `User ${id} Deleted Successfully!` },
       });
     } catch (error) {
       console.error("Error deleting user:", error);

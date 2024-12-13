@@ -151,7 +151,7 @@ function EditUser() {
                         displayEmpty
                         variant="outlined"
                         sx={{
-                          height: 30, // Adjust height for the Select box
+                          height: 35, // Adjust height for the Select box
                           fontSize: "0.85rem", // Optional: Increase font size
                         }}
                       >

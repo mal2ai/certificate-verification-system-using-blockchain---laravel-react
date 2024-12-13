@@ -82,7 +82,7 @@ function DeleteCertificate() {
 
       // After successful deletion, navigate to the certificates page and pass the success message
       navigate("/admin/certificates", {
-        state: { successMessage: "Certificate Deleted Successfully!" },
+        state: { successMessage: `Certificate ${serialNumber} Deleted Successfully!` },
       });
     } catch (error) {
       console.error("Error deleting certificate:", error);
