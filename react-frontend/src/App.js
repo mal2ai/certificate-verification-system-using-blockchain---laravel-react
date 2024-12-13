@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { Routes, Route, Navigate, useLocation, Link } from "react-router-dom";
 
+// ProtectedRoute component
+import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
+
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -37,24 +40,22 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 import brandWhite from "assets/images/logo.png";
 import brandDark from "assets/images/logo.png";
 
-// ProtectedRoute component
-import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
-
 //routers
 import Certificates from "layouts/admin/certificates/index";
 import AddCertificates from "layouts/admin/certificates/addcertificates";
 import EditCertificates from "layouts/admin/certificates/editcertificates";
 import DeleteCertificate from "layouts/admin/certificates/deleteCertificates";
 import AddVerify from "layouts/status/addVerify";
-import Verify from "layouts/status/verify";
+// import Verify from "layouts/status/verify";
 import ViewCertificate from "layouts/status/view-certificate";
 import AdminViewCertificate from "layouts/admin/certificates/view-certificate";
 import ViewRequest from "layouts/admin/status/view-status";
 import ManageUser from "layouts/admin/manage-user/index";
 import EditUser from "layouts/admin/manage-user/edit-user";
-import VerifyCertificate from "layouts/status/editVerify";
+import EditVerify from "layouts/status/editVerify";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Status from "layouts/status";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -186,7 +187,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(filteredRoutes)} {/* Use filtered routes */}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/admin/dashboard" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -215,18 +216,105 @@ export default function App() {
       <Routes>
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
-        <Route path="/admin/certificates/add" element={<AddCertificates />} />
-        <Route path="/admin/edit-certificate/:serialNumber" element={<EditCertificates />} />
-        <Route path="/admin/delete-certificate/:serialNumber" element={<DeleteCertificate />} />
-        <Route path="/admin/certificates" element={<Certificates />} />
-        <Route path="/add-verify" element={<AddVerify />} />
-        <Route path="/view-certificate" element={<ViewCertificate />} />
-        <Route path="/admin/view-certificate/:serialNumber" element={<AdminViewCertificate />} />
-        <Route path="/admin/view-request" element={<ViewRequest />} />
-        <Route path="/admin/manage-user" element={<ManageUser />} />
-        <Route path="/admin/edit-user/:id" element={<EditUser />} />
-        <Route path="/edit-verify" element={<VerifyCertificate />} />
-        <Route path="/verify" element={<Verify />} />
+        {/* Protected Routes */}
+        <Route
+          path="/admin/certificates/add"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AddCertificates />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/edit-certificate/:serialNumber"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <EditCertificates />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/delete-certificate/:serialNumber"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <DeleteCertificate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/certificates"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Certificates />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/view-certificate/:serialNumber"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminViewCertificate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/view-request"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ViewRequest />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-user"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ManageUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/edit-user/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <EditUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/status"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <Status />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-verify"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <AddVerify />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-verify"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <EditVerify />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/view-certificate"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <ViewCertificate />
+            </ProtectedRoute>
+          }
+        />
+        {/* Non-Protected Routes */}
+        {/* <Route path="/verify" element={<Verify />} /> */}
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
       </Routes>

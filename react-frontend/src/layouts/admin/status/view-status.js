@@ -159,7 +159,7 @@ function VerifyCertificate() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="dark">
-                  Account Info
+                  Account Details
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>

@@ -127,6 +127,9 @@ function EditUser() {
                       value={isLoading ? "Loading..." : email}
                       onChange={handleEmailChange}
                       disabled={isLoading}
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                   <MDBox mb={2}>
