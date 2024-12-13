@@ -146,15 +146,8 @@ function ManageUser() {
   };
 
   const handleEdit = (rowData) => {
-    // Navigate to edit page with row data
-    navigate(`/admin/edit-user`, {
-      state: {
-        id: rowData.id,
-        name: rowData.name,
-        email: rowData.email,
-        role: rowData.role,
-      },
-    });
+    // Navigate to manage-user page with user ID
+    navigate(`/admin/edit-user/${rowData.id}`);
   };
 
   const handleDelete = async (rowData) => {
