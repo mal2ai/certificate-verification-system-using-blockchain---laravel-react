@@ -50,6 +50,7 @@ import Verify from "layouts/status/verify";
 import ViewCertificate from "layouts/status/view-certificate";
 import AdminViewCertificate from "layouts/admin/certificates/view-certificate";
 import ViewRequest from "layouts/admin/status/view-status";
+import ManageUser from "layouts/admin/manage-user/index";
 import VerifyCertificate from "layouts/status/editVerify";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -221,6 +222,7 @@ export default function App() {
         <Route path="/view-certificate" element={<ViewCertificate />} />
         <Route path="/admin/view-certificate/:serialNumber" element={<AdminViewCertificate />} />
         <Route path="/admin/view-request" element={<ViewRequest />} />
+        <Route path="/admin/manage-user" element={<ManageUser />} />
         <Route path="/edit-verify" element={<VerifyCertificate />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/sign-in" element={<SignIn />} />
