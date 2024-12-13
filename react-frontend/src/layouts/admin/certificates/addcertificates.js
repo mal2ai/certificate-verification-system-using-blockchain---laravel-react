@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // UI
@@ -68,6 +68,23 @@ function AddCertificates() {
     }
   };
 
+  useEffect(() => {
+    // Initialize the fileinput plugin
+    const $ = window.$;
+    if ($ && $.fn.fileinput) {
+      $("#input-b1").fileinput({
+        browseOnZoneClick: true,
+        showPreview: true,
+        showUpload: false, // Disable upload button if using custom upload handlers
+      });
+
+      // Update the file state when the user selects a file
+      $("#input-b1").on("change", (e) => {
+        setFile(e.target.files[0]);
+      });
+    }
+  }, []);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -120,12 +137,10 @@ function AddCertificates() {
                     />
                   </MDBox>
                   <MDBox mb={2}>
-                    <MDInput
-                      type="file"
-                      label="Upload Certificate"
-                      fullWidth
-                      onChange={handleFileChange}
-                    />
+                    <MDTypography variant="body2" color="dark">
+                      Upload Certificate:
+                    </MDTypography>
+                    <input id="input-b1" name="input-b1" type="file" className="file" />
                   </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
                     <MDButton variant="gradient" color="dark" type="submit" disabled={loading}>
