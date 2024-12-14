@@ -179,7 +179,11 @@ function ManageUser() {
                 <MDTypography variant="h6" color="dark">
                   Manage Users
                 </MDTypography>
-                <MDButton variant="gradient" color="success">
+                <MDButton
+                  variant="gradient"
+                  color="success"
+                  onClick={() => navigate("/admin/add-user")}
+                >
                   Add User
                 </MDButton>
               </MDBox>
