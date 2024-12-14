@@ -48,6 +48,7 @@ import DeleteCertificate from "layouts/admin/certificates/deleteCertificates";
 import AddVerify from "layouts/status/addVerify";
 // import Verify from "layouts/status/verify";
 import ViewCertificate from "layouts/status/view-certificate";
+import VerifyOTP from "layouts/status/verify-otp";
 import AdminViewCertificate from "layouts/admin/certificates/view-certificate";
 import ViewRequest from "layouts/admin/status/view-status";
 import ManageUser from "layouts/admin/manage-user/index";
@@ -337,6 +338,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={["user"]}>
               <ViewCertificate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <VerifyOTP />
             </ProtectedRoute>
           }
         />

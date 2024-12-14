@@ -144,4 +144,30 @@ export const updateDetails = (serialNumber, email, statusData, token) => {
   });
 };
 
+// New OTP API to send OTP to the user
+export const sendOTP = (email, token) => {
+  return api.post(
+    "/send-otp",
+    { email }, // Pass the email in the request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+// New OTP API to verify the OTP entered by the user
+export const verifyOTP = (email, otp, token) => {
+  return api.post(
+    "/verify-otp",
+    { email, otp }, // Pass email and OTP in the request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
 export default api;

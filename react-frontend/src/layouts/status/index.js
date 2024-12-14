@@ -141,8 +141,8 @@ function Status() {
   const handleView = (rowData) => {
     // Check if the status is "approved"
     if (rowData.status === "approved") {
-      // If approved, navigate to the view certificate page
-      navigate(`/view-certificate`, {
+      // If approved, navigate to the verify OTP page
+      navigate(`/verify-otp`, {
         state: {
           name: rowData.name,
           email: rowData.email,

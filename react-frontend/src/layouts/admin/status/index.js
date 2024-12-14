@@ -18,7 +18,7 @@ import DataTable from "examples/Tables/DataTable";
 import MDButton from "components/MDButton";
 
 // API function to get all statuses and update status
-import { getAllStatuses, updateStatus } from "utils/api";
+import { getAllStatuses, updateStatus, sendOTP } from "utils/api";
 
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
@@ -213,19 +213,24 @@ function Status() {
     };
 
     try {
+      // First, update the status of the request
       const response = await updateStatus(rowData.serial_number, updatedStatus, token);
       if (response.data) {
-        setStatusData((prevData) =>
-          prevData.map((item) =>
-            item.serial_number === rowData.serial_number ? { ...item, status: "approved" } : item
-          )
-        );
-        setSnackbarMessage("Request has been approved successfully.");
-        setSnackbarType("success");
-        setOpenSnackbar(true);
+        // If status update is successful, send OTP to the user's email
+        const otpResponse = await sendOTP(rowData.email, token); // Pass the user's email to send OTP
+        if (otpResponse.data) {
+          setStatusData((prevData) =>
+            prevData.map((item) =>
+              item.serial_number === rowData.serial_number ? { ...item, status: "approved" } : item
+            )
+          );
+          setSnackbarMessage("Request has been approved and OTP sent successfully.");
+          setSnackbarType("success");
+          setOpenSnackbar(true);
+        }
       }
     } catch (error) {
-      setSnackbarMessage("Failed to approve the request.");
+      setSnackbarMessage("Failed to approve the request or send OTP.");
       setSnackbarType("error");
       setOpenSnackbar(true);
     }
