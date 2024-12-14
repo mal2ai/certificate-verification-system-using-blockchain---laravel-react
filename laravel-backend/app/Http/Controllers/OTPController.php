@@ -88,8 +88,8 @@ class OTPController extends Controller
 
         // Check if the entered OTP matches the stored (hashed) OTP
         if (Hash::check($enteredOtp, $storedOtp)) {
-            // Optionally, you can clear the OTP after successful verification
-            $user->otp_code = null; // Clear OTP from the database
+            
+            $user->otp_code = null; // set this enable after phase testing end
             $user->save();
 
             return response()->json(['message' => 'OTP verified successfully!'], 200);

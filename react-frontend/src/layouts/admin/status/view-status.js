@@ -6,14 +6,15 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import MDSnackbar from "components/MDSnackbar"; // Importing MDSnackbar
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// API function to get user details by email and delete status
-import { getUserDetailsByEmail, deleteStatus } from "utils/api";
+// API function to get user details by email, delete status, and send OTP
+import { getUserDetailsByEmail, deleteStatus, sendOTP } from "utils/api";
 
 function VerifyCertificate() {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ function VerifyCertificate() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [verificationAttempted, setVerificationAttempted] = useState(false);
+
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message state
+  const [snackbarType, setSnackbarType] = useState("success"); // Snackbar type (success or error)
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar visibility
 
   // Destructure the passed data from location.state
   const { name, email, serial_number, status } = location.state || {};
@@ -67,14 +72,51 @@ function VerifyCertificate() {
       setIsLoading(false);
 
       // Navigate back with a success message
+      setSnackbarMessage(`Request ${serial_number} Deleted Successfully!`);
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+
       navigate("/admin/request", {
         state: { successMessage: `Request ${serial_number} Deleted Successfully!` },
       });
     } catch (error) {
       setIsLoading(false);
       setErrorMessage(error.message || "Error deleting request");
+      setSnackbarMessage(error.message || "Error deleting request");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
     }
   };
+
+  // Handle Resend OTP button click
+  const handleResendOTP = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("token"); // Get token from localStorage
+      await sendOTP(email, token); // Call sendOTP function
+      setIsLoading(false);
+
+      setSnackbarMessage("OTP sent successfully.");
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+    } catch (error) {
+      setIsLoading(false);
+      setErrorMessage(error.message || "Error sending OTP");
+      setSnackbarMessage(error.message || "Error sending OTP");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Show success message if available in the location state
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      setSnackbarMessage(location.state.successMessage);
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
 
   return (
     <DashboardLayout>
@@ -209,7 +251,7 @@ function VerifyCertificate() {
           </Grid>
         </Grid>
 
-        {/* View Certificate & Delete Buttons */}
+        {/* View Certificate, Delete, and Resend OTP Buttons */}
         <MDBox mt={3} display="flex" justifyContent="center" gap={2}>
           <MDButton
             variant="gradient"
@@ -221,6 +263,15 @@ function VerifyCertificate() {
           </MDButton>
           <MDButton
             variant="contained"
+            color="warning"
+            sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
+            onClick={handleResendOTP}
+            disabled={status === "rejected" || status === "pending"} // Disable button if status is 'rejected' or 'pending'
+          >
+            Resend OTP
+          </MDButton>
+          <MDButton
+            variant="contained"
             color="info"
             sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
             onClick={handleViewCertificate}
@@ -229,6 +280,18 @@ function VerifyCertificate() {
           </MDButton>
         </MDBox>
       </MDBox>
+
+      {/* Snackbar */}
+      <MDSnackbar
+        color={snackbarType}
+        icon="check"
+        title="Notification"
+        content={snackbarMessage}
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        close={false}
+        bgWhite
+      />
 
       <Footer />
     </DashboardLayout>

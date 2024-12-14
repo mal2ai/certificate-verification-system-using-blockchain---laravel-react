@@ -89,9 +89,15 @@ function VerifyCertificate() {
                 bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
               >
                 <MDTypography variant="h6" color="dark">
                   Certificate Details
+                </MDTypography>
+                <MDTypography variant="body2" color="error">
+                  (This is one-time view only)
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
