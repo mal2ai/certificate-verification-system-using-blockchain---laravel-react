@@ -52,6 +52,23 @@ function Status() {
     { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Status", accessor: "status" },
     {
+      Header: "Created at",
+      accessor: "created_at",
+      Cell: ({ value }) => {
+        // Malaysia timezone offset (GMT+8)
+        const options = {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "Asia/Kuala_Lumpur",
+        };
+        return new Intl.DateTimeFormat("en-MY", options).format(new Date(value));
+      },
+    },
+    {
       Header: "Actions",
       accessor: "actions",
       align: "center",
@@ -61,7 +78,7 @@ function Status() {
           <MDButton
             variant="outlined"
             color="error"
-            onClick={() => handleReject(row.original)} // Update here
+            onClick={() => handleReject(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
             disabled={row.original.status === "approved" || row.original.status === "rejected"}
@@ -73,7 +90,7 @@ function Status() {
           <MDButton
             variant="outlined"
             color="success"
-            onClick={() => handleApprove(row.original)} // Update here
+            onClick={() => handleApprove(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
             disabled={row.original.status === "approved" || row.original.status === "rejected"}
@@ -81,7 +98,7 @@ function Status() {
             Approve
           </MDButton>
 
-          {/* Edit button */}
+          {/* Info button */}
           <MDButton
             variant="outlined"
             color="info"
@@ -145,22 +162,22 @@ function Status() {
   };
 
   // Handle View button click
-  const handleView = (rowData) => {
-    if (rowData.status === "approved") {
-      navigate(`/view-certificate`, {
-        state: {
-          name: rowData.name,
-          email: rowData.email,
-          serial_number: rowData.serial_number,
-          status: rowData.status,
-        },
-      });
-    } else {
-      setSnackbarMessage("Your request has not been approved yet or has been rejected.");
-      setSnackbarType("error");
-      setOpenSnackbar(true);
-    }
-  };
+  // const handleView = (rowData) => {
+  //   if (rowData.status === "approved") {
+  //     navigate(`/view-certificate`, {
+  //       state: {
+  //         name: rowData.name,
+  //         email: rowData.email,
+  //         serial_number: rowData.serial_number,
+  //         status: rowData.status,
+  //       },
+  //     });
+  //   } else {
+  //     setSnackbarMessage("Your request has not been approved yet or has been rejected.");
+  //     setSnackbarType("error");
+  //     setOpenSnackbar(true);
+  //   }
+  // };
 
   // Handle Reject button click
   const handleReject = async (rowData) => {
