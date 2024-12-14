@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OTPController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -36,4 +37,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users', [UserController::class, 'store']); // Add a new user
     Route::put('/users/{id}', [UserController::class, 'update']); // Update user details
     Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete a user
+
+    // OTP routes (only accessible by admin for sending OTP)
+    Route::post('send-otp', [OTPController::class, 'sendOTP']);
+    Route::post('verify-otp', [OTPController::class, 'verifyOTP']);
 });
