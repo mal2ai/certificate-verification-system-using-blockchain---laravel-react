@@ -82,7 +82,7 @@ function ManageUser() {
           <MDButton
             variant="outlined"
             color="success"
-            onClick={() => handleInfo(row.original)}
+            onClick={() => handleView(row.original)}
             size="small"
             sx={{ marginLeft: "8px" }}
           >
@@ -133,16 +133,8 @@ function ManageUser() {
     }
   }, [location.state, navigate]);
 
-  const handleInfo = (rowData) => {
-    // Navigate with the new structure (role included)
-    navigate(`/admin/view-request`, {
-      state: {
-        id: rowData.id,
-        name: rowData.name,
-        email: rowData.email,
-        role: rowData.role, // Pass the role to the view-request page
-      },
-    });
+  const handleView = (rowData) => {
+    navigate(`/admin/view-user/${rowData.id}`);
   };
 
   const handleEdit = (rowData) => {
