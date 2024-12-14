@@ -207,7 +207,7 @@ function VerifyCertificate() {
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "300px", // Reduced height for a smaller preview
+                      height: "350px",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
