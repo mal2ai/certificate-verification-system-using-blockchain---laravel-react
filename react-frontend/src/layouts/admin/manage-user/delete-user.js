@@ -137,7 +137,7 @@ function DeleteUser() {
                   <MDButton
                     variant="gradient"
                     color="info"
-                    onClick={() => navigate("/admin/users")}
+                    onClick={() => navigate("/admin/manage-user")}
                     sx={{ width: "48%", marginRight: "4%" }}
                   >
                     Cancel
