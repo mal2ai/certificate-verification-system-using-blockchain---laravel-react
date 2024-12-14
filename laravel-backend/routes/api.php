@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OTPController;
+use App\Http\Controllers\ProfileController; // Import the ProfileController
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -41,4 +42,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // OTP routes (only accessible by admin for sending OTP)
     Route::post('send-otp', [OTPController::class, 'sendOTP']);
     Route::post('verify-otp', [OTPController::class, 'verifyOTP']);
+
+    // Profile management routes
+    Route::get('/profile', [ProfileController::class, 'getDetails']); // Get account/user details
+    Route::put('/profile', [ProfileController::class, 'updateDetails']); // Update account/user details
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword']); // Change password
 });
