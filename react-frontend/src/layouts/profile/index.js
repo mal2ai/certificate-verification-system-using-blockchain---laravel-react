@@ -100,7 +100,7 @@ function Overview() {
             </Grid>
           </Grid>
         </MDBox>
-        <MDBox pt={2} px={2} lineHeight={1.25}>
+        {/* <MDBox pt={2} px={2} lineHeight={1.25}>
           <MDTypography variant="h6" fontWeight="medium">
             Projects
           </MDTypography>
@@ -193,7 +193,7 @@ function Overview() {
               />
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
       </Header>
       <Footer />
     </DashboardLayout>
