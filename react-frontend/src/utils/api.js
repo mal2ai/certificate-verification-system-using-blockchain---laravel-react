@@ -58,6 +58,15 @@ export const changePassword = (data, token) => {
   });
 };
 
+// Function to delete account
+export const deleteAccount = (data, token) => {
+  return api.post("/profile/delete-account", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // Manage Users (Admin-only APIs)
 export const getAllUsers = (token) => {
   return api.get("/users", {

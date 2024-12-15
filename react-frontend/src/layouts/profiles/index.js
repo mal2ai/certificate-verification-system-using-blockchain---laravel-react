@@ -23,7 +23,7 @@ import Footer from "examples/Footer";
 import MDSnackbar from "components/MDSnackbar";
 
 // API functions
-import { getProfileDetails, updateProfileDetails, changePassword } from "utils/api";
+import { getProfileDetails, updateProfileDetails, changePassword, deleteAccount } from "utils/api";
 
 function ProfileForm({ onSave }) {
   const [name, setName] = useState("");
@@ -41,6 +41,9 @@ function ProfileForm({ onSave }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarType, setSnackbarType] = useState("success");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isDeleteClicked, setIsDeleteClicked] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,22 +88,7 @@ function ProfileForm({ onSave }) {
     }
   }, [token]);
 
-  // Show success message if available in the location state
-  useEffect(() => {
-    if (location.state?.successMessage) {
-      setSnackbarMessage(location.state.successMessage);
-      setSnackbarType("success");
-      setOpenSnackbar(true);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state, navigate]);
-
-  const handleProfileChange = (event) => {
-    const { name, value } = event.target;
-    if (name === "name") setName(value);
-    if (name === "email") setEmail(value);
-  };
-
+  // Handle Profile Submit
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
     if (token) {
@@ -112,31 +100,19 @@ function ProfileForm({ onSave }) {
         await updateProfileDetails({ name, email }, token);
 
         // Fetch updated profile details
-        console.log("Request Data: ", { name, email });
         const response = await updateProfileDetails({ name, email }, token);
-        console.log("Update Profile Response: ", response);
-
         if (response && response.data && response.data.data) {
           const updatedProfile = response.data.data;
           setName(updatedProfile.name || "");
           setEmail(updatedProfile.email || "");
-        } else {
-          console.error("Profile data is missing:", response);
         }
 
-        // Successfully updated
-        // onSave({ formType: "profile", name, email });
         setSnackbarMessage("Profile updated successfully!");
         setSnackbarType("success");
         setOpenSnackbar(true);
       } catch (error) {
         console.error("Error updating profile details:", error);
-        if (error.response) {
-          console.error("API Response Error: ", error.response);
-          setSnackbarMessage(`Error: ${error.response.data.message || "Unknown error"}`);
-        } else {
-          setSnackbarMessage("Error updating profile details.");
-        }
+        setSnackbarMessage("Error updating profile details.");
         setSnackbarType("error");
         setOpenSnackbar(true);
       } finally {
@@ -146,6 +122,7 @@ function ProfileForm({ onSave }) {
     }
   };
 
+  // Handle Password Submit
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -155,7 +132,6 @@ function ProfileForm({ onSave }) {
     if (token) {
       try {
         setLoadingPassword(true);
-        // Send request with the correct fields
         await changePassword(
           {
             current_password: currentPassword,
@@ -180,6 +156,49 @@ function ProfileForm({ onSave }) {
         setLoadingPassword(false);
       }
     }
+  };
+
+  // Handle Account Deletion
+  const handleDeleteConfirmation = () => {
+    setIsDeleteClicked(true); // Hide the "Delete Account" button and show input fields
+  };
+
+  const handleDeleteAccount = async (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+    setLoadingDelete(true);
+
+    try {
+      // Data to be sent to the API (e.g., current password)
+      const data = { current_password: currentPassword };
+
+      // Call the deleteAccount function with the data and token
+      await deleteAccount(data, token);
+
+      // On success, show a success message or handle accordingly
+      alert("Your account has been successfully deleted.");
+
+      // Remove user data from localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
+      localStorage.removeItem("role");
+
+      // Redirect to the sign-in page
+      navigate("/sign-in");
+
+      // Optionally reset the form or redirect the user
+      setIsDeleteClicked(false);
+      setCurrentPassword(""); // Clear password field
+    } catch (error) {
+      // On error, show an error message
+      console.error("Error ", error);
+    } finally {
+      setLoadingDelete(false); // Stop the loading spinner
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteClicked(false); // Hide input fields and show the "Delete Account" button again
+    setConfirmDelete(false);
   };
 
   return (
@@ -214,7 +233,7 @@ function ProfileForm({ onSave }) {
                                   label="Full Name"
                                   name="name"
                                   value={name || ""}
-                                  onChange={handleProfileChange}
+                                  onChange={(e) => setName(e.target.value)}
                                   fullWidth
                                   InputProps={{
                                     endAdornment: loadingName ? (
@@ -229,7 +248,7 @@ function ProfileForm({ onSave }) {
                                   label="Email"
                                   name="email"
                                   value={email || ""}
-                                  onChange={handleProfileChange}
+                                  onChange={(e) => setEmail(e.target.value)}
                                   fullWidth
                                   InputProps={{
                                     endAdornment: loadingEmail ? (
@@ -249,7 +268,7 @@ function ProfileForm({ onSave }) {
                                     readOnly: true,
                                   }}
                                   InputProps={{
-                                    endAdornment: loadingEmail ? (
+                                    endAdornment: loadingRole ? (
                                       <CircularProgress size={20} />
                                     ) : null,
                                   }}
@@ -276,8 +295,8 @@ function ProfileForm({ onSave }) {
                           <MDTypography variant="h5" fontWeight="medium">
                             Update Password
                           </MDTypography>
-                          <MDTypography variant="body2" color="text" mt={1}>
-                            Ensure your account is using a long, random password to stay secure.
+                          <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                            Update your password. Be sure to choose a strong password.
                           </MDTypography>
                         </MDBox>
                       </Grid>
@@ -289,8 +308,8 @@ function ProfileForm({ onSave }) {
                                 <MDInput
                                   type="password"
                                   label="Current Password"
-                                  name="currentPassword"
-                                  value={currentPassword}
+                                  name="current_password"
+                                  value={currentPassword || ""}
                                   onChange={(e) => setCurrentPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
@@ -304,8 +323,8 @@ function ProfileForm({ onSave }) {
                                 <MDInput
                                   type="password"
                                   label="New Password"
-                                  name="newPassword"
-                                  value={newPassword}
+                                  name="new_password"
+                                  value={newPassword || ""}
                                   onChange={(e) => setNewPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
@@ -319,8 +338,8 @@ function ProfileForm({ onSave }) {
                                 <MDInput
                                   type="password"
                                   label="Confirm Password"
-                                  name="confirmPassword"
-                                  value={confirmPassword}
+                                  name="confirm_password"
+                                  value={confirmPassword || ""}
                                   onChange={(e) => setConfirmPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
@@ -340,6 +359,98 @@ function ProfileForm({ onSave }) {
                         </Card>
                       </Grid>
                     </Grid>
+                    <Divider sx={{ my: 3 }} />
+                  </Grid>
+
+                  {/* Delete account Section */}
+                  <Grid item xs={12}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={4}>
+                        <MDBox>
+                          <MDTypography variant="h5" fontWeight="medium">
+                            Delete Account
+                          </MDTypography>
+                          <MDTypography variant="body2" color="text" mt={1}>
+                            Permanently delete your account.
+                          </MDTypography>
+                        </MDBox>
+                      </Grid>
+                      <Grid item xs={12} md={8}>
+                        <Card sx={{ height: "100%" }}>
+                          <MDBox p={3}>
+                            <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                              Once your account is deleted, all of its resources and data will be
+                              permanently deleted. Before deleting your account, please download any
+                              data or information that you wish to retain.
+                            </MDTypography>
+                            {!isDeleteClicked ? (
+                              // Show the Delete Account button
+                              <MDButton
+                                variant="gradient"
+                                color="error"
+                                onClick={handleDeleteConfirmation}
+                                disabled={loadingDelete}
+                              >
+                                {loadingDelete ? <CircularProgress size={20} /> : "Delete Account"}
+                              </MDButton>
+                            ) : (
+                              // When the button is clicked, show the confirmation section
+                              <>
+                                <MDTypography variant="body2" color="text" mt={1}>
+                                  Once your account is deleted, all of its resources and data will
+                                  be permanently deleted. Before deleting your account, please
+                                  download any data or information that you wish to retain.
+                                </MDTypography>
+
+                                <MDBox mt={2}>
+                                  <form onSubmit={handleDeleteAccount}>
+                                    {/* Add your input fields here, e.g., password or confirmation input */}
+
+                                    <MDBox mt={3}>
+                                      <MDTypography variant="body2" color="error" mb={2}>
+                                        Are you sure you want to delete your account? This action
+                                        cannot be undone.
+                                      </MDTypography>
+                                      <MDBox mb={3}>
+                                        <MDInput
+                                          type="password"
+                                          label="Current Password"
+                                          name="current_password"
+                                          value={currentPassword || ""}
+                                          onChange={(e) => setCurrentPassword(e.target.value)} // Update the currentPassword state
+                                          fullWidth
+                                        />
+                                      </MDBox>
+                                      <MDBox display="flex" gap={2}>
+                                        <MDButton
+                                          variant="outlined"
+                                          color="secondary"
+                                          onClick={cancelDelete}
+                                        >
+                                          Cancel
+                                        </MDButton>
+                                        <MDButton
+                                          variant="outlined"
+                                          color="error"
+                                          type="submit"
+                                          disabled={loadingDelete}
+                                        >
+                                          {loadingDelete ? (
+                                            <CircularProgress size={20} />
+                                          ) : (
+                                            "Yes, Delete Account"
+                                          )}
+                                        </MDButton>
+                                      </MDBox>
+                                    </MDBox>
+                                  </form>
+                                </MDBox>
+                              </>
+                            )}
+                          </MDBox>
+                        </Card>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </MDBox>
@@ -348,24 +459,19 @@ function ProfileForm({ onSave }) {
         </Grid>
       </MDBox>
       <Footer />
-
-      {/* Snackbar */}
+      {/* Snackbar for feedback */}
       <MDSnackbar
-        color={snackbarType}
-        icon="check"
-        title="Notification"
-        content={snackbarMessage}
         open={openSnackbar}
-        onClose={() => setOpenSnackbar(false)}
-        close={false}
-        bgWhite
+        setOpen={setOpenSnackbar}
+        message={snackbarMessage}
+        color={snackbarType === "error" ? "error" : "success"}
       />
     </DashboardLayout>
   );
 }
 
 ProfileForm.propTypes = {
-  onSave: PropTypes.func.isRequired,
+  onSave: PropTypes.func,
 };
 
 export default ProfileForm;
