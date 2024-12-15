@@ -51,10 +51,11 @@ function AddCertificates() {
 
       // Step 2: Register certificate on blockchain
       const { accounts, contract } = await getBlockchain();
-      await contract.methods.registerCertificate(serialNumber, name, ipfsCID).send({
+      const receipt = await contract.methods.registerCertificate(serialNumber, name, ipfsCID).send({
         from: accounts[0],
         gas: 3000000, // Set an appropriate gas limit
       });
+      console.log("Transaction Hash:", receipt.transactionHash);
 
       // Redirect after success
       navigate("/admin/certificates", {

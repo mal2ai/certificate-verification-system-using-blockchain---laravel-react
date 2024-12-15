@@ -121,13 +121,16 @@ const contractABI = [
 // Create and export the getBlockchain function
 export const getBlockchain = async () => {
   try {
-    // You can get accounts from Ganache, or use the account directly as needed
+    // Get accounts from Ganache
     const accounts = await web3.eth.getAccounts();
 
     // Create contract instance
     const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-    return { accounts, contract, web3 };
+    // Get the current block number (total blocks mined)
+    const currentBlock = await web3.eth.getBlockNumber();
+
+    return { accounts, contract, web3, currentBlock };
   } catch (error) {
     console.error("Error getting blockchain:", error);
   }

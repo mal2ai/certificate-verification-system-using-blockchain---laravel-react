@@ -1,17 +1,4 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+import React, { useEffect, useState } from "react";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -35,8 +22,25 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
+//utils
+import { getBlockchain } from "utils/blockchain";
+
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+  const [currentBlock, setCurrentBlock] = useState(null);
+
+  // Fetch blockchain data when component mounts
+  useEffect(() => {
+    const fetchBlockchainData = async () => {
+      const { currentBlock } = await getBlockchain(); // Get current block
+      setCurrentBlock(currentBlock); // Update state with current block number
+    };
+
+    fetchBlockchainData(); // Run the function
+  }, []); // Empty array ensures this only runs on component mount
+
+  // Convert BigInt to string or number
+  const displayBlockNumber = currentBlock ? currentBlock.toString() : "Loading...";
 
   return (
     <DashboardLayout>
@@ -92,8 +96,8 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person_add"
-                title="Followers"
-                count="+91"
+                title="Total Blocks Mined"
+                count={displayBlockNumber} // Display current block or loading text
                 percentage={{
                   color: "success",
                   amount: "",
