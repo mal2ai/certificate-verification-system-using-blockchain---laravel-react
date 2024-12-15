@@ -43,7 +43,8 @@ function Cover() {
 
     try {
       await register({ name, email, password, password_confirmation: passwordConfirmation });
-      navigate("/authentication/sign-in"); // Redirect to sign-in page after registration
+      alert("Your account has been successfully created, Please Log in.");
+      navigate("/sign-in"); // Redirect to sign-in page after registration
     } catch (err) {
       setError("Error registering user. Please try again.");
     }
