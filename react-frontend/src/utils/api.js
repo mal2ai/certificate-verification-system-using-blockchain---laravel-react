@@ -33,6 +33,31 @@ export const logout = (token) => {
   );
 };
 
+// Profile-related APIs
+export const getProfileDetails = (token) => {
+  return api.get("/profile", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateProfileDetails = (data, token) => {
+  return api.put("/profile", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const changePassword = (data, token) => {
+  return api.post("/profile/change-password", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // Manage Users (Admin-only APIs)
 export const getAllUsers = (token) => {
   return api.get("/users", {
