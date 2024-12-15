@@ -214,5 +214,18 @@ class StatusController extends Controller
         }
     }
 
+    // Get count of all Status
+    public function countStatus(Request $request)
+    {
+        // Check if the user is an admin
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Access denied. Admins only.'], 403);
+        }
 
+        // Count only the rows where the status is "pending"
+        $pendingCount = Status::where('status', 'pending')->count();
+
+        // Return the count of "pending" statuses
+        return response()->json(['count' => $pendingCount]);
+    }
 }

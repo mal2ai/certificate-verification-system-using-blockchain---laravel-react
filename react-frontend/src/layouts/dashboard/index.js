@@ -5,7 +5,6 @@ import Grid from "@mui/material/Grid";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import { LibraryBooks } from "@mui/icons-material"; // Example icons
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -28,7 +27,7 @@ import block from "assets/images/3d-cube.png";
 
 //utils
 import { getBlockchain } from "utils/blockchain";
-import { countUsers } from "utils/api"; // Import the countUsers function
+import { countUsers, countStatus } from "utils/api"; // Import the countUsers function
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -36,7 +35,9 @@ function Dashboard() {
   const [certificateCount, setCertificateCount] = useState(null);
   const [userCount, setUserCount] = useState(null); // State for user count
   const [loading, setLoading] = useState(true);
-  const [loadingUsers, setLoadingUsers] = useState(true); // State for loading user count
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [statusCount, setStatusCount] = useState(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
 
   // Fetch blockchain data when component mounts
   useEffect(() => {
@@ -67,11 +68,9 @@ function Dashboard() {
         // Get token from localStorage
         const token = localStorage.getItem("token");
 
-        console.log("Fetching user count with token:", token);
-
         // Call the countUsers API function here with the token
         const response = await countUsers(token); // Passing token from localStorage
-        console.log("User count response:", response); // Debug the response
+
         setUserCount(response.data.count); // Assuming the response contains a 'count' property
         setLoadingUsers(false); // Update loading state
       } catch (error) {
@@ -83,10 +82,28 @@ function Dashboard() {
     fetchUserCount();
   }, []);
 
+  // Fetch status count from API (for "pending" statuses)
+  useEffect(() => {
+    const fetchStatusCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await countStatus(token); // Passing token from localStorage
+        setStatusCount(response.data.count || 0); // Assuming the response contains a 'count' property
+        setLoadingStatus(false); // Update loading state
+      } catch (error) {
+        console.error("Error fetching status count:", error);
+        setLoadingStatus(false);
+      }
+    };
+
+    fetchStatusCount();
+  }, []);
+
   // Convert BigInt to string or number for display
   const displayBlockNumber = currentBlock ? currentBlock.toString() : "Loading...";
   const certificateDisplayCount = certificateCount ? certificateCount : "Loading...";
   const displayUserCount = userCount ? userCount : "Loading...";
+  const displayStatusCount = statusCount || 0;
 
   return (
     <DashboardLayout>
@@ -98,7 +115,7 @@ function Dashboard() {
               {loading ? (
                 <ComplexStatisticsCard
                   color="dark"
-                  icon={<LibraryBooks />}
+                  icon="description"
                   title="Certificates"
                   count="Loading..."
                   percentage={{
@@ -110,7 +127,7 @@ function Dashboard() {
               ) : (
                 <ComplexStatisticsCard
                   color="dark"
-                  icon={<LibraryBooks />}
+                  icon="description"
                   title="Certificates"
                   count={certificateDisplayCount}
                   percentage={{
@@ -126,7 +143,7 @@ function Dashboard() {
             <MDBox mb={1.5}>
               {loadingUsers ? (
                 <ComplexStatisticsCard
-                  icon="person"
+                  icon="group"
                   title="Today's Users"
                   count="Loading..."
                   percentage={{
@@ -137,7 +154,7 @@ function Dashboard() {
                 />
               ) : (
                 <ComplexStatisticsCard
-                  icon="person"
+                  icon="group"
                   title="Total Users"
                   count={displayUserCount}
                   percentage={{
@@ -151,17 +168,31 @@ function Dashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
-                }}
-              />
+              {loadingStatus ? (
+                <ComplexStatisticsCard
+                  color="warning"
+                  icon="rate_review"
+                  title="Pending Requests"
+                  count="Loading..."
+                  percentage={{
+                    color: "success",
+                    amount: "+1%",
+                    label: "than yesterday",
+                  }}
+                />
+              ) : (
+                <ComplexStatisticsCard
+                  color="warning"
+                  icon="rate_review"
+                  title="Pending Requests"
+                  count={displayStatusCount}
+                  percentage={{
+                    color: "success",
+                    amount: "+1%", // You can replace this with dynamic data if needed
+                    label: "than yesterday",
+                  }}
+                />
+              )}
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>

@@ -160,6 +160,14 @@ export const getAllStatuses = (token) => {
   });
 };
 
+export const countStatus = (token) => {
+  return api.get("/status-count", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // New User-related API to get user details by email (admin only)
 export const getUserDetailsByEmail = (email, token) => {
   return api.get(`/user/details/${email}`, {
