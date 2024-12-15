@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OTPController;
-use App\Http\Controllers\ProfileController; // Import the ProfileController
+use App\Http\Controllers\ProfileController; 
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -38,6 +38,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users', [UserController::class, 'store']); // Add a new user
     Route::put('/users/{id}', [UserController::class, 'update']); // Update user details
     Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete a user
+
+    // New route for getting the count of all users
+    Route::get('/users-count', [UserController::class, 'countUsers']);
 
     // OTP routes (only accessible by admin for sending OTP)
     Route::post('send-otp', [OTPController::class, 'sendOTP']);
