@@ -396,12 +396,6 @@ function ProfileForm({ onSave }) {
                             ) : (
                               // When the button is clicked, show the confirmation section
                               <>
-                                <MDTypography variant="body2" color="text" mt={1}>
-                                  Once your account is deleted, all of its resources and data will
-                                  be permanently deleted. Before deleting your account, please
-                                  download any data or information that you wish to retain.
-                                </MDTypography>
-
                                 <MDBox mt={2}>
                                   <form onSubmit={handleDeleteAccount}>
                                     {/* Add your input fields here, e.g., password or confirmation input */}
@@ -423,14 +417,14 @@ function ProfileForm({ onSave }) {
                                       </MDBox>
                                       <MDBox display="flex" gap={2}>
                                         <MDButton
-                                          variant="outlined"
+                                          variant="gradient"
                                           color="secondary"
                                           onClick={cancelDelete}
                                         >
                                           Cancel
                                         </MDButton>
                                         <MDButton
-                                          variant="outlined"
+                                          variant="gradient"
                                           color="error"
                                           type="submit"
                                           disabled={loadingDelete}
