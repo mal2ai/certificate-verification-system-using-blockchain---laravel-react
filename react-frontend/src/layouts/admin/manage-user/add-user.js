@@ -143,7 +143,7 @@ function AddUser() {
                     />
                     <MDButton
                       variant="gradient"
-                      color="info"
+                      color="dark"
                       onClick={handleRegister}
                       sx={{
                         width: "200px",

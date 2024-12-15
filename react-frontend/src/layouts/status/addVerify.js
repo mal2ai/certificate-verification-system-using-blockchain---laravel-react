@@ -137,7 +137,7 @@ function VerifyCertificate() {
                     />
                     <MDButton
                       variant="gradient"
-                      color="info"
+                      color="dark"
                       onClick={handleVerify}
                       sx={{
                         width: "200px",

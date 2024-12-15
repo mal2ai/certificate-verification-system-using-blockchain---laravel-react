@@ -256,7 +256,7 @@ function ProfileForm({ onSave }) {
                                 />
                               </MDBox>
                               <MDBox display="flex" justifyContent="flex-end">
-                                <MDButton variant="gradient" color="success" type="submit">
+                                <MDButton variant="gradient" color="dark" type="submit">
                                   Save
                                 </MDButton>
                               </MDBox>
@@ -331,7 +331,7 @@ function ProfileForm({ onSave }) {
                                 />
                               </MDBox>
                               <MDBox display="flex" justifyContent="flex-end">
-                                <MDButton variant="gradient" color="success" type="submit">
+                                <MDButton variant="gradient" color="dark" type="submit">
                                   Save
                                 </MDButton>
                               </MDBox>
