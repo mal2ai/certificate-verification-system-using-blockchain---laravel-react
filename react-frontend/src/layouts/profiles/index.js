@@ -28,12 +28,14 @@ import { getProfileDetails, updateProfileDetails, changePassword } from "utils/a
 function ProfileForm({ onSave }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingName, setLoadingName] = useState(false); // Loading state for name input
   const [loadingEmail, setLoadingEmail] = useState(false); // Loading state for email input
+  const [loadingRole, setLoadingRole] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false); // Loading state for password inputs
   const [token, setToken] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -56,6 +58,7 @@ function ProfileForm({ onSave }) {
         try {
           setLoadingName(true);
           setLoadingEmail(true);
+          setLoadingRole(true);
           const response = await getProfileDetails(token);
 
           // Check if the response contains the correct data
@@ -64,6 +67,7 @@ function ProfileForm({ onSave }) {
 
             setName(profileData.name || "");
             setEmail(profileData.email || "");
+            setRole(profileData.role || "");
           } else {
             console.error("Profile data is missing:", response);
           }
@@ -72,6 +76,7 @@ function ProfileForm({ onSave }) {
         } finally {
           setLoadingName(false);
           setLoadingEmail(false);
+          setLoadingRole(false);
           setLoading(false);
         }
       };
@@ -226,6 +231,23 @@ function ProfileForm({ onSave }) {
                                   value={email || ""}
                                   onChange={handleProfileChange}
                                   fullWidth
+                                  InputProps={{
+                                    endAdornment: loadingEmail ? (
+                                      <CircularProgress size={20} />
+                                    ) : null,
+                                  }}
+                                />
+                              </MDBox>
+                              <MDBox mb={3}>
+                                <MDInput
+                                  type="text"
+                                  label="Role"
+                                  name="role"
+                                  value={role || ""}
+                                  fullWidth
+                                  inputProps={{
+                                    readOnly: true,
+                                  }}
                                   InputProps={{
                                     endAdornment: loadingEmail ? (
                                       <CircularProgress size={20} />
