@@ -14,6 +14,7 @@ import Footer from "examples/Footer";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
+import { format } from "date-fns";
 
 function VerifyCertificate() {
   const navigate = useNavigate();
@@ -68,6 +69,11 @@ function VerifyCertificate() {
     fetchCertificateData();
   }, [serialNumber]);
 
+  // Format the issuedDate to 'dd/MM/yyyy, h:mm a'
+  const formattedIssuedDate = certificateDetails?.issuedDate
+    ? format(new Date(certificateDetails.issuedDate), "dd/MM/yyyy, h:mm a")
+    : "";
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -76,6 +82,59 @@ function VerifyCertificate() {
           {/* Certificate Details Card */}
           <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Student Details
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {verificationAttempted && !certificateDetails && !isLoading && (
+                  <MDTypography variant="body2" color="error">
+                    {errorMessage}
+                  </MDTypography>
+                )}
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <MDBox mt={3}>
+                    <MDInput
+                      label="Name"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.name || ""}
+                      disabled
+                    />
+
+                    <MDInput
+                      label="IC Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.icNumber || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Student ID"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.studentId || ""}
+                      disabled
+                    />
+                  </MDBox>
+                </form>
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
                 mt={-3}
@@ -99,14 +158,6 @@ function VerifyCertificate() {
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.name || ""}
-                      disabled
-                    />
-                    <MDInput
                       label="Serial Number"
                       variant="outlined"
                       fullWidth
@@ -114,22 +165,7 @@ function VerifyCertificate() {
                       value={serialNumber || ""}
                       disabled
                     />
-                    <MDInput
-                      label="IC Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.icNumber || ""}
-                      disabled
-                    />
-                    <MDInput
-                      label="Student ID"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.studentId || ""}
-                      disabled
-                    />
+
                     <MDInput
                       label="Course Name"
                       variant="outlined"
@@ -143,7 +179,7 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={certificateDetails?.issuedDate || ""}
+                      value={formattedIssuedDate}
                       disabled
                     />
                     <MDInput
