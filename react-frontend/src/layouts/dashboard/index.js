@@ -28,12 +28,15 @@ import block from "assets/images/3d-cube.png";
 
 //utils
 import { getBlockchain } from "utils/blockchain";
+import { countUsers } from "utils/api"; // Import the countUsers function
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
   const [currentBlock, setCurrentBlock] = useState(null);
   const [certificateCount, setCertificateCount] = useState(null);
+  const [userCount, setUserCount] = useState(null); // State for user count
   const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true); // State for loading user count
 
   // Fetch blockchain data when component mounts
   useEffect(() => {
@@ -44,8 +47,6 @@ function Dashboard() {
       // Fetch certificate count once blockchain data is available
       try {
         const count = await contract.methods.getCertificatesCount().call();
-
-        // Convert BigInt to string or number
         const certificateCount = count.toString(); // Convert BigInt to string
 
         setCertificateCount(certificateCount); // Set state with certificate count
@@ -59,9 +60,33 @@ function Dashboard() {
     fetchBlockchainData();
   }, []);
 
+  // Fetch user count from API
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        // Get token from localStorage
+        const token = localStorage.getItem("token");
+
+        console.log("Fetching user count with token:", token);
+
+        // Call the countUsers API function here with the token
+        const response = await countUsers(token); // Passing token from localStorage
+        console.log("User count response:", response); // Debug the response
+        setUserCount(response.data.count); // Assuming the response contains a 'count' property
+        setLoadingUsers(false); // Update loading state
+      } catch (error) {
+        console.error("Error fetching user count:", error);
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
+
   // Convert BigInt to string or number for display
   const displayBlockNumber = currentBlock ? currentBlock.toString() : "Loading...";
   const certificateDisplayCount = certificateCount ? certificateCount : "Loading...";
+  const displayUserCount = userCount ? userCount : "Loading...";
 
   return (
     <DashboardLayout>
@@ -99,16 +124,29 @@ function Dashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Today's Users"
-                count="2,300"
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last month",
-                }}
-              />
+              {loadingUsers ? (
+                <ComplexStatisticsCard
+                  icon="person"
+                  title="Today's Users"
+                  count="Loading..."
+                  percentage={{
+                    color: "success",
+                    amount: "+3%",
+                    label: "than last month",
+                  }}
+                />
+              ) : (
+                <ComplexStatisticsCard
+                  icon="person"
+                  title="Total Users"
+                  count={displayUserCount}
+                  percentage={{
+                    color: "success",
+                    amount: "+3%", // You can replace this with dynamic data if needed
+                    label: "than last month",
+                  }}
+                />
+              )}
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>

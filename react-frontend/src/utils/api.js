@@ -108,6 +108,15 @@ export const deleteUser = (id, token) => {
   });
 };
 
+// New User-related API to count users (admin only)
+export const countUsers = (token) => {
+  return api.get("/users-count", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // Status-related APIs
 export const getStatusBySerialNumber = (serialNumber, token) => {
   return api.get(`/status/${serialNumber}`, {
