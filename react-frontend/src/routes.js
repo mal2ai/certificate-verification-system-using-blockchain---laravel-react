@@ -9,6 +9,7 @@ import Status from "layouts/status";
 import Certificates from "layouts/admin/certificates";
 import AdminStatus from "layouts/admin/status";
 import ManageUser from "layouts/admin/manage-user/index";
+import MyProfile from "layouts/profiles/index";
 
 // Import ProtectedRoute
 import ProtectedRoute from "components/ProtectedRoute";
@@ -104,18 +105,30 @@ const routes = [
   //     </ProtectedRoute>
   //   ),
   // },
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <Profile />
-      </ProtectedRoute>
-    ),
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Profile",
+  //   key: "profile",
+  //   icon: <Icon fontSize="small">person</Icon>,
+  //   route: "/profile",
+  //   component: (
+  //     <ProtectedRoute allowedRoles={["admin"]}>
+  //       <Profile />
+  //     </ProtectedRoute>
+  //   ),
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Profile",
+  //   key: "profile",
+  //   icon: <Icon fontSize="small">person</Icon>,
+  //   route: "/my-profile",
+  //   component: (
+  //     <ProtectedRoute allowedRoles={["admin", "user"]}>
+  //       <MyProfile />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
     type: "collapse",
     name: "Status",

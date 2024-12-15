@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 // react-router components
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -20,6 +20,7 @@ import MDInput from "components/MDInput";
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
 import NotificationItem from "examples/Items/NotificationItem";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import Tooltip from "@mui/material/Tooltip";
 
@@ -46,6 +47,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Setting the navbar type
@@ -97,6 +99,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
     </Menu>
   );
 
+  const handleProfileClick = () => {
+    navigate("/my-profile"); // Navigate to the profile page
+  };
+
   // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -146,7 +152,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
-              <IconButton
+              {/* <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -157,7 +163,19 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 onClick={handleOpenMenu}
               >
                 <Icon sx={iconsStyle}>notifications</Icon>
-              </IconButton>
+              </IconButton> */}
+
+              <Tooltip title="My Profile" arrow>
+                <IconButton
+                  size="small"
+                  disableRipple
+                  color="inherit"
+                  sx={navbarIconButton}
+                  onClick={handleProfileClick}
+                >
+                  <Icon fontSize="small">person</Icon> {/* Using the 'person' icon */}
+                </IconButton>
+              </Tooltip>
               <IconButton
                 size="small"
                 disableRipple

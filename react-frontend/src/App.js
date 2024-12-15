@@ -57,6 +57,7 @@ import AddUser from "layouts/admin/manage-user/add-user";
 import ViewUser from "layouts/admin/manage-user/view-user";
 import DeleteUser from "layouts/admin/manage-user/delete-user";
 import EditVerify from "layouts/status/editVerify";
+import Profile from "layouts/profiles/index";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
@@ -346,6 +347,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={["user"]}>
               <VerifyOTP />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute allowedRoles={["user", "admin"]}>
+              <Profile />
             </ProtectedRoute>
           }
         />
