@@ -92,15 +92,16 @@ class ProfileController extends Controller
             ], 400);
         }
 
+        // Delete associated records from the "status" table where email matches
+        DB::table('status')->where('email', $user->email)->delete();
+
         // Delete user account
         $user->delete();
-
-        // Optionally, you can delete associated data from other tables if needed, for example:
-        // DB::table('orders')->where('user_id', $user->id)->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'User account deleted successfully.',
         ]);
     }
+
 }
