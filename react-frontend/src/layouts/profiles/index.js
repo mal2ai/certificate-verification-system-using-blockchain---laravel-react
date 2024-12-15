@@ -251,29 +251,30 @@ function ProfileForm({ onSave }) {
                                   onChange={(e) => setEmail(e.target.value)}
                                   fullWidth
                                   InputProps={{
+                                    readOnly: true,
                                     endAdornment: loadingEmail ? (
                                       <CircularProgress size={20} />
                                     ) : null,
                                   }}
                                 />
                               </MDBox>
-                              <MDBox mb={3}>
-                                <MDInput
-                                  type="text"
-                                  label="Role"
-                                  name="role"
-                                  value={role || ""}
-                                  fullWidth
-                                  inputProps={{
-                                    readOnly: true,
-                                  }}
-                                  InputProps={{
-                                    endAdornment: loadingRole ? (
-                                      <CircularProgress size={20} />
-                                    ) : null,
-                                  }}
-                                />
-                              </MDBox>
+                              {role === "admin" && (
+                                <MDBox mb={3}>
+                                  <MDInput
+                                    type="text"
+                                    label="Role"
+                                    name="role"
+                                    value={role || ""}
+                                    fullWidth
+                                    InputProps={{
+                                      readOnly: true,
+                                      endAdornment: loadingRole ? (
+                                        <CircularProgress size={20} />
+                                      ) : null,
+                                    }}
+                                  />
+                                </MDBox>
+                              )}
                               <MDBox display="flex" justifyContent="flex-end">
                                 <MDButton variant="gradient" color="dark" type="submit">
                                   Save
