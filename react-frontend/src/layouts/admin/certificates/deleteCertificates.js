@@ -16,7 +16,6 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
 // Utility to interact with blockchain
@@ -29,6 +28,10 @@ function DeleteCertificate() {
   // States to hold certificate data and loading state
   const [name, setName] = useState("");
   const [cid, setCid] = useState("");
+  const [icNumber, setIcNumber] = useState(""); // New state for IC Number
+  const [studentId, setStudentId] = useState(""); // New state for Student ID
+  const [courseName, setCourseName] = useState(""); // New state for Course Name
+  const [issuedDate, setIssuedDate] = useState(""); // New state for Issued Date
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch certificate data using the serial number
@@ -43,6 +46,10 @@ function DeleteCertificate() {
         if (certificate) {
           setName(certificate[1] || ""); // Name is at index 1
           setCid(certificate[2] || ""); // CID is at index 2
+          setIcNumber(certificate[3] || ""); // IC Number is at index 3
+          setStudentId(certificate[4] || ""); // Student ID is at index 4
+          setCourseName(certificate[5] || ""); // Course Name is at index 5
+          setIssuedDate(certificate[6] || ""); // Issued Date is at index 6
         }
 
         setIsLoading(false);
@@ -148,6 +155,30 @@ function DeleteCertificate() {
                               {cid}
                             </a>
                           </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>IC Number</strong>
+                          </TableCell>
+                          <TableCell>{icNumber}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Student ID</strong>
+                          </TableCell>
+                          <TableCell>{studentId}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Course Name</strong>
+                          </TableCell>
+                          <TableCell>{courseName}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Issued Date</strong>
+                          </TableCell>
+                          <TableCell>{issuedDate}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

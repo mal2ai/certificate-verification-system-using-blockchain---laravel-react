@@ -5,6 +5,7 @@ import Grid from "@mui/material/Grid";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
+import { LibraryBooks } from "@mui/icons-material"; // Example icons
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -22,25 +23,45 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
+//image
+import block from "assets/images/3d-cube.png";
+
 //utils
 import { getBlockchain } from "utils/blockchain";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
   const [currentBlock, setCurrentBlock] = useState(null);
+  const [certificateCount, setCertificateCount] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Fetch blockchain data when component mounts
   useEffect(() => {
     const fetchBlockchainData = async () => {
-      const { currentBlock } = await getBlockchain(); // Get current block
+      const { currentBlock, contract, web3, accounts } = await getBlockchain();
       setCurrentBlock(currentBlock); // Update state with current block number
+
+      // Fetch certificate count once blockchain data is available
+      try {
+        const count = await contract.methods.getCertificatesCount().call();
+
+        // Convert BigInt to string or number
+        const certificateCount = count.toString(); // Convert BigInt to string
+
+        setCertificateCount(certificateCount); // Set state with certificate count
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching certificate count:", error);
+        setLoading(false);
+      }
     };
 
-    fetchBlockchainData(); // Run the function
-  }, []); // Empty array ensures this only runs on component mount
+    fetchBlockchainData();
+  }, []);
 
-  // Convert BigInt to string or number
+  // Convert BigInt to string or number for display
   const displayBlockNumber = currentBlock ? currentBlock.toString() : "Loading...";
+  const certificateDisplayCount = certificateCount ? certificateCount : "Loading...";
 
   return (
     <DashboardLayout>
@@ -49,17 +70,31 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="weekend"
-                title="Bookings"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
-                }}
-              />
+              {loading ? (
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<LibraryBooks />}
+                  title="Certificates"
+                  count="Loading..."
+                  percentage={{
+                    color: "info",
+                    amount: "0%",
+                    label: "count",
+                  }}
+                />
+              ) : (
+                <ComplexStatisticsCard
+                  color="dark"
+                  icon={<LibraryBooks />}
+                  title="Certificates"
+                  count={certificateDisplayCount}
+                  percentage={{
+                    color: "success",
+                    amount: "+55%", // You can replace this with dynamic data if needed
+                    label: "than last week",
+                  }}
+                />
+              )}
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -95,9 +130,20 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="primary"
-                icon="person_add"
-                title="Total Blocks Mined"
-                count={displayBlockNumber} // Display current block or loading text
+                icon={
+                  <img
+                    src={block}
+                    alt="Block"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      filter: "invert(1)",
+                    }}
+                  />
+                }
+                title="Total Blocks"
+                count={displayBlockNumber}
                 percentage={{
                   color: "success",
                   amount: "",

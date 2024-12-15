@@ -27,6 +27,10 @@ function EditCertificate() {
   const [cid, setCid] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // New loading state for data fetching
+  const [icNumber, setIcNumber] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [issuedDate, setIssuedDate] = useState("");
 
   // Fetch existing certificate data using the serialNumber
   useEffect(() => {
@@ -38,19 +42,20 @@ function EditCertificate() {
     const fetchCertificateData = async () => {
       try {
         const { accounts, contract } = await getBlockchain();
-        //console.log("Serial Number:", serialNumber); // Ensure serialNumber is being passed correctly
 
         const certificate = await contract.methods.getCertificate(serialNumber).call();
-        //console.log("Fetched Certificate:", certificate); // Log the certificate data
 
         if (certificate) {
-          setName(certificate[1] || ""); // Use the correct index for `name`
-          setCid(certificate[2] || ""); // Use the correct index for `cid`
+          setName(certificate[1] || "");
+          setCid(certificate[2] || "");
+          setIcNumber(certificate[3] || "");
+          setStudentId(certificate[4] || "");
+          setCourseName(certificate[5] || "");
+          setIssuedDate(certificate[6] || "");
         }
 
         setIsLoading(false);
       } catch (error) {
-        //console.error("Error fetching certificate details:", error);
         alert("Error fetching certificate details.");
         setIsLoading(false);
       }
@@ -76,10 +81,12 @@ function EditCertificate() {
 
       // Step 2: Update certificate on blockchain
       const { accounts, contract } = await getBlockchain();
-      await contract.methods.updateCertificate(serialNumber, name, ipfsCID).send({
-        from: accounts[0],
-        gas: 3000000, // Set an appropriate gas limit
-      });
+      await contract.methods
+        .updateCertificate(serialNumber, name, ipfsCID, icNumber, studentId, courseName, issuedDate)
+        .send({
+          from: accounts[0],
+          gas: 3000000, // Set an appropriate gas limit
+        });
 
       navigate("/admin/certificates", {
         state: { successMessage: "Certificate Updated Successfully!" },
@@ -132,6 +139,49 @@ function EditCertificate() {
                       fullWidth
                       value={serialNumber || "Loading..."} // Show loading placeholder
                       disabled
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="IC Number"
+                      fullWidth
+                      value={isLoading ? "Loading..." : icNumber}
+                      onChange={(e) => setIcNumber(e.target.value)}
+                      disabled={isLoading} // Prevent editing during loading
+                    />
+                  </MDBox>
+
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Student ID"
+                      fullWidth
+                      value={isLoading ? "Loading..." : studentId}
+                      onChange={(e) => setStudentId(e.target.value)}
+                      disabled={isLoading} // Prevent editing during loading
+                    />
+                  </MDBox>
+
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Course Name"
+                      fullWidth
+                      value={isLoading ? "Loading..." : courseName}
+                      onChange={(e) => setCourseName(e.target.value)}
+                      disabled={isLoading} // Prevent editing during loading
+                    />
+                  </MDBox>
+
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="datetime-local"
+                      label="Issued Date"
+                      fullWidth
+                      value={isLoading ? "Loading..." : issuedDate}
+                      onChange={(e) => setIssuedDate(e.target.value)}
+                      disabled={isLoading} // Prevent editing during loading
                     />
                   </MDBox>
                   <MDBox mb={2}>

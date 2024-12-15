@@ -222,4 +222,9 @@ contract CertificateRegistry {
 
         emit CertificateDeleted(serialNumber, msg.sender, block.timestamp);
     }
+
+    // Get the count of all registered certificates
+    function getCertificatesCount() public view returns (uint256) {
+        return certificateSerialNumbers.length;
+    }
 }

@@ -43,6 +43,10 @@ function VerifyCertificate() {
           const newCertificate = {
             serialNumber,
             name: certificate[1] || "",
+            icNumber: certificate[3] || "",
+            studentId: certificate[4] || "",
+            courseName: certificate[5] || "",
+            issuedDate: certificate[6] || "",
             cid: certificate[2] || "", // Assuming `cid` is the IPFS CID
           };
           setCertificateDetails(newCertificate);
@@ -108,6 +112,38 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={serialNumber || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="IC Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.icNumber || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Student ID"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.studentId || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Course Name"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.courseName || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Issued Date"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.issuedDate || ""}
                       disabled
                     />
                     <MDInput

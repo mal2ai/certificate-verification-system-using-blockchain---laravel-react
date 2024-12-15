@@ -3,25 +3,17 @@ import Web3 from "web3";
 // Connect to Ganache (Local Ethereum Node)
 const web3 = new Web3("http://127.0.0.1:7545"); // Replace with your Ganache RPC URL
 
-const contractAddress = "0x720cb8707C40C78E3AdfC4553bde78094bE29a20";
+const contractAddress = "0xdd83eC4d763238FfaF68A2410fE045Cb5d7c9879";
 const contractABI = [
   {
     inputs: [
-      {
-        internalType: "string",
-        name: "serialNumber",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "name",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "cid",
-        type: "string",
-      },
+      { internalType: "string", name: "serialNumber", type: "string" },
+      { internalType: "string", name: "name", type: "string" },
+      { internalType: "string", name: "cid", type: "string" },
+      { internalType: "string", name: "icNumber", type: "string" },
+      { internalType: "string", name: "studentId", type: "string" },
+      { internalType: "string", name: "courseName", type: "string" },
+      { internalType: "string", name: "issuedDate", type: "string" },
     ],
     name: "registerCertificate",
     outputs: [],
@@ -29,30 +21,16 @@ const contractABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "string",
-        name: "serialNumber",
-        type: "string",
-      },
-    ],
+    inputs: [{ internalType: "string", name: "serialNumber", type: "string" }],
     name: "getCertificate",
     outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
+      { internalType: "string", name: "", type: "string" },
     ],
     stateMutability: "view",
     type: "function",
@@ -61,42 +39,33 @@ const contractABI = [
     inputs: [],
     name: "getAllCertificates",
     outputs: [
-      {
-        internalType: "string[]",
-        name: "",
-        type: "string[]",
-      },
-      {
-        internalType: "string[]",
-        name: "",
-        type: "string[]",
-      },
-      {
-        internalType: "string[]",
-        name: "",
-        type: "string[]",
-      },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
+      { internalType: "string[]", name: "", type: "string[]" },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
+    inputs: [{ internalType: "string", name: "serialNumber", type: "string" }],
+    name: "verifyCertificate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
-      {
-        internalType: "string",
-        name: "serialNumber",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "newName",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "newCid",
-        type: "string",
-      },
+      { internalType: "string", name: "serialNumber", type: "string" },
+      { internalType: "string", name: "newName", type: "string" },
+      { internalType: "string", name: "newCid", type: "string" },
+      { internalType: "string", name: "newIcNumber", type: "string" },
+      { internalType: "string", name: "newStudentId", type: "string" },
+      { internalType: "string", name: "newCourseName", type: "string" },
+      { internalType: "string", name: "newIssuedDate", type: "string" },
     ],
     name: "updateCertificate",
     outputs: [],
@@ -104,17 +73,70 @@ const contractABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "string",
-        name: "serialNumber",
-        type: "string",
-      },
-    ],
+    inputs: [{ internalType: "string", name: "serialNumber", type: "string" }],
     name: "deleteCertificate",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "getCertificatesCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "string", name: "serialNumber", type: "string" },
+      { indexed: false, internalType: "string", name: "name", type: "string" },
+      { indexed: false, internalType: "string", name: "cid", type: "string" },
+      { indexed: false, internalType: "string", name: "icNumber", type: "string" },
+      { indexed: false, internalType: "string", name: "studentId", type: "string" },
+      { indexed: false, internalType: "string", name: "courseName", type: "string" },
+      { indexed: false, internalType: "string", name: "issuedDate", type: "string" },
+      { indexed: true, internalType: "address", name: "sender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    name: "CertificateRegistered",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "string", name: "serialNumber", type: "string" },
+      { indexed: false, internalType: "string", name: "newName", type: "string" },
+      { indexed: false, internalType: "string", name: "newCid", type: "string" },
+      { indexed: false, internalType: "string", name: "newIcNumber", type: "string" },
+      { indexed: false, internalType: "string", name: "newStudentId", type: "string" },
+      { indexed: false, internalType: "string", name: "newCourseName", type: "string" },
+      { indexed: false, internalType: "string", name: "newIssuedDate", type: "string" },
+      { indexed: true, internalType: "address", name: "sender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    name: "CertificateUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "string", name: "serialNumber", type: "string" },
+      { indexed: true, internalType: "address", name: "sender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    name: "CertificateDeleted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "string", name: "serialNumber", type: "string" },
+      { indexed: true, internalType: "address", name: "verifier", type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    name: "CertificateVerified",
+    type: "event",
   },
 ];
 

@@ -26,20 +26,28 @@ function AddCertificates() {
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
+  const [icNumber, setIcNumber] = useState(""); // New state for IC Number
+  const [studentId, setStudentId] = useState(""); // New state for Student ID
+  const [courseName, setCourseName] = useState(""); // New state for Course Name
+  const [issuedDate, setIssuedDate] = useState(""); // New state for Issued Date
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
   const handleNameChange = (e) => setName(e.target.value);
   const handleSerialNumberChange = (e) => setSerialNumber(e.target.value);
+  const handleIcNumberChange = (e) => setIcNumber(e.target.value); // New handler for IC Number
+  const handleStudentIdChange = (e) => setStudentId(e.target.value); // New handler for Student ID
+  const handleCourseNameChange = (e) => setCourseName(e.target.value); // New handler for Course Name
+  const handleIssuedDateChange = (e) => setIssuedDate(e.target.value); // New handler for Issued Date
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     // Step 1: Validate if the required fields are filled
-    if (!serialNumber || !name || !file) {
-      setStatusMessage("Please fill in all required fields (Name, Serial Number, and File).");
+    if (!serialNumber || !name || !file || !icNumber || !studentId || !courseName || !issuedDate) {
+      setStatusMessage("Please fill in all required fields.");
       setLoading(false);
       return; // Stop the function if any required field is missing
     }
@@ -51,10 +59,20 @@ function AddCertificates() {
 
       // Step 2: Register certificate on blockchain
       const { accounts, contract } = await getBlockchain();
-      const receipt = await contract.methods.registerCertificate(serialNumber, name, ipfsCID).send({
-        from: accounts[0],
-        gas: 3000000, // Set an appropriate gas limit
-      });
+      const receipt = await contract.methods
+        .registerCertificate(
+          serialNumber,
+          name,
+          ipfsCID,
+          icNumber,
+          studentId,
+          courseName,
+          issuedDate
+        )
+        .send({
+          from: accounts[0],
+          gas: 3000000, // Set an appropriate gas limit
+        });
       console.log("Transaction Hash:", receipt.transactionHash);
 
       // Redirect after success
@@ -135,6 +153,42 @@ function AddCertificates() {
                       fullWidth
                       value={serialNumber}
                       onChange={handleSerialNumberChange}
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="IC Number"
+                      fullWidth
+                      value={icNumber}
+                      onChange={handleIcNumberChange}
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Student ID"
+                      fullWidth
+                      value={studentId}
+                      onChange={handleStudentIdChange}
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="Course Name"
+                      fullWidth
+                      value={courseName}
+                      onChange={handleCourseNameChange}
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="datetime-local"
+                      label="Issued Date"
+                      fullWidth
+                      value={issuedDate}
+                      onChange={handleIssuedDateChange}
                     />
                   </MDBox>
                   <MDBox mb={2}>
