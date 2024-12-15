@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
@@ -68,6 +69,38 @@ class ProfileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Password changed successfully.',
+        ]);
+    }
+
+    /**
+     * Delete user account.
+     */
+    public function deleteAccount(Request $request)
+    {
+        $user = Auth::user();
+
+        // Optionally, verify current password before deleting
+        $request->validate([
+            'current_password' => 'required',
+        ]);
+
+        // Check if current password matches before deleting
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect.',
+            ], 400);
+        }
+
+        // Delete user account
+        $user->delete();
+
+        // Optionally, you can delete associated data from other tables if needed, for example:
+        // DB::table('orders')->where('user_id', $user->id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User account deleted successfully.',
         ]);
     }
 }
