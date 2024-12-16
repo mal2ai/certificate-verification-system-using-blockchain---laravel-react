@@ -124,10 +124,15 @@ class StatusController extends Controller
     }
 
     //get all status for admin
-    public function getAllStatuses()
+    public function getAllStatuses(Request $request)
     {
         try {
-            // Retrieve all statuses, you can paginate or return all records as needed
+            // Check if the user is an admin
+            if ($request->user()->role !== 'admin') {
+                return response()->json(['message' => 'Access denied. Admins only.'], 403);
+            }
+
+            // Retrieve all statuses
             $statuses = Status::all();
 
             // If there are statuses, return them
@@ -137,6 +142,7 @@ class StatusController extends Controller
 
             // If no statuses found, return a 404 error
             return response()->json(['message' => 'No statuses found'], 404);
+
         } catch (Exception $e) {
             // Catch any other exceptions and return a 500 error
             return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);

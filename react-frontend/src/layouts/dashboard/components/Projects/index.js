@@ -1,19 +1,5 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getTransactions } from "utils/api"; // Assuming your getTransactions function is in utils/api
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -28,12 +14,32 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 
-// Data
-import data from "layouts/dashboard/components/Projects/data";
-
 function Projects() {
-  const { columns, rows } = data();
+  const [transactions, setTransactions] = useState([]);
   const [menu, setMenu] = useState(null);
+
+  // Fetch transactions when the component mounts
+  useEffect(() => {
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem("token");
+
+    // If there's no token, you can handle that scenario (e.g., redirect the user to login)
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+
+    const fetchTransactions = async () => {
+      try {
+        const response = await getTransactions(token); // Pass the token to the getTransactions function
+        setTransactions(response.data.transactions); // assuming the data structure contains transactions
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, []); // Empty dependency array means this effect runs once after the component mounts
 
   const openMenu = ({ currentTarget }) => setMenu(currentTarget);
   const closeMenu = () => setMenu(null);
@@ -59,12 +65,45 @@ function Projects() {
     </Menu>
   );
 
+  // Define columns based on the transaction data structure
+  const columns = [
+    { Header: "Transaction Hash", accessor: "transaction_hash" },
+    { Header: "Block Number", accessor: "block_number" },
+    { Header: "Gas Used", accessor: "gas_used" },
+    { Header: "Status", accessor: "status" },
+    { Header: "Created At", accessor: "created_at" },
+  ];
+
+  const rows = transactions.map((transaction) => {
+    // Format the created_at field
+    const createdAt = new Date(transaction.created_at);
+
+    // Format the date to dd/mm/yyyy, h:m am/pm
+    const formattedDate = createdAt.toLocaleString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return {
+      transaction_hash: transaction.transaction_hash,
+      block_number: transaction.block_number,
+      gas_used: transaction.gas_used,
+      status: transaction.status,
+      created_at: formattedDate,
+    };
+  });
+
   return (
     <Card>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
         <MDBox>
           <MDTypography variant="h6" gutterBottom>
-            Projects
+            Transactions
           </MDTypography>
           <MDBox display="flex" alignItems="center" lineHeight={0}>
             <Icon
@@ -77,7 +116,7 @@ function Projects() {
               done
             </Icon>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              &nbsp;<strong>30 done</strong> this month
+              &nbsp;<strong>{transactions.length} transactions</strong> this month
             </MDTypography>
           </MDBox>
         </MDBox>
@@ -91,10 +130,10 @@ function Projects() {
       <MDBox>
         <DataTable
           table={{ columns, rows }}
-          showTotalEntries={false}
-          isSorted={false}
+          showTotalEntries={true}
+          isSorted={true}
           noEndBorder
-          entriesPerPage={false}
+          entriesPerPage={true}
         />
       </MDBox>
     </Card>
