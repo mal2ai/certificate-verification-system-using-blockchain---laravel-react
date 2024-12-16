@@ -74,29 +74,31 @@ function Projects() {
     { Header: "Created At", accessor: "created_at" },
   ];
 
-  const rows = transactions.map((transaction) => {
-    // Format the created_at field
-    const createdAt = new Date(transaction.created_at);
+  // Map the transactions and format the date
+  const rows = transactions
+    .map((transaction) => {
+      const createdAt = new Date(transaction.created_at); // Parse created_at into Date object
 
-    // Format the date to dd/mm/yyyy, h:m am/pm
-    const formattedDate = createdAt.toLocaleString("en-GB", {
-      weekday: "short",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+      // Format the date to dd/mm/yyyy, h:m am/pm
+      const formattedDate = createdAt.toLocaleString("en-GB", {
+        weekday: "short",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
 
-    return {
-      transaction_hash: transaction.transaction_hash,
-      block_number: transaction.block_number,
-      gas_used: transaction.gas_used,
-      status: transaction.status,
-      created_at: formattedDate,
-    };
-  });
+      return {
+        transaction_hash: transaction.transaction_hash,
+        block_number: transaction.block_number,
+        gas_used: transaction.gas_used,
+        status: transaction.status,
+        created_at: formattedDate,
+      };
+    })
+    .sort((a, b) => b.block_number - a.block_number);
 
   return (
     <Card>
@@ -129,7 +131,7 @@ function Projects() {
       </MDBox>
       <MDBox>
         <DataTable
-          table={{ columns, rows }}
+          table={{ columns, rows }} // Pass the sorted rows
           showTotalEntries={true}
           isSorted={true}
           noEndBorder
