@@ -94,14 +94,17 @@ class StatusController extends Controller
             // Validate the incoming request data
             $validated = $request->validate([
                 'status' => 'required|in:approved,rejected', // Only allow approved or rejected statuses
+                'email' => 'required|email', // Validate email format
             ]);
 
-            // Find the status by serial_number
-            $status = Status::where('serial_number', $serialNumber)->first();
+            // Find the status by serial_number and email
+            $status = Status::where('serial_number', $serialNumber)
+                            ->where('email', $validated['email']) // Ensure the email matches
+                            ->first();
 
             // If status not found, return a 404 error
             if (!$status) {
-                return response()->json(['message' => 'Status not found'], 404);
+                return response()->json(['message' => 'Status not found or email does not match'], 404);
             }
 
             // Update the status

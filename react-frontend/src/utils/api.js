@@ -126,12 +126,16 @@ export const getStatusBySerialNumber = (serialNumber, token) => {
   });
 };
 
-export const updateStatus = (serialNumber, statusData, token) => {
-  return api.put(`/status/${serialNumber}`, statusData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const updateStatus = (serialNumber, email, statusData, token) => {
+  return api.put(
+    `/status/${serialNumber}`,
+    { ...statusData, email }, // Include email in the request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 };
 
 export const storeStatus = (data, token) => {

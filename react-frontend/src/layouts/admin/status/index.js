@@ -113,6 +113,8 @@ function Status() {
   ];
 
   // Fetch all status data when the component mounts
+  // Adding statusData to dependencies to refetch when data changes
+  // Fetch all status data when the component mounts
   useEffect(() => {
     const fetchStatuses = async () => {
       setLoading(true);
@@ -132,7 +134,7 @@ function Status() {
     };
 
     fetchStatuses();
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   // Handle success message if present in the location state
   useEffect(() => {
@@ -189,6 +191,7 @@ function Status() {
     try {
       const response = await updateStatus(rowData.serial_number, updatedStatus, token);
       if (response.data) {
+        // After rejecting, refresh the status data
         setStatusData((prevData) =>
           prevData.map((item) =>
             item.serial_number === rowData.serial_number ? { ...item, status: "rejected" } : item
@@ -213,20 +216,32 @@ function Status() {
     };
 
     try {
-      // First, update the status of the request
-      const response = await updateStatus(rowData.serial_number, updatedStatus, token);
+      // Update status in the backend
+      const response = await updateStatus(
+        rowData.serial_number,
+        rowData.email,
+        updatedStatus,
+        token
+      );
+
       if (response.data) {
-        // If status update is successful, send OTP to the user's email
-        const otpResponse = await sendOTP(rowData.email, token); // Pass the user's email to send OTP
+        // Send OTP after approving
+        const otpResponse = await sendOTP(rowData.email, token);
+
         if (otpResponse.data) {
-          setStatusData((prevData) =>
-            prevData.map((item) =>
-              item.serial_number === rowData.serial_number ? { ...item, status: "approved" } : item
-            )
-          );
           setSnackbarMessage("Request has been approved and OTP sent successfully.");
           setSnackbarType("success");
           setOpenSnackbar(true);
+
+          // Update the statusData state with the new approved status
+          setStatusData((prevData) =>
+            prevData.map(
+              (item) =>
+                item.serial_number === rowData.serial_number && item.email === rowData.email
+                  ? { ...item, status: "approved" } // Update only the matching item
+                  : item // Leave other items unchanged
+            )
+          );
         }
       }
     } catch (error) {
