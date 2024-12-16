@@ -89,8 +89,6 @@ function AddCertificates() {
           gas: 3000000, // Set an appropriate gas limit
         });
 
-      console.log("Transaction Receipt:", receipt);
-
       // Prepare receipt data for backend
       const transactionData = {
         transactionHash: receipt.transactionHash || "",
@@ -104,7 +102,6 @@ function AddCertificates() {
       // Step 3: Store transaction details in Laravel backend
       const token = localStorage.getItem("token"); // Retrieve token
       await storeTransaction(transactionData, token);
-      console.log("Transaction details stored successfully in the backend");
 
       // Redirect after success
       navigate("/admin/certificates", {

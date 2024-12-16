@@ -18,6 +18,7 @@ import Footer from "examples/Footer";
 // Utility functions
 import { uploadToIPFS } from "utils/ipfs";
 import { getBlockchain } from "utils/blockchain";
+import { storeTransaction } from "utils/api";
 
 function EditCertificate() {
   const navigate = useNavigate();
@@ -80,14 +81,29 @@ function EditCertificate() {
       }
 
       // Step 2: Update certificate on blockchain
-      const { adminAccount, contract } = await getBlockchain(); // Extract adminAccount
-      await contract.methods
+      const { adminAccount, contract, web3 } = await getBlockchain(); // Extract adminAccount
+      const receipt = await contract.methods
         .updateCertificate(serialNumber, name, ipfsCID, icNumber, studentId, courseName, issuedDate)
         .send({
           from: adminAccount, // Use adminAccount instead of accounts[0]
           gas: 3000000, // Set an appropriate gas limit
         });
 
+      // Prepare the transaction data
+      const transactionData = {
+        transactionHash: receipt.transactionHash || "",
+        from: receipt.from || "",
+        to: receipt.to || "",
+        blockNumber: receipt.blockNumber?.toString() || "",
+        gasUsed: receipt.gasUsed?.toString() || "",
+        status: receipt.status ? "Success" : "Failed",
+      };
+
+      // Step 3: Store transaction details in Laravel backend
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      await storeTransaction(transactionData, token); // Send transaction data to backend
+
+      // After successful update, navigate to the certificates page and pass the success message
       navigate("/admin/certificates", {
         state: { successMessage: "Certificate Updated Successfully!" },
       });

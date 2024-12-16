@@ -20,6 +20,7 @@ import TableRow from "@mui/material/TableRow";
 
 // Utility to interact with blockchain
 import { getBlockchain } from "utils/blockchain";
+import { storeTransaction } from "utils/api";
 
 function DeleteCertificate() {
   const { serialNumber } = useParams();
@@ -77,12 +78,24 @@ function DeleteCertificate() {
       const gasLimit = parseInt(gasEstimate, 10); // Use parseInt to convert BigInt to a number
 
       // Call the deleteCertificate function from the smart contract with the gas limit
-      await contract.methods.deleteCertificate(serialNumber).send({
+      const receipt = await contract.methods.deleteCertificate(serialNumber).send({
         from: adminAccount, // Use adminAccount instead of accounts[0]
         gas: gasLimit * 2, // Increase gas by 2x the estimated gas limit
       });
 
-      console.log(`Certificate with serial number ${serialNumber} deleted`);
+      // Prepare the transaction data
+      const transactionData = {
+        transactionHash: receipt.transactionHash || "",
+        from: receipt.from || "",
+        to: receipt.to || "",
+        blockNumber: receipt.blockNumber?.toString() || "",
+        gasUsed: receipt.gasUsed?.toString() || "",
+        status: receipt.status ? "Success" : "Failed",
+      };
+
+      // Step 3: Store transaction details in Laravel backend
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      await storeTransaction(transactionData, token); // Send transaction data to backend
 
       // After successful deletion, navigate to the certificates page and pass the success message
       navigate("/admin/certificates", {
