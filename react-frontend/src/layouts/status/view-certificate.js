@@ -37,36 +37,38 @@ function VerifyCertificate() {
   const fetchCertificateData = async (serialNumber) => {
     try {
       setIsLoading(true);
-      const { accounts, contract } = await getBlockchain();
+      const { userAccount, contract } = await getBlockchain();
 
-      // Check if the status is "approved"
-      if (status === "approved") {
-        // If approved, fetch the certificate data
-        const certificate = await contract.methods.getCertificate(serialNumber).call();
+      // Verify the certificate first using verifyCertificate
+      const verifyTx = await contract.methods.verifyCertificate(serialNumber).send({
+        from: userAccount,
+        gas: 3000000, // Set an appropriate gas limit
+      });
 
-        if (certificate) {
-          const newCertificate = {
-            serialNumber,
-            name: certificate[1] || "",
-            cid: certificate[2] || "",
-          };
+      // Log the transaction hash to the console
+      console.log("Transaction hash:", verifyTx.transactionHash);
 
-          setCertificateDetails(newCertificate);
-        } else {
-          setCertificateDetails(null);
-          setErrorMessage("Certificate not found.");
-        }
+      // If verified, fetch the certificate data
+      const certificate = await contract.methods.getCertificate(serialNumber).call();
+
+      if (certificate) {
+        const newCertificate = {
+          serialNumber,
+          name: certificate[1] || "",
+          cid: certificate[2] || "",
+        };
+
+        setCertificateDetails(newCertificate);
       } else {
-        // If status is not "approved", show an error message
         setCertificateDetails(null);
-        setErrorMessage("Your request not approved yet.");
+        setErrorMessage("Certificate not found.");
       }
 
       setIsLoading(false);
       setVerificationAttempted(true);
     } catch (error) {
       setCertificateDetails(null);
-      setErrorMessage("Error fetching certificate.");
+      setErrorMessage("Error fetching or verifying certificate.");
       setIsLoading(false);
       setVerificationAttempted(true);
     }
