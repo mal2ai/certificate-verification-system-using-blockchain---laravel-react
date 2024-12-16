@@ -13,6 +13,7 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import Divider from "@mui/material/Divider";
 
 // Notification components
 import MDSnackbar from "components/MDSnackbar";
@@ -26,20 +27,33 @@ function AddCertificates() {
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
-  const [icNumber, setIcNumber] = useState(""); // New state for IC Number
-  const [studentId, setStudentId] = useState(""); // New state for Student ID
-  const [courseName, setCourseName] = useState(""); // New state for Course Name
-  const [issuedDate, setIssuedDate] = useState(""); // New state for Issued Date
+  const [icNumber, setIcNumber] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [issuedDate, setIssuedDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
   const handleNameChange = (e) => setName(e.target.value);
   const handleSerialNumberChange = (e) => setSerialNumber(e.target.value);
-  const handleIcNumberChange = (e) => setIcNumber(e.target.value); // New handler for IC Number
-  const handleStudentIdChange = (e) => setStudentId(e.target.value); // New handler for Student ID
-  const handleCourseNameChange = (e) => setCourseName(e.target.value); // New handler for Course Name
-  const handleIssuedDateChange = (e) => setIssuedDate(e.target.value); // New handler for Issued Date
+  const handleIcNumberChange = (e) => setIcNumber(e.target.value);
+  const handleStudentIdChange = (e) => setStudentId(e.target.value);
+  const handleCourseNameChange = (e) => setCourseName(e.target.value);
+  const handleIssuedDateChange = (e) => setIssuedDate(e.target.value);
+
+  const courseOptions = [
+    "Diploma Pengajian Muamalat",
+    "Diploma Pengurusan Haji dan Umrah",
+    "Diploma Pengurusan Industri Halal",
+    "Diploma Zakat dan Wakaf",
+    "Diploma Syariah Islamiyah",
+    "Diploma Teknologi Maklumat (DITe)",
+    "Diploma in Business Administration",
+    "Diploma Perakaunan",
+    "Diploma Kaunseling Islam",
+    "Sijil Aplikasi Muamalat (SAM)",
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,24 +188,41 @@ function AddCertificates() {
                       onChange={handleStudentIdChange}
                     />
                   </MDBox>
+
                   <MDBox mb={2}>
-                    <MDInput
-                      type="text"
-                      label="Course Name"
-                      fullWidth
-                      value={courseName}
-                      onChange={handleCourseNameChange}
-                    />
-                  </MDBox>
-                  <MDBox mb={2}>
-                    <MDInput
+                    <MDTypography variant="body2" color="dark">
+                      Issued Date:
+                    </MDTypography>
+                    <input
                       type="datetime-local"
                       label="Issued Date"
-                      fullWidth
+                      className="form-control"
+                      placeholder="dd/mm/yyyy"
                       value={issuedDate}
                       onChange={handleIssuedDateChange}
                     />
                   </MDBox>
+                  <MDBox mb={2}>
+                    <MDTypography variant="body2" color="dark">
+                      Course Name:
+                    </MDTypography>
+                    <input
+                      type="text"
+                      id="course_name"
+                      name="course_name"
+                      value={courseName}
+                      onChange={handleCourseNameChange}
+                      list="course-list"
+                      placeholder="Type to search..."
+                      className="form-control"
+                    />
+                    <datalist id="course-list">
+                      {courseOptions.map((course, index) => (
+                        <option key={index} value={course}></option>
+                      ))}
+                    </datalist>
+                  </MDBox>
+
                   <MDBox mb={2}>
                     <MDTypography variant="body2" color="dark">
                       Upload Certificate:

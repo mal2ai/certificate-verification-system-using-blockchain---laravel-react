@@ -25,15 +25,15 @@ import MDSnackbar from "components/MDSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 
 // Define the CID Cell Component
-const CIDCell = ({ value }) => (
-  <a href={`http://127.0.0.1:8080/ipfs/${value}`} target="_blank" rel="noopener noreferrer">
-    {value}
-  </a>
-);
+// const CIDCell = ({ value }) => (
+//   <a href={`http://127.0.0.1:8080/ipfs/${value}`} target="_blank" rel="noopener noreferrer">
+//     {value}
+//   </a>
+// );
 
-CIDCell.propTypes = {
-  value: PropTypes.string.isRequired,
-};
+// CIDCell.propTypes = {
+//   value: PropTypes.string.isRequired,
+// };
 
 const ActionsCell = ({ row }) => {
   const navigate = useNavigate();
@@ -131,6 +131,9 @@ function Certificates() {
           serialNumber: data[0][index],
           name: data[1][index],
           cid: data[2][index],
+          icNumber: data[3][index],
+          courseName: data[5][index],
+
           id: index,
         }));
 
@@ -160,7 +163,8 @@ function Certificates() {
   const columns = [
     { Header: "Serial Number", accessor: "serialNumber", align: "left" },
     { Header: "Name", accessor: "name", align: "left" },
-    { Header: "CID", accessor: "cid", align: "left", Cell: CIDCell },
+    { Header: "IC Number", accessor: "icNumber", align: "left" },
+    { Header: "Course", accessor: "courseName", align: "left" },
     {
       Header: "Actions",
       accessor: "id",

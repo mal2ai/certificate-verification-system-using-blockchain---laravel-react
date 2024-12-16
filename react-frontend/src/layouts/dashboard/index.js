@@ -119,9 +119,9 @@ function Dashboard() {
                   title="Certificates"
                   count="Loading..."
                   percentage={{
-                    color: "info",
-                    amount: "0%",
-                    label: "count",
+                    color: "success",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               ) : (
@@ -132,8 +132,8 @@ function Dashboard() {
                   count={certificateDisplayCount}
                   percentage={{
                     color: "success",
-                    amount: "+55%", // You can replace this with dynamic data if needed
-                    label: "than last week",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               )}
@@ -148,8 +148,8 @@ function Dashboard() {
                   count="Loading..."
                   percentage={{
                     color: "success",
-                    amount: "+3%",
-                    label: "than last month",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               ) : (
@@ -159,8 +159,8 @@ function Dashboard() {
                   count={displayUserCount}
                   percentage={{
                     color: "success",
-                    amount: "+3%", // You can replace this with dynamic data if needed
-                    label: "than last month",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               )}
@@ -176,8 +176,8 @@ function Dashboard() {
                   count="Loading..."
                   percentage={{
                     color: "success",
-                    amount: "+1%",
-                    label: "than yesterday",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               ) : (
@@ -188,8 +188,8 @@ function Dashboard() {
                   count={displayStatusCount}
                   percentage={{
                     color: "success",
-                    amount: "+1%", // You can replace this with dynamic data if needed
-                    label: "than yesterday",
+                    amount: "",
+                    label: "Just updated",
                   }}
                 />
               )}

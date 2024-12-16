@@ -189,14 +189,24 @@ function Status() {
     };
 
     try {
-      const response = await updateStatus(rowData.serial_number, updatedStatus, token);
+      // Pass both serial_number and email to update status
+      const response = await updateStatus(
+        rowData.serial_number,
+        rowData.email, // Add email here as part of the update
+        updatedStatus,
+        token
+      );
+
       if (response.data) {
-        // After rejecting, refresh the status data
+        // After rejecting, refresh the status data based on both serial_number and email
         setStatusData((prevData) =>
           prevData.map((item) =>
-            item.serial_number === rowData.serial_number ? { ...item, status: "rejected" } : item
+            item.serial_number === rowData.serial_number && item.email === rowData.email
+              ? { ...item, status: "rejected" }
+              : item
           )
         );
+
         setSnackbarMessage("Request has been rejected successfully.");
         setSnackbarType("success");
         setOpenSnackbar(true);
