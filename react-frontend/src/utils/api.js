@@ -221,4 +221,12 @@ export const verifyOTP = (email, otp, token) => {
   );
 };
 
+export const storeTransaction = (data, token) => {
+  return api.post("/store-transaction", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

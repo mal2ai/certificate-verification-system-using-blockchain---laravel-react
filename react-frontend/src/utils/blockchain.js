@@ -157,3 +157,24 @@ export const getBlockchain = async () => {
     console.error("Error getting blockchain:", error);
   }
 };
+
+// export const getBlockchain = async () => {
+//   try {
+//     // Get accounts from Ganache
+//     const accounts = await web3.eth.getAccounts();
+
+//     // Define roles (this is for frontend guidance)
+//     const adminAccount = accounts[0]; // Admin is always the first account
+//     const userAccount = accounts[1]; // Public user is the second account
+
+//     // Create contract instance
+//     const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+//     // Get the current block number (total blocks mined)
+//     const currentBlock = await web3.eth.getBlockNumber();
+
+//     return { adminAccount, userAccount, contract, web3, currentBlock };
+//   } catch (error) {
+//     console.error("Error getting blockchain:", error);
+//   }
+// };

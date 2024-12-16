@@ -5,7 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OTPController;
-use App\Http\Controllers\ProfileController; 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TransactionController; 
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -52,4 +53,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'updateDetails']); // Update account/user details
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword']); // Change password
     Route::post('/profile/delete-account', [ProfileController::class, 'deleteAccount']);
+
+    // New route to store blockchain transaction details
+    Route::post('/store-transaction', [TransactionController::class, 'storeTransaction']);
 });
