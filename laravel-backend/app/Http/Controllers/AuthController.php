@@ -21,23 +21,38 @@ class AuthController extends Controller
         ]);
 
         try {
-            // Check if user exists and password is correct
+            // Check if user exists
             $user = User::where('email', $validated['email'])->first();
 
-            if ($user && Hash::check($validated['password'], $user->password)) {
-                // Create token for user
-                $token = $user->createToken('API Token')->plainTextToken;
+            if ($user) {
+                // Check if the status is inactive or banned
+                if (in_array($user->status, ['inactive'])) {
+                    return response()->json(['message' => 'Your account is inactive.'], 403); // Forbidden
+                }
 
-                // Return response with the token
-                return response()->json([
-                    'message' => 'Login successful',
-                    'token' => $token,
-                    'role' => $user->role,
-                ], 200);
+                if (in_array($user->status, ['banned'])) {
+                    return response()->json(['message' => 'Your account is banned.'], 403); // Forbidden
+                }
+
+                // Check if the password is correct
+                if (Hash::check($validated['password'], $user->password)) {
+                    // Create token for the user
+                    $token = $user->createToken('API Token')->plainTextToken;
+
+                    // Return response with the token
+                    return response()->json([
+                        'message' => 'Login successful',
+                        'token' => $token,
+                        'role' => $user->role,
+                    ], 200);
+                }
+
+                // Return error if credentials are wrong
+                return response()->json(['message' => 'Invalid credentials'], 401);
             }
 
-            // Return error if credentials are wrong
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            // Return error if user doesn't exist
+            return response()->json(['message' => 'User not found'], 404);
 
         } catch (\Exception $e) {
             // Log the error for debugging purposes

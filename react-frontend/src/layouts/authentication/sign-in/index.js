@@ -53,11 +53,12 @@ const Basic = () => {
       const response = await login({ email, password });
       console.log("Login Response:", response); // Debugging
 
+      // Check if the response contains a token
       if (response.data && response.data.token) {
         const token = response.data.token;
         const role = response.data.role;
 
-        // Always store token, role, and email in localStorage (no sessionStorage)
+        // Store token, role, and email in localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("email", email);
         localStorage.setItem("role", role);
@@ -68,14 +69,23 @@ const Basic = () => {
         } else {
           navigate("/admin/dashboard"); // Redirect to /dashboard if role is admin or other
         }
+      } else if (response.data && response.data.message) {
+        // Check if the response contains a message (e.g., account inactive)
+        setError(response.data.message); // Set the error state with the backend message
       } else {
-        // If the response doesn't contain a token, handle it as an error
+        // If the response doesn't contain a token or message, handle as an error
         setError("Invalid login credentials. Please check your email and password.");
       }
     } catch (err) {
       // Catch any errors from the login API request
       console.error("Login error:", err);
-      setError("An error occurred during login. Please try again.");
+
+      // Check if the error response contains a message (for example, account is inactive)
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message); // Display the error message from the backend
+      } else {
+        setError("An error occurred during login. Please try again.");
+      }
     }
   };
 
@@ -100,10 +110,11 @@ const Basic = () => {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             {error && (
-              <MDTypography variant="body2" color="error">
+              <MDTypography variant="body2" color="error" sx={{ marginBottom: 2 }}>
                 {error}
               </MDTypography>
             )}
+
             <MDBox mb={2}>
               <MDInput
                 type="email"

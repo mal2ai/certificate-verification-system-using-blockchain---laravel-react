@@ -2,22 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; // Add this line
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Mass assignable fields
     protected $fillable = [
         'name',
         'email',
@@ -25,27 +19,45 @@ class User extends Authenticatable
         'role',
         'otp_code',
         'otp_sent_at',
+        'status',          // New attribute for user status
+        'account_type',    // New attribute for account type
+        'student_id',      // Additional fields based on account_type
+        'company_name',    // Additional fields based on account_type
+        'institution_name' // Additional fields based on account_type
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // Attributes hidden for serialization
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    // Casting attributes
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
         ];
+    }
+
+    // Adding a custom validation for account_type-specific fields
+    public static function boot()
+    {
+        parent::boot();
+
+        // Create a mutator to validate conditionally required fields
+        static::saving(function ($user) {
+            if ($user->account_type === 'student' && empty($user->student_id)) {
+                throw new \Exception("Student ID is required for student accounts.");
+            }
+
+            if ($user->account_type === 'Potential Employer' && empty($user->company_name)) {
+                throw new \Exception("Company Name is required for potential employer accounts.");
+            }
+
+            if ($user->account_type === 'Educational Institution' && empty($user->institution_name)) {
+                throw new \Exception("Institution Name is required for educational institution accounts.");
+            }
+        });
     }
 }
