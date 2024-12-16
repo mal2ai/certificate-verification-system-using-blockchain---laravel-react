@@ -21,6 +21,7 @@ import MDSnackbar from "components/MDSnackbar";
 // Utility functions
 import { uploadToIPFS } from "utils/ipfs";
 import { getBlockchain } from "utils/blockchain";
+import { storeTransaction } from "utils/api";
 
 function AddCertificates() {
   const navigate = useNavigate();
@@ -88,7 +89,22 @@ function AddCertificates() {
           gas: 3000000, // Set an appropriate gas limit
         });
 
-      console.log("Transaction Hash:", receipt.transactionHash);
+      console.log("Transaction Receipt:", receipt);
+
+      // Prepare receipt data for backend
+      const transactionData = {
+        transactionHash: receipt.transactionHash || "",
+        from: receipt.from || "",
+        to: receipt.to || "",
+        blockNumber: receipt.blockNumber?.toString() || "",
+        gasUsed: receipt.gasUsed?.toString() || "",
+        status: receipt.status ? "Success" : "Failed",
+      };
+
+      // Step 3: Store transaction details in Laravel backend
+      const token = localStorage.getItem("token"); // Retrieve token
+      await storeTransaction(transactionData, token);
+      console.log("Transaction details stored successfully in the backend");
 
       // Redirect after success
       navigate("/admin/certificates", {

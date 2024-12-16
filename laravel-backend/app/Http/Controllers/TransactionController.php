@@ -13,16 +13,25 @@ class TransactionController extends Controller
      * @param  object $receipt
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeTransaction($receipt)
+    public function storeTransaction(Request $request)
     {
         try {
+            $data = $request->validate([
+                'transactionHash' => 'required|string',
+                'from' => 'required|string',
+                'to' => 'required|string',
+                'blockNumber' => 'required|string',
+                'gasUsed' => 'required|string',
+                'status' => 'required|string',
+            ]);
+
             DB::table('transactions')->insert([
-                'transaction_hash' => $receipt->transactionHash,
-                'from_address' => $receipt->from,
-                'to_address' => $receipt->to,
-                'block_number' => $receipt->blockNumber,
-                'gas_used' => $receipt->gasUsed,
-                'status' => $receipt->status ? 'Success' : 'Failed',
+                'transaction_hash' => $data['transactionHash'],
+                'from_address' => $data['from'],
+                'to_address' => $data['to'],
+                'block_number' => $data['blockNumber'],
+                'gas_used' => $data['gasUsed'],
+                'status' => $data['status'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -37,4 +46,23 @@ class TransactionController extends Controller
             ], 500);
         }
     }
+
+    public function getAllTransactions()
+    {
+        try {
+            // Retrieve all transactions from the 'transactions' table
+            $transactions = DB::table('transactions')->get();
+
+            // Return the transactions in the response
+            return response()->json([
+                'transactions' => $transactions,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to retrieve transactions',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

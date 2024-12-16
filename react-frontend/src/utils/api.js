@@ -236,4 +236,12 @@ export const storeTransaction = (data, token) => {
   });
 };
 
+export const getTransactions = (token) => {
+  return api.get("/transactions", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

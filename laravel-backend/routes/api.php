@@ -6,7 +6,7 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TransactionController; 
+use App\Http\Controllers\TransactionController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -56,4 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // New route to store blockchain transaction details
     Route::post('/store-transaction', [TransactionController::class, 'storeTransaction']);
+    
+    // New route to display all stored transactions for auditing
+    Route::get('/transactions', [TransactionController::class, 'getAllTransactions']);
 });
