@@ -149,11 +149,16 @@ class StatusController extends Controller
         try {
             // Check if the authenticated user is an admin
             if ($request->user()->role !== 'admin') {
-                return response()->json(['message' => 'You are not authorized to view user details.'], 403);
+                return response()->json(['message' => 'You are not authorized to delete this status.'], 403);
             }
 
-            // Find the status by serial number
-            $status = Status::where('serial_number', $serialNumber)->first();
+            // Extract the email from the request
+            $email = $request->input('email');
+
+            // Find the status by serial number and email
+            $status = Status::where('serial_number', $serialNumber)
+                ->where('email', $email)
+                ->first();
 
             // If status not found, return a 404 error
             if (!$status) {
@@ -170,6 +175,7 @@ class StatusController extends Controller
             return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
+
 
     // Update name, email, and serial number by serial number and email
     public function updateDetails(Request $request, $serialNumber, $email)

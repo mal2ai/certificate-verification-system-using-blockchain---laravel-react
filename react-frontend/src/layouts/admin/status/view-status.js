@@ -68,16 +68,21 @@ function VerifyCertificate() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token"); // Get token from localStorage
-      await deleteStatus(serial_number, token); // Call delete function
+
+      if (!email) {
+        throw new Error("Email is required for deletion");
+      }
+
+      await deleteStatus(serial_number, email, token); // Pass both serial_number and email to the delete function
       setIsLoading(false);
 
       // Navigate back with a success message
-      setSnackbarMessage(`Request ${serial_number} Deleted Successfully!`);
+      setSnackbarMessage(`Request ${serial_number} for ${email} Deleted Successfully!`);
       setSnackbarType("success");
       setOpenSnackbar(true);
 
       navigate("/admin/request", {
-        state: { successMessage: `Request ${serial_number} Deleted Successfully!` },
+        state: { successMessage: `Request ${serial_number} for ${email} Deleted Successfully!` },
       });
     } catch (error) {
       setIsLoading(false);
