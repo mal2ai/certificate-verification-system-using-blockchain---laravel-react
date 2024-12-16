@@ -26,8 +26,7 @@ function DeleteUser() {
   const navigate = useNavigate();
 
   // States to hold user data and loading state
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [userDetails, setUserDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch user data using the userId
@@ -40,8 +39,7 @@ function DeleteUser() {
         const userData = response.data;
 
         if (userData) {
-          setName(userData.name || "");
-          setEmail(userData.email || "");
+          setUserDetails(userData);
         }
 
         setIsLoading(false);
@@ -74,6 +72,71 @@ function DeleteUser() {
     }
   };
 
+  // Render the user details based on account type
+  const renderAccountDetails = () => {
+    if (!userDetails) return null;
+
+    const { accountType, status, studentId, companyName, institutionName } = userDetails;
+
+    return (
+      <TableContainer>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Account Type</strong>
+              </TableCell>
+              <TableCell>{userDetails.account_type || "N/A"}</TableCell>
+            </TableRow>
+            {userDetails.account_type === "educational_institution" && (
+              <TableRow>
+                <TableCell>
+                  <strong>Institution Name</strong>
+                </TableCell>
+                <TableCell>{userDetails.institution_name || "N/A"}</TableCell>
+              </TableRow>
+            )}
+            {userDetails.account_type === "potential_employer" && (
+              <TableRow>
+                <TableCell>
+                  <strong>Company Name</strong>
+                </TableCell>
+                <TableCell>{userDetails.company_name || "N/A"}</TableCell>
+              </TableRow>
+            )}
+            <TableRow>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>{userDetails.name}</TableCell>
+            </TableRow>
+            {/* Conditionally render the relevant input field based on account type */}
+            {userDetails.account_type === "student" && (
+              <TableRow>
+                <TableCell>
+                  <strong>Student ID</strong>
+                </TableCell>
+                <TableCell>{userDetails.student_id || "N/A"}</TableCell>
+              </TableRow>
+            )}
+            <TableRow>
+              <TableCell>
+                <strong>Email</strong>
+              </TableCell>
+              <TableCell>{userDetails.email}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Status</strong>
+              </TableCell>
+              <TableCell>{status || "N/A"}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -104,24 +167,7 @@ function DeleteUser() {
                     Loading user details...
                   </MDTypography>
                 ) : (
-                  <TableContainer>
-                    <Table>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <strong>Name</strong>
-                          </TableCell>
-                          <TableCell>{name}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <strong>Email</strong>
-                          </TableCell>
-                          <TableCell>{email}</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  renderAccountDetails()
                 )}
               </MDBox>
               <MDBox

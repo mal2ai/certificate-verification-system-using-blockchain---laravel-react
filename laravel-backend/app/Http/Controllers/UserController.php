@@ -66,32 +66,54 @@ class UserController extends Controller
     // Edit an existing user
     public function update(Request $request, $id)
     {
+        // Ensure the user is an admin
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'Access denied. Admins only.'], 403);
         }
 
+        // Find the user to be updated
         $user = User::find($id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
             'password' => 'sometimes|string|min:8',
             'role' => 'sometimes|string|in:admin,user',
+            'status' => 'sometimes|string|in:active,inactive,banned',
+            'account_type' => 'sometimes|string|in:student,potential_employer,educational_institution',
+            'student_id' => 'required_if:account_type,student|nullable|string|max:255',
+            'company_name' => 'required_if:account_type,potential_employer|nullable|string|max:255',
+            'institution_name' => 'required_if:account_type,educational_institution|nullable|string|max:255',
         ]);
 
+        // Check if validation fails
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
+        // Update user details
         $user->update([
             'name' => $request->name ?? $user->name,
             'email' => $request->email ?? $user->email,
             'password' => $request->password ? Hash::make($request->password) : $user->password,
             'role' => $request->role ?? $user->role,
+            'status' => $request->status ?? $user->status,
+            'account_type' => $request->account_type ?? $user->account_type,
         ]);
+
+        // Handle account-type-specific fields
+        if ($request->account_type) {
+            $user->student_id = $request->account_type === 'student' ? $request->student_id : null;
+            $user->company_name = $request->account_type === 'potential_employer' ? $request->company_name : null;
+            $user->institution_name = $request->account_type === 'educational_institution' ? $request->institution_name : null;
+        }
+
+        // Save the updated user
+        $user->save();
 
         return response()->json(['message' => 'User updated successfully', 'user' => $user]);
     }

@@ -5,10 +5,14 @@ import { register } from "utils/api"; // Import the register function
 // UI
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -17,12 +21,17 @@ import Footer from "examples/Footer";
 
 function AddUser() {
   const navigate = useNavigate();
-  const [name, setName] = useState(""); // State for name
-  const [email, setEmail] = useState(""); // State for email
-  const [password, setPassword] = useState(""); // State for password
-  const [passwordConfirmation, setPasswordConfirmation] = useState(""); // State for confirm password
-  const [statusMessage, setStatusMessage] = useState(""); // Success/error status message
-  const [isLoading, setIsLoading] = useState(false); // Loading state for the button
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [status, setStatus] = useState("Please choose"); // Default status
+  const [accountType, setAccountType] = useState("Please choose"); // Default account type
+  const [studentId, setStudentId] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [institutionName, setInstitutionName] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle input change for form fields
   const handleInputChange = (event, setter) => {
@@ -38,14 +47,14 @@ function AddUser() {
     if (!name || !email || !password || !passwordConfirmation) {
       setStatusMessage("Please fill in all required fields.");
       setIsLoading(false);
-      return; // Stop the function if required fields are empty
+      return;
     }
 
     // Check if passwords match
     if (password !== passwordConfirmation) {
       setStatusMessage("Passwords do not match.");
       setIsLoading(false);
-      return; // Stop the function if passwords don't match
+      return;
     }
 
     // Prepare data for registration
@@ -53,11 +62,16 @@ function AddUser() {
       name,
       email,
       password,
-      password_confirmation: passwordConfirmation, // Add password confirmation
+      password_confirmation: passwordConfirmation,
+      status,
+      account_type: accountType,
+      student_id: accountType === "student" ? studentId : null,
+      company_name: accountType === "potential_employer" ? companyName : null,
+      institution_name: accountType === "educational_institution" ? institutionName : null,
     };
 
     try {
-      await register(data); // Call register API function
+      await register(data);
       setStatusMessage("User registered successfully.");
       navigate("/admin/manage-user", {
         state: { successMessage: "User Registered Successfully!" },
@@ -65,7 +79,7 @@ function AddUser() {
     } catch (error) {
       setStatusMessage("Failed to register user. Please try again.");
     } finally {
-      setIsLoading(false); // Stop loading state
+      setIsLoading(false);
     }
   };
 
@@ -103,15 +117,79 @@ function AddUser() {
                 )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
-                    <MDInput
-                      label="Enter Name"
-                      variant="outlined"
-                      fullWidth
-                      value={name}
-                      onChange={(e) => handleInputChange(e, setName)}
-                      sx={{ mb: 2 }}
-                      required
-                    />
+                    {/* Account Type Dropdown */}
+                    <FormControl fullWidth>
+                      <InputLabel>Account Type</InputLabel>
+                      <Select
+                        value={accountType}
+                        required
+                        label="Account Type"
+                        onChange={(e) => handleInputChange(e, setAccountType)}
+                        sx={{
+                          height: "40px", // Adjust the height to your preference
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px", // Add padding for inner spacing
+                          },
+                        }}
+                      >
+                        <MenuItem value="Please choose" disabled>
+                          Please choose
+                        </MenuItem>
+                        <MenuItem value="student">Student</MenuItem>
+                        <MenuItem value="potential_employer">Potential Employer</MenuItem>
+                        <MenuItem value="educational_institution">Educational Institution</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    {/* Conditional Inputs */}
+                    {accountType === "student" && (
+                      <MDBox mt={3}>
+                        <MDInput
+                          label="Enter Student ID"
+                          variant="outlined"
+                          fullWidth
+                          value={studentId}
+                          onChange={(e) => handleInputChange(e, setStudentId)}
+                          required
+                        />
+                      </MDBox>
+                    )}
+                    {accountType === "potential_employer" && (
+                      <MDBox mt={3}>
+                        <MDInput
+                          label="Enter Company Name"
+                          variant="outlined"
+                          fullWidth
+                          value={companyName}
+                          onChange={(e) => handleInputChange(e, setCompanyName)}
+                          required
+                        />
+                      </MDBox>
+                    )}
+                    {accountType === "educational_institution" && (
+                      <MDBox mt={3}>
+                        <MDInput
+                          label="Enter Institution Name"
+                          variant="outlined"
+                          fullWidth
+                          value={institutionName}
+                          onChange={(e) => handleInputChange(e, setInstitutionName)}
+                          required
+                        />
+                      </MDBox>
+                    )}
+
+                    <MDBox mt={3}>
+                      <MDInput
+                        label="Enter Name"
+                        variant="outlined"
+                        fullWidth
+                        value={name}
+                        onChange={(e) => handleInputChange(e, setName)}
+                        sx={{ mb: 2 }}
+                        required
+                      />
+                    </MDBox>
                     <MDInput
                       label="Enter Email"
                       variant="outlined"
@@ -141,19 +219,46 @@ function AddUser() {
                       sx={{ mb: 2 }}
                       required
                     />
-                    <MDButton
-                      variant="gradient"
-                      color="dark"
-                      onClick={handleRegister}
-                      sx={{
-                        width: "200px",
-                        display: "block",
-                        margin: "0 auto",
-                      }}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Registering..." : "Register"}
-                    </MDButton>
+
+                    {/* Status Dropdown */}
+                    <FormControl fullWidth>
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        fullWidth
+                        value={status}
+                        label="Status"
+                        onChange={(e) => handleInputChange(e, setStatus)}
+                        sx={{
+                          height: "40px", // Adjust the height to your preference
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px", // Add padding for inner spacing
+                          },
+                        }}
+                      >
+                        <MenuItem value="Please choose" disabled>
+                          Please choose
+                        </MenuItem>
+                        <MenuItem value="active">Active</MenuItem>
+                        <MenuItem value="inactive">Inactive</MenuItem>
+                        <MenuItem value="banned">Banned</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    <MDBox mt={3}>
+                      <MDButton
+                        variant="gradient"
+                        color="dark"
+                        onClick={handleRegister}
+                        sx={{
+                          width: "200px",
+                          display: "block",
+                          margin: "0 auto",
+                        }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Registering..." : "Register"}
+                      </MDButton>
+                    </MDBox>
                   </MDBox>
                 </form>
               </MDBox>

@@ -13,7 +13,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // API function to get user details by ID
-import { getUserById, deleteStatus } from "utils/api";
+import { getUserById } from "utils/api";
 
 function ViewUser() {
   const navigate = useNavigate();
@@ -62,74 +62,126 @@ function ViewUser() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3} display="flex" justifyContent="center" minHeight="70vh">
-        <Grid item xs={12} md={6} lg={4}>
-          <Card>
-            <MDBox
-              mx={2}
-              mt={-3}
-              py={3}
-              px={2}
-              variant="gradient"
-              bgColor="white"
-              borderRadius="lg"
-              coloredShadow="info"
-            >
-              <MDTypography variant="h6" color="dark">
-                User Details
-              </MDTypography>
-            </MDBox>
-            <MDBox p={3}>
-              {isLoading && (
-                <MDTypography variant="body2" color="dark">
-                  Loading details...
+      <MDBox pt={6} pb={3}>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} md={8}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  User Details
                 </MDTypography>
-              )}
-              {!isLoading && errorMessage && (
-                <MDTypography variant="body2" color="error">
-                  {errorMessage}
-                </MDTypography>
-              )}
-              {!isLoading && userDetails && (
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails.name || ""}
-                      disabled
-                    />
-                    <MDInput
-                      label="Email"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails.email || ""}
-                      disabled
-                    />
-                    <MDInput
-                      label="Role"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails.role || ""}
-                      disabled
-                    />
-                    <MDInput
-                      label="Created at"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={formatDateToMalaysiaTime(userDetails.created_at) || ""}
-                      disabled
-                    />
-                  </MDBox>
-                </form>
-              )}
-            </MDBox>
-          </Card>
+              </MDBox>
+              <MDBox p={3}>
+                {isLoading && (
+                  <MDTypography variant="body2" color="dark">
+                    Loading details...
+                  </MDTypography>
+                )}
+                {!isLoading && errorMessage && (
+                  <MDTypography variant="body2" color="error">
+                    {errorMessage}
+                  </MDTypography>
+                )}
+                {!isLoading && userDetails && (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <MDBox mt={3}>
+                      {/* Display Account Type */}
+                      <MDInput
+                        label="Account Type"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails.account_type || ""}
+                        disabled
+                      />
+                      {userDetails.account_type === "potential_employer" && (
+                        <MDInput
+                          label="Company Name"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails.company_name || ""}
+                          disabled
+                        />
+                      )}
+                      {userDetails.account_type === "educational_institution" && (
+                        <MDInput
+                          label="Institution Name"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails.institution_name || ""}
+                          disabled
+                        />
+                      )}
+                      <MDInput
+                        label="Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails.name || ""}
+                        disabled
+                      />
+                      {/* Conditional Inputs Based on Account Type */}
+                      {userDetails.account_type === "student" && (
+                        <MDInput
+                          label="Student ID"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails.student_id || ""}
+                          disabled
+                        />
+                      )}
+                      <MDInput
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails.email || ""}
+                        disabled
+                      />
+                      <MDInput
+                        label="Role"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails.role || ""}
+                        disabled
+                      />
+                      <MDInput
+                        label="Created at"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={formatDateToMalaysiaTime(userDetails.created_at) || ""}
+                        disabled
+                      />
+
+                      {/* Display Status */}
+                      <MDInput
+                        label="Status"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails.status || ""}
+                        disabled
+                      />
+                    </MDBox>
+                  </form>
+                )}
+              </MDBox>
+            </Card>
+          </Grid>
         </Grid>
       </MDBox>
 

@@ -11,6 +11,7 @@ import MDButton from "components/MDButton";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 // Material Dashboard 2 React components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -26,6 +27,11 @@ function EditUser() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const [accountType, setAccountType] = useState(""); // New state for Account Type
+  const [status, setStatus] = useState(""); // New state for Status
+  const [studentId, setStudentId] = useState(""); // State for student ID
+  const [companyName, setCompanyName] = useState(""); // State for company name
+  const [institutionName, setInstitutionName] = useState(""); // State for institution name
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -43,6 +49,11 @@ function EditUser() {
         setName(user.name || "");
         setEmail(user.email || "");
         setRole(user.role || "");
+        setAccountType(user.account_type || ""); // Set Account Type
+        setStatus(user.status || ""); // Set Status
+        setStudentId(user.student_id || ""); // Set Student ID
+        setCompanyName(user.company_name || ""); // Set Company Name
+        setInstitutionName(user.institution_name || ""); // Set Institution Name
       } catch (error) {
         console.error("Error fetching user details:", error);
         alert("Failed to fetch user details. Please try again.");
@@ -61,18 +72,40 @@ function EditUser() {
   const handleNameChange = (e) => setName(e.target.value);
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handleRoleChange = (e) => setRole(e.target.value);
+  const handleAccountTypeChange = (e) => setAccountType(e.target.value); // Handle Account Type
+  const handleStatusChange = (e) => setStatus(e.target.value); // Handle Status
+  const handleStudentIdChange = (e) => setStudentId(e.target.value); // Handle Student ID
+  const handleCompanyNameChange = (e) => setCompanyName(e.target.value); // Handle Company Name
+  const handleInstitutionNameChange = (e) => setInstitutionName(e.target.value); // Handle Institution Name
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Validation
+      if (accountType === "potential_employer" && !companyName.trim()) {
+        alert("Company Name is required for Potential Employer accounts.");
+        setLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Authentication token not found");
       }
 
-      const data = { name, email, role };
+      const data = {
+        name,
+        email,
+        role,
+        account_type: accountType,
+        status,
+        student_id: studentId,
+        company_name: accountType === "potential_employer" ? companyName : "",
+        institution_name: accountType === "educational_institution" ? institutionName : "",
+      };
+
       await updateUser(id, data, token);
 
       navigate("/admin/manage-user", {
@@ -109,6 +142,71 @@ function EditUser() {
               </MDBox>
               <MDBox p={3}>
                 <form onSubmit={handleSubmit}>
+                  {/* Account Type Dropdown */}
+                  <MDBox mb={2}>
+                    <FormControl fullWidth>
+                      <InputLabel>Account Type</InputLabel>
+                      <Select
+                        value={isLoading ? "Loading..." : accountType}
+                        onChange={handleAccountTypeChange}
+                        label="Account Type"
+                        required
+                        readOnly
+                        sx={{
+                          height: "40px", // Adjust the height to your preference
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px", // Add padding for inner spacing
+                          },
+                        }}
+                      >
+                        <MenuItem value="student">Student</MenuItem>
+                        <MenuItem value="potential_employer">Potential Employer</MenuItem>
+                        <MenuItem value="educational_institution">Educational Institution</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </MDBox>
+
+                  {/* Conditionally Render Fields Based on Account Type */}
+                  {accountType === "student" && (
+                    <MDBox mb={2}>
+                      <MDInput
+                        type="text"
+                        label="Student ID"
+                        fullWidth
+                        value={isLoading ? "Loading..." : studentId}
+                        onChange={handleStudentIdChange}
+                        disabled={isLoading}
+                      />
+                    </MDBox>
+                  )}
+
+                  {accountType === "potential_employer" && (
+                    <MDBox mb={2}>
+                      <MDInput
+                        type="text"
+                        label="Company Name"
+                        fullWidth
+                        value={isLoading ? "Loading..." : companyName}
+                        onChange={handleCompanyNameChange}
+                        disabled={isLoading}
+                        required
+                      />
+                    </MDBox>
+                  )}
+
+                  {accountType === "educational_institution" && (
+                    <MDBox mb={2}>
+                      <MDInput
+                        type="text"
+                        label="Institution Name"
+                        fullWidth
+                        value={isLoading ? "Loading..." : institutionName}
+                        onChange={handleInstitutionNameChange}
+                        disabled={isLoading}
+                      />
+                    </MDBox>
+                  )}
+
                   <MDBox mb={2}>
                     <MDInput
                       type="text"
@@ -134,25 +232,17 @@ function EditUser() {
                   </MDBox>
                   <MDBox mb={2}>
                     <FormControl fullWidth>
-                      {/* Add InputLabel for label */}
-                      <MDTypography
-                        sx={{
-                          // Adjust height for the Select box
-                          fontSize: "0.9rem", // Optional: Increase font size
-                        }}
-                        color="dark"
-                      >
-                        {isLoading ? "Loading..." : "Select Role:"}
-                      </MDTypography>
+                      <InputLabel>Role</InputLabel>
                       <Select
                         value={isLoading ? "Loading..." : role}
                         onChange={handleRoleChange}
                         disabled={isLoading}
-                        displayEmpty
-                        variant="outlined"
+                        label="Role"
                         sx={{
-                          height: 35, // Adjust height for the Select box
-                          fontSize: "0.85rem", // Optional: Increase font size
+                          height: "40px", // Adjust the height to your preference
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px", // Add padding for inner spacing
+                          },
                         }}
                       >
                         <MenuItem value="" disabled>
@@ -160,6 +250,32 @@ function EditUser() {
                         </MenuItem>
                         <MenuItem value="admin">Admin</MenuItem>
                         <MenuItem value="user">User</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </MDBox>
+
+                  {/* Status Dropdown */}
+                  <MDBox mb={2}>
+                    <FormControl fullWidth>
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        value={isLoading ? "Loading..." : status}
+                        onChange={handleStatusChange}
+                        disabled={isLoading}
+                        label="Status"
+                        sx={{
+                          height: "40px", // Adjust the height to your preference
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px", // Add padding for inner spacing
+                          },
+                        }}
+                      >
+                        <MenuItem value="" disabled>
+                          {isLoading ? "Loading..." : "Select Status"}
+                        </MenuItem>
+                        <MenuItem value="active">Active</MenuItem>
+                        <MenuItem value="inactive">Inactive</MenuItem>
+                        <MenuItem value="banned">Banned</MenuItem>
                       </Select>
                     </FormControl>
                   </MDBox>

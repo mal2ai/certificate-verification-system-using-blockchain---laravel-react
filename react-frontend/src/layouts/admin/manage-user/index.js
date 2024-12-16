@@ -49,9 +49,11 @@ function ManageUser() {
 
   // Columns for the DataTable with Edit and Delete buttons
   const columns = [
+    { Header: "Account Type", accessor: "account_type" },
     { Header: "Name", accessor: "name" },
     { Header: "Email", accessor: "email" },
     { Header: "Role", accessor: "role" },
+    { Header: "Status", accessor: "status" },
     {
       Header: "Actions",
       accessor: "actions",
