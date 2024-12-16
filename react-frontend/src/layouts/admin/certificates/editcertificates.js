@@ -119,8 +119,8 @@ function EditCertificate() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={8}>
+        <Grid container justifyContent="center" spacing={3}>
+          <Grid item xs={12} md={6}>
             <Card>
               <MDBox
                 mx={2}
@@ -133,7 +133,7 @@ function EditCertificate() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="dark">
-                  Edit Certificate
+                  Update Certificate
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
@@ -201,50 +201,10 @@ function EditCertificate() {
                     />
                   </MDBox>
                   <MDBox mb={2}>
-                    <MDInput
-                      type="file"
-                      label="Upload New Certificate"
-                      fullWidth
-                      onChange={handleFileChange}
-                    />
-                  </MDBox>
-                  <MDBox mb={2} display="flex" alignItems="center">
-                    <MDTypography variant="caption" color="text">
-                      Existing Certificate:
+                    <MDTypography variant="body2" color="dark">
+                      Upload new certificate:
                     </MDTypography>
-                    {cid ? (
-                      <MDBox display="flex" alignItems="center" ml={1}>
-                        <Icon
-                          fontSize="small"
-                          color="dark"
-                          sx={{
-                            cursor: "pointer",
-                          }}
-                          component="a"
-                          href={`http://127.0.0.1:8080/ipfs/${cid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          picture_as_pdf
-                        </Icon>
-                        <MDTypography
-                          variant="button"
-                          fontWeight="bold"
-                          color="dark"
-                          component="a"
-                          href={`http://127.0.0.1:8080/ipfs/${cid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{ ml: 0.5 }} // Margin between icon and label
-                        >
-                          PDF
-                        </MDTypography>
-                      </MDBox>
-                    ) : (
-                      <MDTypography variant="body2" color="text" ml={1}>
-                        No existing certificate available.
-                      </MDTypography>
-                    )}
+                    <MDInput type="file" fullWidth onChange={handleFileChange} />
                   </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
                     <MDButton
@@ -257,6 +217,52 @@ function EditCertificate() {
                     </MDButton>
                   </MDBox>
                 </form>
+              </MDBox>
+            </Card>
+          </Grid>
+
+          {/* Right side for PDF preview */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Existing Certificate PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "400px", // Adjust height for smaller preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${cid}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate to display.
+                  </MDTypography>
+                )}
               </MDBox>
             </Card>
           </Grid>

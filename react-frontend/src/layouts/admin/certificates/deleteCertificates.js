@@ -112,7 +112,9 @@ function DeleteCertificate() {
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6} justifyContent="center">
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={6}>
+            {" "}
+            {/* Adjusting left side width */}
             <Card>
               <MDBox
                 mx={2}
@@ -222,6 +224,52 @@ function DeleteCertificate() {
                     Yes, Delete
                   </MDButton>
                 </MDBox>
+              </MDBox>
+            </Card>
+          </Grid>
+
+          {/* Right side for PDF preview */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Certificate PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "400px", // Adjust height for smaller preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${cid}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate to display.
+                  </MDTypography>
+                )}
               </MDBox>
             </Card>
           </Grid>

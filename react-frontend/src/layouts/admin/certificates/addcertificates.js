@@ -136,8 +136,8 @@ function AddCertificates() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={8}>
+        <Grid container justifyContent="center" spacing={3}>
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
               <MDBox
                 mx={2}
@@ -208,9 +208,7 @@ function AddCertificates() {
                     </MDTypography>
                     <input
                       type="datetime-local"
-                      label="Issued Date"
                       className="form-control"
-                      placeholder="dd/mm/yyyy"
                       value={issuedDate}
                       onChange={handleIssuedDateChange}
                     />
@@ -226,7 +224,6 @@ function AddCertificates() {
                       value={courseName}
                       onChange={handleCourseNameChange}
                       list="course-list"
-                      placeholder="Type to search..."
                       className="form-control"
                     />
                     <datalist id="course-list">
@@ -235,11 +232,31 @@ function AddCertificates() {
                       ))}
                     </datalist>
                   </MDBox>
+                </form>
+              </MDBox>
+            </Card>
+          </Grid>
 
+          {/* Certificate Upload Section */}
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Upload Certificate
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                <form onSubmit={handleSubmit}>
                   <MDBox mb={2}>
-                    <MDTypography variant="body2" color="dark">
-                      Upload Certificate:
-                    </MDTypography>
                     <input id="input-b1" name="input-b1" type="file" className="file" />
                   </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
