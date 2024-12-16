@@ -11,6 +11,7 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import { format } from "date-fns";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
@@ -26,6 +27,14 @@ function VerifyCertificate() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [verificationAttempted, setVerificationAttempted] = useState(false);
+  const [transactionReceipt, setTransactionReceipt] = useState({
+    transactionHash: "",
+    from: "",
+    to: "",
+    blockNumber: "",
+    gasUsed: "",
+    status: "",
+  });
 
   // Fetch certificate data from the blockchain using the serial number
   useEffect(() => {
@@ -39,26 +48,33 @@ function VerifyCertificate() {
       setIsLoading(true);
       const { userAccount, contract } = await getBlockchain();
 
-      // Verify the certificate first using verifyCertificate
       const verifyTx = await contract.methods.verifyCertificate(serialNumber).send({
         from: userAccount,
         gas: 3000000, // Set an appropriate gas limit
       });
 
-      // Log the transaction hash to the console
-      console.log("Transaction hash:", verifyTx.transactionHash);
+      const receipt = {
+        transactionHash: verifyTx.transactionHash || "",
+        from: verifyTx.from || "",
+        to: verifyTx.to || "",
+        blockNumber: verifyTx.blockNumber?.toString() || "",
+        gasUsed: verifyTx.gasUsed?.toString() || "",
+        status: verifyTx.status ? "Success" : "Failed",
+      };
 
-      // If verified, fetch the certificate data
+      setTransactionReceipt(receipt);
+
       const certificate = await contract.methods.getCertificate(serialNumber).call();
-
       if (certificate) {
-        const newCertificate = {
+        setCertificateDetails({
           serialNumber,
           name: certificate[1] || "",
           cid: certificate[2] || "",
-        };
-
-        setCertificateDetails(newCertificate);
+          icNumber: certificate[3] || "",
+          studentId: certificate[4] || "",
+          courseName: certificate[5] || "",
+          issuedDate: certificate[6] || "",
+        });
       } else {
         setCertificateDetails(null);
         setErrorMessage("Certificate not found.");
@@ -67,12 +83,17 @@ function VerifyCertificate() {
       setIsLoading(false);
       setVerificationAttempted(true);
     } catch (error) {
+      setTransactionReceipt(null); // Reset transaction receipt on error
       setCertificateDetails(null);
-      setErrorMessage("Certificate not exist");
+      setErrorMessage("Certificate not exist.");
       setIsLoading(false);
       setVerificationAttempted(true);
     }
   };
+
+  const formattedIssuedDate = certificateDetails?.issuedDate
+    ? format(new Date(certificateDetails.issuedDate), "dd/MM/yyyy, h:mm a")
+    : "";
 
   return (
     <DashboardLayout>
@@ -119,11 +140,43 @@ function VerifyCertificate() {
                       disabled
                     />
                     <MDInput
+                      label="Student ID"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.studentId || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="IC Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.icNumber || ""}
+                      disabled
+                    />
+                    <MDInput
                       label="Serial Number"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.serialNumber || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Course Name"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.courseName || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Issued Date"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={formattedIssuedDate}
                       disabled
                     />
                     <MDInput
@@ -188,8 +241,6 @@ function VerifyCertificate() {
 
           {/* Certificate PDF Preview Card */}
           <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
-            {" "}
-            {/* Reduce the card width by changing md={6} to md={4} */}
             <Card>
               <MDBox
                 mt={-3}
@@ -230,6 +281,84 @@ function VerifyCertificate() {
                     No certificate data to display.
                   </MDTypography>
                 )}
+              </MDBox>
+            </Card>
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Blockchain Details
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {verificationAttempted && !certificateDetails && !isLoading && (
+                  <MDTypography variant="body2" color="error">
+                    {errorMessage}
+                  </MDTypography>
+                )}
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <MDBox mt={3}>
+                    <MDInput
+                      label="Transaction Hash"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.transactionHash || "N/A"}
+                      disabled
+                    />
+                    <MDInput
+                      label="From"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.from || "N/A"}
+                      disabled
+                    />
+                    <MDInput
+                      label="To"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.to || "N/A"}
+                      disabled
+                    />
+                    <MDInput
+                      label="Block Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.blockNumber?.toString() || "N/A"}
+                      disabled
+                    />
+                    <MDInput
+                      label="Gas Used"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.gasUsed?.toString() || "N/A"}
+                      disabled
+                    />
+                    <MDInput
+                      label="Status"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={transactionReceipt?.status || "N/A"}
+                      disabled
+                    />
+                  </MDBox>
+                </form>
               </MDBox>
             </Card>
           </Grid>
