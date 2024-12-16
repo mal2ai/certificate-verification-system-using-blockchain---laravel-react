@@ -58,7 +58,7 @@ function AddCertificates() {
       console.log("Uploaded to IPFS, CID:", ipfsCID);
 
       // Step 2: Register certificate on blockchain
-      const { accounts, contract } = await getBlockchain();
+      const { adminAccount, contract } = await getBlockchain();
       const receipt = await contract.methods
         .registerCertificate(
           serialNumber,
@@ -70,9 +70,10 @@ function AddCertificates() {
           issuedDate
         )
         .send({
-          from: accounts[0],
+          from: adminAccount, // Use adminAccount here
           gas: 3000000, // Set an appropriate gas limit
         });
+
       console.log("Transaction Hash:", receipt.transactionHash);
 
       // Redirect after success

@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 contract CertificateRegistry {
+    address private admin;
+
     struct Certificate {
         string serialNumber;
         string name;
@@ -52,7 +54,18 @@ contract CertificateRegistry {
         uint256 timestamp
     );
 
-    // Register a certificate
+    // Modifier to restrict access to only the admin
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can perform this action");
+        _;
+    }
+
+    // Constructor to set the contract deployer as admin
+    constructor() {
+        admin = msg.sender;
+    }
+
+    // Register a certificate (only admin)
     function registerCertificate(
         string memory serialNumber,
         string memory name,
@@ -61,7 +74,7 @@ contract CertificateRegistry {
         string memory studentId,
         string memory courseName,
         string memory issuedDate
-    ) public {
+    ) public onlyAdmin {
         certificates[serialNumber] = Certificate(
             serialNumber, 
             name, 
@@ -115,10 +128,11 @@ contract CertificateRegistry {
         );
     }
 
-    // Get all certificates' details
+    // Get all certificates' details (only admin)
     function getAllCertificates()
         public
         view
+        onlyAdmin
         returns (
             string[] memory,
             string[] memory,
@@ -170,7 +184,7 @@ contract CertificateRegistry {
         emit CertificateVerified(serialNumber, msg.sender, block.timestamp);
     }
 
-    // Update an existing certificate's details
+    // Update an existing certificate's details (only admin)
     function updateCertificate(
         string memory serialNumber,
         string memory newName,
@@ -179,7 +193,7 @@ contract CertificateRegistry {
         string memory newStudentId,
         string memory newCourseName,
         string memory newIssuedDate
-    ) public {
+    ) public onlyAdmin {
         Certificate storage cert = certificates[serialNumber];
         require(bytes(cert.serialNumber).length > 0, "Certificate not found");
         cert.name = newName;
@@ -202,8 +216,8 @@ contract CertificateRegistry {
         );
     }
 
-    // Delete a certificate by serial number
-    function deleteCertificate(string memory serialNumber) public {
+    // Delete a certificate by serial number (only admin)
+    function deleteCertificate(string memory serialNumber) public onlyAdmin {
         require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
         delete certificates[serialNumber];
 

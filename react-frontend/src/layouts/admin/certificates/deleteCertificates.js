@@ -65,23 +65,20 @@ function DeleteCertificate() {
   // Handle certificate deletion
   const handleDelete = async () => {
     try {
-      // Get blockchain data (accounts and contract)
-      const { accounts, contract, web3 } = await getBlockchain();
-
-      // Get the first account to send the transaction (can be changed if needed)
-      const account = accounts[0];
+      // Get blockchain data (adminAccount and contract)
+      const { adminAccount, contract, web3 } = await getBlockchain(); // Extract adminAccount
 
       // Estimate gas for the transaction to get the appropriate gas limit
       const gasEstimate = await contract.methods
         .deleteCertificate(serialNumber)
-        .estimateGas({ from: account });
+        .estimateGas({ from: adminAccount });
 
       // Convert the gas estimate to a number
       const gasLimit = parseInt(gasEstimate, 10); // Use parseInt to convert BigInt to a number
 
       // Call the deleteCertificate function from the smart contract with the gas limit
       await contract.methods.deleteCertificate(serialNumber).send({
-        from: account,
+        from: adminAccount, // Use adminAccount instead of accounts[0]
         gas: gasLimit * 2, // Increase gas by 2x the estimated gas limit
       });
 

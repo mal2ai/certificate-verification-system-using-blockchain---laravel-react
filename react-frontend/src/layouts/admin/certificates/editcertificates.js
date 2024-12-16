@@ -80,11 +80,11 @@ function EditCertificate() {
       }
 
       // Step 2: Update certificate on blockchain
-      const { accounts, contract } = await getBlockchain();
+      const { adminAccount, contract } = await getBlockchain(); // Extract adminAccount
       await contract.methods
         .updateCertificate(serialNumber, name, ipfsCID, icNumber, studentId, courseName, issuedDate)
         .send({
-          from: accounts[0],
+          from: adminAccount, // Use adminAccount instead of accounts[0]
           gas: 3000000, // Set an appropriate gas limit
         });
 

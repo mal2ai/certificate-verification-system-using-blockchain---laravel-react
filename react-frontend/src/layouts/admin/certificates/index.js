@@ -124,8 +124,8 @@ function Certificates() {
     const fetchCertificates = async () => {
       try {
         setLoading(true);
-        const { contract } = await getBlockchain();
-        const data = await contract.methods.getAllCertificates().call();
+        const { adminAccount, contract } = await getBlockchain(); // Get adminAccount along with the contract
+        const data = await contract.methods.getAllCertificates().call({ from: adminAccount }); // Use adminAccount here
 
         const rows = data[0].map((_, index) => ({
           serialNumber: data[0][index],
