@@ -47,9 +47,14 @@ class TransactionController extends Controller
         }
     }
 
-    public function getAllTransactions()
+    public function getAllTransactions(Request $request)
     {
         try {
+            // Check if the user is an admin
+            if ($request->user()->role !== 'admin') {
+                return response()->json(['message' => 'Access denied. Admins only.'], 403);
+            }
+
             // Retrieve all transactions from the 'transactions' table
             $transactions = DB::table('transactions')->get();
 
@@ -57,6 +62,7 @@ class TransactionController extends Controller
             return response()->json([
                 'transactions' => $transactions,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to retrieve transactions',
@@ -64,5 +70,4 @@ class TransactionController extends Controller
             ], 500);
         }
     }
-
 }
