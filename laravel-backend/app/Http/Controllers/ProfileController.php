@@ -26,19 +26,45 @@ class ProfileController extends Controller
      */
     public function updateDetails(Request $request)
     {
+        $user = Auth::user();
+
+        // Validate request data
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'account_type' => 'required|string|in:student,potential_employer,educational_institution,admin',
+            'student_id' => 'nullable|required_if:account_type,student|string|max:255',
+            'company_name' => 'nullable|required_if:account_type,potential_employer|string|max:255',
+            'institution_name' => 'nullable|required_if:account_type,educational_institution|string|max:255',
         ]);
 
-        $user = Auth::user();
+        // Update user details
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->account_type = $request->account_type;
+
+        // Update fields based on account_type
+        if ($request->account_type === 'student') {
+            $user->student_id = $request->student_id ?? null;
+            $user->company_name = null;
+            $user->institution_name = null;
+        } elseif ($request->account_type === 'potential_employer') {
+            $user->company_name = $request->company_name ?? null;
+            $user->student_id = null;
+            $user->institution_name = null;
+        } elseif ($request->account_type === 'educational_institution') {
+            $user->institution_name = $request->institution_name ?? null;
+            $user->student_id = null;
+            $user->company_name = null;
+        }
+
+        // Save the updated user
         $user->save();
 
         return response()->json([
             'success' => true,
             'message' => 'User details updated successfully.',
+            'user' => $user,
         ]);
     }
 

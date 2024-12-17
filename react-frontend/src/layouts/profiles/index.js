@@ -29,6 +29,10 @@ function ProfileForm({ onSave }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const [accountType, setAccountType] = useState(""); // To store the account type (e.g., student, potential_employer, educational_institution)
+  const [studentId, setStudentId] = useState(""); // To store the student ID
+  const [companyName, setCompanyName] = useState(""); // To store the company name
+  const [institutionName, setInstitutionName] = useState(""); // To store the institution name
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,15 +42,32 @@ function ProfileForm({ onSave }) {
   const [loadingRole, setLoadingRole] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false); // Loading state for password inputs
   const [token, setToken] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarType, setSnackbarType] = useState("success");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isDeleteClicked, setIsDeleteClicked] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Notification state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
+
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handle success message if present in the location state
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      setSnackbarMessage(location.state.successMessage);
+      setSnackbarType("success");
+      setOpenSnackbar(true);
+
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false); // Close the snackbar
+  };
 
   // Fetch token from localStorage
   useEffect(() => {
@@ -62,15 +83,27 @@ function ProfileForm({ onSave }) {
           setLoadingName(true);
           setLoadingEmail(true);
           setLoadingRole(true);
+          setLoading(true);
+
           const response = await getProfileDetails(token);
 
           // Check if the response contains the correct data
           if (response && response.data && response.data.data) {
-            const profileData = response.data.data; // This contains the actual name and email
+            const profileData = response.data.data;
 
             setName(profileData.name || "");
             setEmail(profileData.email || "");
             setRole(profileData.role || "");
+            setAccountType(profileData.account_type || "");
+
+            // Fetch additional fields based on account type
+            if (profileData.account_type === "student") {
+              setStudentId(profileData.student_id || "");
+            } else if (profileData.account_type === "potential_employer") {
+              setCompanyName(profileData.company_name || "");
+            } else if (profileData.account_type === "educational_institution") {
+              setInstitutionName(profileData.institution_name || "");
+            }
           } else {
             console.error("Profile data is missing:", response);
           }
@@ -96,15 +129,37 @@ function ProfileForm({ onSave }) {
         setLoadingName(true);
         setLoadingEmail(true);
 
-        // Update profile details
-        await updateProfileDetails({ name, email }, token);
+        // Transform the payload keys to match backend expectations
+        const profileData = {
+          name,
+          email,
+          account_type: accountType, // Match the backend key for account type
+        };
 
-        // Fetch updated profile details
-        const response = await updateProfileDetails({ name, email }, token);
+        if (accountType === "student") {
+          profileData.student_id = studentId; // Match backend key for student ID
+        } else if (accountType === "potential_employer") {
+          profileData.company_name = companyName; // Match backend key for company name
+        } else if (accountType === "educational_institution") {
+          profileData.institution_name = institutionName; // Match backend key for institution name
+        }
+
+        // Update profile details
+        const response = await updateProfileDetails(profileData, token);
+
+        // Check if response contains updated data
         if (response && response.data && response.data.data) {
           const updatedProfile = response.data.data;
+
+          // Update the state with the new values
           setName(updatedProfile.name || "");
           setEmail(updatedProfile.email || "");
+          setAccountType(updatedProfile.account_type || ""); // Use the correct backend key
+
+          // Update based on account type
+          setStudentId(updatedProfile.student_id || "");
+          setCompanyName(updatedProfile.company_name || "");
+          setInstitutionName(updatedProfile.institution_name || "");
         }
 
         setSnackbarMessage("Profile updated successfully!");
@@ -227,6 +282,61 @@ function ProfileForm({ onSave }) {
                         <Card sx={{ height: "100%" }}>
                           <MDBox p={3}>
                             <form onSubmit={handleProfileSubmit}>
+                              <MDBox mb={3}>
+                                <MDInput
+                                  type="text"
+                                  label="Account Type"
+                                  name="account_type"
+                                  value={accountType || ""}
+                                  fullWidth
+                                  InputProps={{
+                                    readOnly: true,
+                                    endAdornment: loadingEmail ? (
+                                      <CircularProgress size={20} />
+                                    ) : null,
+                                  }}
+                                />
+                              </MDBox>
+
+                              {/* Conditional Inputs Based on Account Type */}
+                              {accountType === "student" && (
+                                <MDBox mb={3}>
+                                  <MDInput
+                                    type="text"
+                                    label="Student ID"
+                                    name="student_id"
+                                    value={studentId || ""}
+                                    onChange={(e) => setStudentId(e.target.value)}
+                                    fullWidth
+                                  />
+                                </MDBox>
+                              )}
+
+                              {accountType === "potential_employer" && (
+                                <MDBox mb={3}>
+                                  <MDInput
+                                    type="text"
+                                    label="Company Name"
+                                    name="company_name"
+                                    value={companyName || ""}
+                                    onChange={(e) => setCompanyName(e.target.value)}
+                                    fullWidth
+                                  />
+                                </MDBox>
+                              )}
+
+                              {accountType === "educational_institution" && (
+                                <MDBox mb={3}>
+                                  <MDInput
+                                    type="text"
+                                    label="Institution Name"
+                                    name="institution_name"
+                                    value={institutionName || ""}
+                                    onChange={(e) => setInstitutionName(e.target.value)}
+                                    fullWidth
+                                  />
+                                </MDBox>
+                              )}
                               <MDBox mb={3}>
                                 <MDInput
                                   type="text"
@@ -454,12 +564,16 @@ function ProfileForm({ onSave }) {
         </Grid>
       </MDBox>
       <Footer />
-      {/* Snackbar for feedback */}
+      {/* Snackbar Component */}
       <MDSnackbar
+        color={snackbarType}
+        icon={snackbarType === "success" ? "check_circle" : "error"}
+        title={snackbarType === "success" ? "Success" : "Error"}
+        content={snackbarMessage}
         open={openSnackbar}
-        setOpen={setOpenSnackbar}
-        message={snackbarMessage}
-        color={snackbarType === "error" ? "error" : "success"}
+        onClose={handleCloseSnackbar}
+        closeColor="white"
+        bgWhite
       />
     </DashboardLayout>
   );
