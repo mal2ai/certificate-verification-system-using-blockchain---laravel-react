@@ -211,7 +211,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.name || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
 
                     {/* Display IC Number */}
@@ -221,7 +223,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.ic_number || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
 
                     {/* Display Email */}
@@ -231,7 +235,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.email || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
 
                     {/* Display Serial Number */}
@@ -241,7 +247,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.serial_number || serialNumber || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Created At"
@@ -253,7 +261,9 @@ function VerifyCertificate() {
                           ? formatDate(certificateDetails.created_at)
                           : ""
                       }
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Update At"
@@ -265,7 +275,9 @@ function VerifyCertificate() {
                           ? formatDate(certificateDetails.updated_at)
                           : ""
                       }
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Status"
@@ -273,7 +285,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.status || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>
@@ -307,7 +321,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.account_type || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     {userDetails?.account_type === "potential_employer" && (
                       <MDInput
@@ -316,7 +332,9 @@ function VerifyCertificate() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails?.company_name || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     )}
                     {userDetails?.account_type === "educational_instituition" && (
@@ -326,7 +344,9 @@ function VerifyCertificate() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails?.instituition_name || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     )}
                     <MDInput
@@ -335,7 +355,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.name || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     {userDetails?.account_type === "student" && (
                       <MDInput
@@ -344,7 +366,9 @@ function VerifyCertificate() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails?.student_id || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     )}
                     <MDInput
@@ -353,7 +377,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.email || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Role"
@@ -361,7 +387,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.role || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Created at"
@@ -369,7 +397,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.created_at ? formatDate(userDetails.created_at) : ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Account Status"
@@ -377,7 +407,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.status || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>

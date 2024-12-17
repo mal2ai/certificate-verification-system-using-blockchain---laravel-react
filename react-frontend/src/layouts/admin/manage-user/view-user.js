@@ -101,7 +101,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails.account_type || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                       {userDetails.account_type === "potential_employer" && (
                         <MDInput
@@ -110,7 +112,9 @@ function ViewUser() {
                           fullWidth
                           sx={{ mb: 2 }}
                           value={userDetails.company_name || ""}
-                          disabled
+                          InputProps={{
+                            readOnly: true,
+                          }}
                         />
                       )}
                       {userDetails.account_type === "educational_institution" && (
@@ -120,7 +124,9 @@ function ViewUser() {
                           fullWidth
                           sx={{ mb: 2 }}
                           value={userDetails.institution_name || ""}
-                          disabled
+                          InputProps={{
+                            readOnly: true,
+                          }}
                         />
                       )}
                       <MDInput
@@ -129,7 +135,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails.name || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                       {/* Conditional Inputs Based on Account Type */}
                       {userDetails.account_type === "student" && (
@@ -139,7 +147,9 @@ function ViewUser() {
                           fullWidth
                           sx={{ mb: 2 }}
                           value={userDetails.student_id || ""}
-                          disabled
+                          InputProps={{
+                            readOnly: true,
+                          }}
                         />
                       )}
                       <MDInput
@@ -148,7 +158,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails.email || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                       <MDInput
                         label="Role"
@@ -156,7 +168,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails.role || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                       <MDInput
                         label="Created at"
@@ -164,7 +178,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={formatDateToMalaysiaTime(userDetails.created_at) || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
 
                       {/* Display Status */}
@@ -174,7 +190,9 @@ function ViewUser() {
                         fullWidth
                         sx={{ mb: 2 }}
                         value={userDetails.status || ""}
-                        disabled
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     </MDBox>
                   </form>

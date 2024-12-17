@@ -15,18 +15,21 @@ import { format } from "date-fns";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
+import { getStatusBySerialNumber } from "utils/api";
 
 function VerifyCertificate() {
   const location = useLocation(); // Access the passed state from the navigate function
 
   // Destructure the passed data from location.state
-  const { name, email, serial_number, status } = location.state || {};
+  const { email, serial_number, created_at } = location.state || {};
 
   // Blockchain state and functions
   const [certificateDetails, setCertificateDetails] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [verificationAttempted, setVerificationAttempted] = useState(false);
+  const [status, setStatus] = useState("");
+
   const [transactionReceipt, setTransactionReceipt] = useState({
     transactionHash: "",
     from: "",
@@ -35,6 +38,27 @@ function VerifyCertificate() {
     gasUsed: "",
     status: "",
   });
+
+  // Fetch status details using useEffect
+  useEffect(() => {
+    const fetchStatusDetails = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem("token"); // Get token from localStorage (or from context)
+
+        const response = await getStatusBySerialNumber(email, serial_number, created_at, token);
+        setStatus(response.data);
+
+        setIsLoading(false);
+      } catch (error) {
+        setStatus(null);
+        setErrorMessage("Error fetching certificate details.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchStatusDetails();
+  }, [email, serial_number, created_at]);
 
   // Fetch certificate data from the blockchain using the serial number
   useEffect(() => {
@@ -137,7 +161,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.name || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Student ID"
@@ -145,7 +171,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.studentId || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="IC Number"
@@ -153,7 +181,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.icNumber || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Serial Number"
@@ -161,7 +191,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.serialNumber || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Course Name"
@@ -169,7 +201,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.courseName || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Issued Date"
@@ -177,7 +211,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={formattedIssuedDate}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="CID"
@@ -185,7 +221,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.cid || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>
@@ -214,24 +252,40 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={name || ""}
-                      disabled
+                      value={status?.name || ""}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                    <MDInput
+                      label="Ic Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={status?.ic_number || ""}
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Email"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={email || ""}
-                      disabled
+                      value={status?.email || ""}
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Status"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={status || ""}
-                      disabled
+                      value={status?.status || ""}
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>
@@ -260,7 +314,7 @@ function VerifyCertificate() {
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "350px",
+                      height: "325px",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -315,7 +369,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.transactionHash || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="From"
@@ -323,7 +379,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.from || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="To"
@@ -331,7 +389,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.to || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Block Number"
@@ -339,7 +399,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.blockNumber?.toString() || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Gas Used"
@@ -347,7 +409,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.gasUsed?.toString() || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Status"
@@ -355,7 +419,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={transactionReceipt?.status || "N/A"}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>

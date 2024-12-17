@@ -154,7 +154,9 @@ function EditCertificate() {
                       label="Serial Number"
                       fullWidth
                       value={serialNumber || "Loading..."} // Show loading placeholder
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                   <MDBox mb={2}>

@@ -18,7 +18,7 @@ import Footer from "examples/Footer";
 function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation(); // Access passed state from previous page
-  const { name, email, serial_number, status } = location.state || {}; // Destructure the state
+  const { email, serial_number, created_at } = location.state || {}; // Destructure the state
 
   const [otp, setOtp] = useState(""); // State for OTP
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
@@ -51,10 +51,9 @@ function VerifyOTP() {
         // Navigate to view certificate page with additional data passed via state
         navigate("/view-certificate", {
           state: {
-            name,
             email,
             serial_number,
-            status,
+            created_at,
           },
         });
       } else {

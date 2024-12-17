@@ -55,6 +55,11 @@ function Status() {
     { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Status", accessor: "status" },
     {
+      Header: "Created at",
+      accessor: "created_at",
+      Cell: ({ value }) => formatDate(value), // Format date for 'created_at'
+    },
+    {
       Header: "Actions",
       accessor: "actions",
       Cell: ({ row }) => (
@@ -148,6 +153,7 @@ function Status() {
           email: rowData.email,
           serial_number: rowData.serial_number,
           status: rowData.status,
+          created_at: rowData.created_at,
         },
       });
     } else {
@@ -160,6 +166,26 @@ function Status() {
       setSnackbarType("error");
       setOpenSnackbar(true);
     }
+  };
+
+  // Function to format the date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+
+    // Options for formatting the date and time
+    const options = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // 12-hour format (AM/PM)
+    };
+
+    // Format the date into "dd/mm/yyyy, h:mm AM/PM"
+    const formattedDate = date.toLocaleString("en-GB", options);
+
+    return formattedDate;
   };
 
   return (

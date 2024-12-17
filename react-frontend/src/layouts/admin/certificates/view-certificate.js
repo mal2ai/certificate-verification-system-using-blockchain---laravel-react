@@ -110,7 +110,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.name || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
 
                     <MDInput
@@ -119,7 +121,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.icNumber || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Student ID"
@@ -127,7 +131,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.studentId || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>
@@ -163,7 +169,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={serialNumber || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
 
                     <MDInput
@@ -172,7 +180,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.courseName || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Issued Date"
@@ -180,7 +190,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={formattedIssuedDate}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="CID"
@@ -188,7 +200,9 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.cid || ""}
-                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                 </form>
