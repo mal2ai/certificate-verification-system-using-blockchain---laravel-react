@@ -186,6 +186,7 @@ function EditUser() {
                           <MenuItem value="educational_institution">
                             Educational Institution
                           </MenuItem>
+                          <MenuItem value="admin">Admin</MenuItem>
                         </Select>
                       </FormControl>
                     </MDBox>

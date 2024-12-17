@@ -84,7 +84,7 @@ class UserController extends Controller
             'password' => 'sometimes|string|min:8',
             'role' => 'sometimes|string|in:admin,user',
             'status' => 'sometimes|string|in:active,inactive,banned',
-            'account_type' => 'sometimes|string|in:student,potential_employer,educational_institution',
+            'account_type' => 'sometimes|string|in:student,potential_employer,educational_institution,admin',
             'student_id' => 'required_if:account_type,student|nullable|string|max:255',
             'company_name' => 'required_if:account_type,potential_employer|nullable|string|max:255',
             'institution_name' => 'required_if:account_type,educational_institution|nullable|string|max:255',
