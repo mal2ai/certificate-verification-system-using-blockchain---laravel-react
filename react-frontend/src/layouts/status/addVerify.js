@@ -140,7 +140,9 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       value={name}
-                      disabled // Make this field non-editable
+                      InputProps={{
+                        readOnly: true,
+                      }}
                       sx={{ mb: 2 }}
                       required
                     />
@@ -149,7 +151,9 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       value={email}
-                      disabled // Make this field non-editable
+                      InputProps={{
+                        readOnly: true,
+                      }}
                       sx={{ mb: 2 }}
                     />
                     <MDInput

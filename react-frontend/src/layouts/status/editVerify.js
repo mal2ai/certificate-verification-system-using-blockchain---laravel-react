@@ -22,6 +22,7 @@ function VerifyCertificate() {
   const [serialNumber, setSerialNumber] = useState(""); // State for serial number
   const [name, setName] = useState(""); // State for name
   const [email, setEmail] = useState(""); // State for email
+  const [icNumber, setIcNumber] = useState(""); // State for IC number
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
   const [isLoading, setIsLoading] = useState(false); // Loading state for the button
   const [statusMessage, setStatusMessage] = useState(""); // Success/error status message
@@ -29,14 +30,15 @@ function VerifyCertificate() {
   // Retrieve passed data from the location state for editing
   useEffect(() => {
     if (location.state) {
-      const { name, email, serial_number } = location.state.rowData;
+      const { name, email, serial_number, ic_number } = location.state.rowData;
       setName(name);
       setEmail(email);
       setSerialNumber(serial_number);
+      setIcNumber(ic_number); // Set the IC number if available
     }
   }, [location.state]);
 
-  // Handle input change for name, email, and serial number
+  // Handle input change for name, email, serial number, and IC number
   const handleInputChange = (event, setter) => {
     setter(event.target.value);
   };
@@ -46,7 +48,7 @@ function VerifyCertificate() {
     setIsLoading(true);
     setErrorMessage("");
 
-    if (!name || !serialNumber) {
+    if (!name || !serialNumber || !icNumber) {
       setStatusMessage("Please fill in all required fields.");
       setIsLoading(false);
       return; // Stop the function if required fields are empty
@@ -59,6 +61,7 @@ function VerifyCertificate() {
       name,
       email, // Use email from localStorage
       serial_number: serialNumber, // New serial number to be updated
+      ic_number: icNumber, // New IC number to be updated
       status: "pending", // Default status as pending
     };
 
@@ -117,14 +120,28 @@ function VerifyCertificate() {
                       onChange={(e) => handleInputChange(e, setName)}
                       sx={{ mb: 2 }}
                       required
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                     <MDInput
                       label="Enter Your Email"
                       variant="outlined"
                       fullWidth
                       value={email}
-                      disabled // Disable the field so it's not editable
+                      InputProps={{
+                        readOnly: true,
+                      }}
                       sx={{ mb: 2 }}
+                    />
+                    <MDInput
+                      label="Enter IC Number"
+                      variant="outlined"
+                      fullWidth
+                      value={icNumber}
+                      onChange={(e) => handleInputChange(e, setIcNumber)}
+                      sx={{ mb: 2 }}
+                      required
                     />
                     <MDInput
                       label="Enter Certificate Serial Number"
