@@ -208,10 +208,10 @@ export const updateDetails = (serialNumber, email, statusData, token) => {
 };
 
 // New OTP API to send OTP to the user
-export const sendOTP = (email, token) => {
+export const sendOTP = (email, status_id, token) => {
   return api.post(
     "/send-otp",
-    { email }, // Pass the email in the request body
+    { email, status_id }, // Pass both email and status_id in the request body
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -221,10 +221,10 @@ export const sendOTP = (email, token) => {
 };
 
 // New OTP API to verify the OTP entered by the user
-export const verifyOTP = (email, otp, token) => {
+export const verifyOTP = (email, otp, status_id, token) => {
   return api.post(
     "/verify-otp",
-    { email, otp }, // Pass email and OTP in the request body
+    { email, otp, status_id }, // Pass email, OTP, and status_id in the request body
     {
       headers: {
         Authorization: `Bearer ${token}`,

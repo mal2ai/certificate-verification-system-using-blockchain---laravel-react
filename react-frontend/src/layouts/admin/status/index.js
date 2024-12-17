@@ -237,8 +237,8 @@ function Status() {
 
       if (response.data) {
         // Send OTP after approving
-        const otpResponse = await sendOTP(rowData.email, token);
-
+        const otpResponse = await sendOTP(rowData.email, rowData.id, token);
+        console.log("OTP response:", otpResponse);
         if (otpResponse.data) {
           setSnackbarMessage("Request has been approved and OTP sent successfully.");
           setSnackbarType("success");

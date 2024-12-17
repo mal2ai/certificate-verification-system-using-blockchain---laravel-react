@@ -149,6 +149,7 @@ function Status() {
       // If approved, navigate to the verify OTP page
       navigate(`/verify-otp`, {
         state: {
+          id: rowData.id,
           name: rowData.name,
           email: rowData.email,
           serial_number: rowData.serial_number,

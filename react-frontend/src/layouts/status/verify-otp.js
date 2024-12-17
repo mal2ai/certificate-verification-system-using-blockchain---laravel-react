@@ -18,7 +18,7 @@ import Footer from "examples/Footer";
 function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation(); // Access passed state from previous page
-  const { email, serial_number, created_at } = location.state || {}; // Destructure the state
+  const { id, email, serial_number, created_at } = location.state || {}; // Destructure the state
 
   const [otp, setOtp] = useState(""); // State for OTP
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
@@ -45,7 +45,7 @@ function VerifyOTP() {
     const token = localStorage.getItem("token"); // Get token from localStorage
 
     try {
-      const response = await verifyOTP(email, otp, token); // Call verifyOTP API function
+      const response = await verifyOTP(email, otp, id, token); // Call verifyOTP API function
       if (response.status === 200) {
         setStatusMessage("OTP verified successfully.");
         // Navigate to view certificate page with additional data passed via state

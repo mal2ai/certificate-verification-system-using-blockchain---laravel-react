@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Status;
 use Illuminate\Support\Facades\Log;
 
 class OTPController extends Controller
@@ -20,15 +21,17 @@ class OTPController extends Controller
             return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
         }
 
-        // Validate the email input
+        // Validate the email and status_id input
         $request->validate([
-            'email' => 'required|email|exists:users,email', // Check email in the users table explicitly
+            'email' => 'required|email|exists:users,email', // Check if the email exists in the users table
+            'status_id' => 'required|exists:status,id', // Validate that the status_id exists in the status table
         ]);
 
         $email = $request->input('email');
+        $status_id = $request->input('status_id');
         
-        // Log the email being validated
-        \Log::info("Validating email: $email");
+        // Log the email and status_id being validated
+        \Log::info("Validating email: $email with status_id: $status_id");
 
         // Try manually fetching the user
         $user = User::where('email', $email)->first();
@@ -37,15 +40,23 @@ class OTPController extends Controller
         if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
-        
+
+        // Fetch the status with the provided status_id
+        $status = Status::find($status_id);
+
+        if (!$status || $status->status !== 'approved') {
+            return response()->json(['message' => 'Invalid or unapproved status for this status_id.'], 400);
+        }
+
         // Generate a 6-digit OTP
         $otp = rand(100000, 999999);
         
         // Hash the OTP using bcrypt
         $hashedOtp = bcrypt($otp);
 
-        // Store the hashed OTP in the database (or store it in a dedicated table for OTPs)
+        // Store the hashed OTP and status_id in the database
         $user->otp_code = $hashedOtp; // Assuming `otp_code` is a column in the `users` table
+        $user->status_id = $status_id; // Store the status_id for the user
         $user->otp_sent_at = now(); // Store the timestamp when OTP was sent (optional)
         $user->save();
 
@@ -71,25 +82,33 @@ class OTPController extends Controller
     {
         // Validate the input
         $request->validate([
-            'otp' => 'required|numeric|digits:6',
-            'email' => 'required|email' // Added email validation for the OTP verification process
+            'otp' => 'required|numeric|digits:6', // Ensure OTP is a 6-digit number
+            'email' => 'required|email', // Ensure email is provided
+            'status_id' => 'required|exists:status,id' // Validate status_id is provided and exists in the 'status' table
         ]);
 
-        $email = $request->input('email'); // Assuming the user also sends their email for OTP verification
+        $email = $request->input('email'); // The email for OTP verification
+        $status_id = $request->input('status_id'); // The status_id from the request
 
-        // Retrieve the user and the stored hashed OTP
+        // Retrieve the user by email
         $user = User::where('email', $email)->first();
         if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
         }
 
+        // Ensure that the status_id matches the stored status_id for the user
+        if ($user->status_id !== $status_id) {
+            return response()->json(['message' => 'Invalid status ID.'], 400);
+        }
+
+        // Retrieve the stored (hashed) OTP and compare with the entered OTP
         $storedOtp = $user->otp_code;
         $enteredOtp = $request->input('otp');
 
-        // Check if the entered OTP matches the stored (hashed) OTP
         if (Hash::check($enteredOtp, $storedOtp)) {
-            
-            $user->otp_code = null; // set this enable after phase testing end
+            // Clear the OTP and status_id after successful verification
+            $user->otp_code = null;
+            $user->status_id = null;
             $user->save();
 
             return response()->json(['message' => 'OTP verified successfully!'], 200);
