@@ -148,10 +148,10 @@ function Projects() {
         ) : (
           <DataTable
             table={{ columns, rows }} // Pass the sorted rows
-            showTotalEntries={true}
             isSorted={true}
-            noEndBorder
-            entriesPerPage={true}
+            entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+            showTotalEntries={true}
+            canSearch={true}
           />
         )}
       </MDBox>

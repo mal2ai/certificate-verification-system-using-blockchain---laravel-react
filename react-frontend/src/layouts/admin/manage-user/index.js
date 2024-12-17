@@ -190,9 +190,9 @@ function ManageUser() {
                   <DataTable
                     table={{ columns, rows: userRoleData }}
                     isSorted={true}
-                    entriesPerPage={true}
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
                     showTotalEntries={true}
-                    noEndBorder
+                    canSearch={true}
                   />
                 )}
               </MDBox>
@@ -235,9 +235,9 @@ function ManageUser() {
                   <DataTable
                     table={{ columns, rows: adminRoleData }}
                     isSorted={true}
-                    entriesPerPage={true}
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
                     showTotalEntries={true}
-                    noEndBorder
+                    canSearch={true}
                   />
                 )}
               </MDBox>

@@ -225,10 +225,9 @@ function Certificates() {
                   <DataTable
                     table={{ columns, rows: certificates }}
                     isSorted={true}
-                    entriesPerPage={5}
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
                     showTotalEntries={true}
-                    search={true}
-                    noEndBorder
+                    canSearch={true}
                   />
                 )}
               </MDBox>

@@ -1,41 +1,16 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useMemo, useEffect, useState } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
-
-// react-table components
 import { useTable, usePagination, useGlobalFilter, useAsyncDebounce, useSortBy } from "react-table";
-
-// @mui material components
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Icon from "@mui/material/Icon";
 import Autocomplete from "@mui/material/Autocomplete";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDPagination from "components/MDPagination";
-
-// Material Dashboard 2 React example components
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
 
@@ -86,7 +61,7 @@ function DataTable({
   // Set the entries per page value based on the select value
   const setEntriesPerPage = (value) => setPageSize(value);
 
-  // Render the paginations
+  // Render the pagination controls
   const renderPagination = pageOptions.map((option) => (
     <MDPagination
       item
@@ -98,7 +73,7 @@ function DataTable({
     </MDPagination>
   ));
 
-  // Handler for the input to set the pagination index
+  // Handle input pagination change
   const handleInputPagination = ({ target: { value } }) =>
     value > pageOptions.length || value < 0 ? gotoPage(0) : gotoPage(Number(value));
 
@@ -231,6 +206,7 @@ function DataTable({
           </MDBox>
         )}
       </MDBox>
+
       <MDBox
         display="flex"
         flexDirection={{ xs: "column", sm: "row" }}
@@ -246,7 +222,7 @@ function DataTable({
           </MDBox>
         )}
 
-        {pageOptions.length > 1 && (
+        {pageOptions.length > 1 && ( // Ensure pagination is always displayed when there are multiple pages
           <MDPagination
             variant={pagination.variant ? pagination.variant : "gradient"}
             color={pagination.color ? pagination.color : "info"}
@@ -261,7 +237,7 @@ function DataTable({
                 <MDInput
                   inputProps={{ type: "number", min: 1, max: customizedPageOptions.length }}
                   value={customizedPageOptions[pageIndex]}
-                  onChange={(handleInputPagination, handleInputPaginationValue)}
+                  onChange={handleInputPagination}
                 />
               </MDBox>
             ) : (
@@ -281,7 +257,7 @@ function DataTable({
 
 // Setting default values for the props of DataTable
 DataTable.defaultProps = {
-  entriesPerPage: { defaultValue: 10, entries: [5, 10, 15, 20, 25] },
+  entriesPerPage: { defaultValue: 5, entries: [5, 10, 15, 20, 25] },
   canSearch: false,
   showTotalEntries: true,
   pagination: { variant: "gradient", color: "info" },
