@@ -123,7 +123,25 @@ function DataTable({
   return (
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" p={2}>
+        <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+          {entriesPerPage && (
+            <MDBox display="flex" alignItems="center">
+              <Autocomplete
+                disableClearable
+                value={pageSize.toString()}
+                options={entries}
+                onChange={(event, newValue) => {
+                  setEntriesPerPage(parseInt(newValue, 10));
+                }}
+                size="small"
+                sx={{ width: "5rem" }}
+                renderInput={(params) => <MDInput {...params} />}
+              />
+              <MDTypography variant="caption" color="secondary">
+                &nbsp;&nbsp;entries per page
+              </MDTypography>
+            </MDBox>
+          )}
           {canSearch && (
             <MDBox width="12rem" ml="auto">
               <MDInput
@@ -178,34 +196,6 @@ function DataTable({
           })}
         </TableBody>
       </Table>
-
-      <MDBox
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", sm: "center" }}
-        p={2}
-        mt={0} // Remove any top margin
-      >
-        {entriesPerPage && (
-          <MDBox display="flex" alignItems="center">
-            <Autocomplete
-              disableClearable
-              value={pageSize.toString()}
-              options={entries}
-              onChange={(event, newValue) => {
-                setEntriesPerPage(parseInt(newValue, 10));
-              }}
-              size="small"
-              sx={{ width: "5rem" }}
-              renderInput={(params) => <MDInput {...params} />}
-            />
-            <MDTypography variant="caption" color="secondary">
-              &nbsp;&nbsp;entries per page
-            </MDTypography>
-          </MDBox>
-        )}
-      </MDBox>
 
       <MDBox
         display="flex"
