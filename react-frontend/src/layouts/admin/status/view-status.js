@@ -162,20 +162,19 @@ function VerifyCertificate() {
                       disabled
                     />
                     <MDInput
-                      label="Serial Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={serial_number || serialNumber || ""}
-                      disabled
-                    />
-                    {/* Additional Fields */}
-                    <MDInput
                       label="Email"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
                       value={email || userDetails?.email || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Serial Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={serial_number || serialNumber || ""}
                       disabled
                     />
                     <MDInput

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { storeStatus } from "utils/api"; // Import the storeStatus function
+import { storeStatus, getProfileDetails } from "utils/api"; // Import the API functions
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -24,7 +24,32 @@ function VerifyCertificate() {
   const [isLoading, setIsLoading] = useState(false); // Loading state for the button
   const [statusMessage, setStatusMessage] = useState(""); // Success/error status message
 
-  // Handle input change for name, email, and serial number
+  useEffect(() => {
+    const fetchProfileDetails = async () => {
+      const token = localStorage.getItem("token"); // Get the token from localStorage
+
+      if (!token) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("email");
+        navigate("/sign-in"); // Redirect to login if token is not available
+        return;
+      }
+
+      try {
+        const response = await getProfileDetails(token);
+        setName(response.data.data.name);
+        setEmail(response.data.data.email);
+      } catch (error) {
+        console.error("Failed to fetch profile details:", error);
+        setStatusMessage("Unable to retrieve user details. Please try again later.");
+      }
+    };
+
+    fetchProfileDetails();
+  }, [navigate]);
+
+  // Handle input change for the serial number
   const handleInputChange = (event, setter) => {
     setter(event.target.value);
   };
@@ -42,12 +67,11 @@ function VerifyCertificate() {
     }
 
     const token = localStorage.getItem("token"); // Get token from localStorage
-    const email = localStorage.getItem("email");
 
     // Prepare data to send in the API request
     const data = {
       name,
-      email: email,
+      email,
       serial_number: serialNumber,
       status: "pending", // Default status as pending
     };
@@ -110,20 +134,20 @@ function VerifyCertificate() {
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
-                      label="Enter Your Name"
+                      label="Your Name"
                       variant="outlined"
                       fullWidth
                       value={name}
-                      onChange={(e) => handleInputChange(e, setName)}
+                      disabled // Make this field non-editable
                       sx={{ mb: 2 }}
                       required
                     />
                     <MDInput
-                      label="Enter Your Email"
+                      label="Your Email"
                       variant="outlined"
                       fullWidth
-                      value={localStorage.getItem("email") || ""} // Get email from localStorage
-                      disabled // Disable the field so it's not editable
+                      value={email}
+                      disabled // Make this field non-editable
                       sx={{ mb: 2 }}
                     />
                     <MDInput
@@ -146,7 +170,7 @@ function VerifyCertificate() {
                       }}
                       disabled={isLoading}
                     >
-                      {isLoading ? "Saving..." : "Sent Request"}
+                      {isLoading ? "Saving..." : "Send Request"}
                     </MDButton>
                   </MDBox>
                 </form>
