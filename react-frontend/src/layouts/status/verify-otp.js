@@ -47,7 +47,8 @@ function VerifyOTP() {
     try {
       const response = await verifyOTP(email, otp, id, token); // Call verifyOTP API function
       if (response.status === 200) {
-        setStatusMessage("OTP verified successfully.");
+        // Display the message from the API response (assuming it’s in response.data.message)
+        setStatusMessage(response.data.message || "OTP verified successfully.");
         // Navigate to view certificate page with additional data passed via state
         navigate("/view-certificate", {
           state: {
@@ -57,10 +58,12 @@ function VerifyOTP() {
           },
         });
       } else {
-        setStatusMessage("Failed to verify OTP.");
+        // Handle the case if the status is not 200
+        setStatusMessage(response.data.message);
       }
     } catch (error) {
-      setStatusMessage("Failed to verify OTP.");
+      // In case of an error (e.g., network issues or unexpected server response)
+      setStatusMessage("Invalid OTP. Please try again.");
     } finally {
       setIsLoading(false); // Stop loading state
     }
@@ -90,10 +93,7 @@ function VerifyOTP() {
               <MDBox p={3}>
                 {statusMessage && (
                   <MDBox mt={2}>
-                    <MDTypography
-                      variant="body2"
-                      color={statusMessage.includes("successfully") ? "green" : "red"}
-                    >
+                    <MDTypography variant="body2" color="error">
                       {statusMessage}
                     </MDTypography>
                   </MDBox>

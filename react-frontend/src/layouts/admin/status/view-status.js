@@ -42,7 +42,6 @@ function VerifyCertificate() {
         const token = localStorage.getItem("token"); // Get token from localStorage (or from context)
 
         const response = await getStatusBySerialNumber(email, serial_number, created_at, token);
-        console.log(response); // Log response here
         setCertificateDetails(response.data); // Set certificate details in the state
 
         setIsLoading(false);
@@ -66,7 +65,7 @@ function VerifyCertificate() {
         const token = localStorage.getItem("token"); // Get token from localStorage
 
         const response = await getUserDetailsByEmail(email, token);
-        console.log(response); // Log response here
+
         setUserDetails(response.data); // Set user details in the state
 
         setIsLoading(false);
@@ -129,7 +128,7 @@ function VerifyCertificate() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token"); // Get token from localStorage
-      await sendOTP(email, token); // Call sendOTP function
+      await sendOTP(email, certificateDetails?.id, token); // Call sendOTP function
       setIsLoading(false);
 
       setSnackbarMessage("OTP sent successfully.");
@@ -433,6 +432,9 @@ function VerifyCertificate() {
             color="warning"
             sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
             onClick={handleResendOTP}
+            disabled={
+              certificateDetails?.status === "pending" || certificateDetails?.status === "rejected"
+            }
           >
             Resend OTP
           </MDButton>
