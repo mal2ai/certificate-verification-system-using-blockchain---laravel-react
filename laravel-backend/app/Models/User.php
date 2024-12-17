@@ -45,19 +45,5 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        // Create a mutator to validate conditionally required fields
-        static::saving(function ($user) {
-            if ($user->account_type === 'student' && empty($user->student_id)) {
-                throw new \Exception("Student ID is required for student accounts.");
-            }
-
-            if ($user->account_type === 'Potential Employer' && empty($user->company_name)) {
-                throw new \Exception("Company Name is required for potential employer accounts.");
-            }
-
-            if ($user->account_type === 'Educational Institution' && empty($user->institution_name)) {
-                throw new \Exception("Institution Name is required for educational institution accounts.");
-            }
-        });
     }
 }
