@@ -6,6 +6,7 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -17,13 +18,12 @@ import DataTable from "examples/Tables/DataTable";
 function Projects() {
   const [transactions, setTransactions] = useState([]);
   const [menu, setMenu] = useState(null);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   // Fetch transactions when the component mounts
   useEffect(() => {
-    // Retrieve the token from localStorage
     const token = localStorage.getItem("token");
 
-    // If there's no token, you can handle that scenario (e.g., redirect the user to login)
     if (!token) {
       console.error("No token found in localStorage");
       return;
@@ -31,10 +31,12 @@ function Projects() {
 
     const fetchTransactions = async () => {
       try {
-        const response = await getTransactions(token); // Pass the token to the getTransactions function
-        setTransactions(response.data.transactions); // assuming the data structure contains transactions
+        const response = await getTransactions(token);
+        setTransactions(response.data.transactions);
+        setLoadingTransactions(false);
       } catch (error) {
         console.error("Error fetching transactions:", error);
+        setLoadingTransactions(false);
       }
     };
 
@@ -129,14 +131,29 @@ function Projects() {
         </MDBox>
         {renderMenu}
       </MDBox>
+
       <MDBox>
-        <DataTable
-          table={{ columns, rows }} // Pass the sorted rows
-          showTotalEntries={true}
-          isSorted={true}
-          noEndBorder
-          entriesPerPage={true}
-        />
+        {loadingTransactions ? ( // Show loading spinner while fetching data
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              padding: "20px",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : (
+          <DataTable
+            table={{ columns, rows }} // Pass the sorted rows
+            showTotalEntries={true}
+            isSorted={true}
+            noEndBorder
+            entriesPerPage={true}
+          />
+        )}
       </MDBox>
     </Card>
   );

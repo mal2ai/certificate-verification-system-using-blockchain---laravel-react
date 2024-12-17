@@ -13,6 +13,7 @@ import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
@@ -117,7 +118,7 @@ function Dashboard() {
                   color="dark"
                   icon="description"
                   title="Certificates"
-                  count="Loading..."
+                  count={<CircularProgress size={24} />} // Add CircularProgress here
                   percentage={{
                     color: "success",
                     amount: "",
@@ -144,8 +145,8 @@ function Dashboard() {
               {loadingUsers ? (
                 <ComplexStatisticsCard
                   icon="group"
-                  title="Today's Users"
-                  count="Loading..."
+                  title="Total Users"
+                  count={<CircularProgress size={24} />} // Display the spinner here
                   percentage={{
                     color: "success",
                     amount: "",
@@ -173,7 +174,7 @@ function Dashboard() {
                   color="warning"
                   icon="rate_review"
                   title="Pending Requests"
-                  count="Loading..."
+                  count={<CircularProgress size={24} />} // Display the spinner here
                   percentage={{
                     color: "success",
                     amount: "",
@@ -212,7 +213,7 @@ function Dashboard() {
                   />
                 }
                 title="Total Blocks"
-                count={displayBlockNumber}
+                count={loading ? <CircularProgress size={24} /> : displayBlockNumber} // Use loading state here
                 percentage={{
                   color: "success",
                   amount: "",
