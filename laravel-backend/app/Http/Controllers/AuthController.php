@@ -154,7 +154,7 @@ class AuthController extends Controller
         }
 
         // Return user details excluding password
-        return response()->json($user->only('id', 'name', 'email', 'role'), 200);
+        return response()->json($user, 200);
     }
 
 }

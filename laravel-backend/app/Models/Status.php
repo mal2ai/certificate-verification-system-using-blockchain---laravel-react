@@ -15,6 +15,7 @@ class Status extends Model
         'name',
         'email',
         'serial_number',
+        'ic_number',
         'status',
     ];
 }

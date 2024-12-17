@@ -118,8 +118,13 @@ export const countUsers = (token) => {
 };
 
 // Status-related APIs
-export const getStatusBySerialNumber = (serialNumber, token) => {
-  return api.get(`/status/${serialNumber}`, {
+export const getStatusBySerialNumber = (email, serialNumber, createdAt, token) => {
+  return api.get(`/status`, {
+    params: {
+      email: email,
+      serial_number: serialNumber,
+      created_at: createdAt, // Pass the created_at timestamp here
+    },
     headers: {
       Authorization: `Bearer ${token}`,
     },

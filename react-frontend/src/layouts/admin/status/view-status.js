@@ -14,7 +14,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // API function to get user details by email, delete status, and send OTP
-import { getUserDetailsByEmail, deleteStatus, sendOTP } from "utils/api";
+import { getStatusBySerialNumber, deleteStatus, sendOTP, getUserDetailsByEmail } from "utils/api";
 
 function VerifyCertificate() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ function VerifyCertificate() {
   const location = useLocation(); // Accessing location state
 
   const [certificateDetails, setCertificateDetails] = useState(null);
-  const [userDetails, setUserDetails] = useState(null); // State for storing user details
+  const [userDetails, setUserDetails] = useState(null); // State to store user details
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [verificationAttempted, setVerificationAttempted] = useState(false);
@@ -32,35 +32,58 @@ function VerifyCertificate() {
   const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar visibility
 
   // Destructure the passed data from location.state
-  const { name, email, serial_number, status } = location.state || {};
+  const { email, serial_number, created_at } = location.state || {}; // Only fetching email, serial_number, and created_at
 
-  // Fetch user details by email
+  // Fetch status details by email, serial_number, and created_at
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchStatusDetails = async () => {
       try {
         setIsLoading(true);
-
         const token = localStorage.getItem("token"); // Get token from localStorage (or from context)
 
-        const response = await getUserDetailsByEmail(email, token); // Fetch user details by email
-        setUserDetails(response.data); // Set user details in the state
+        const response = await getStatusBySerialNumber(email, serial_number, created_at, token);
+        console.log(response); // Log response here
+        setCertificateDetails(response.data); // Set certificate details in the state
 
         setIsLoading(false);
         setVerificationAttempted(true);
       } catch (error) {
-        setUserDetails(null);
-        setErrorMessage("Error fetching user details.");
+        setCertificateDetails(null);
+        setErrorMessage("Error fetching certificate details.");
         setIsLoading(false);
         setVerificationAttempted(true);
       }
     };
 
-    fetchUserDetails();
-  }, [email]); // Adding email as dependency to re-fetch if email changes
+    fetchStatusDetails();
+  }, [email, serial_number, created_at]);
+
+  // Fetch user account details by email
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem("token"); // Get token from localStorage
+
+        const response = await getUserDetailsByEmail(email, token);
+        console.log(response); // Log response here
+        setUserDetails(response.data); // Set user details in the state
+
+        setIsLoading(false);
+      } catch (error) {
+        setErrorMessage("Error fetching user details.");
+        setIsLoading(false);
+      }
+    };
+
+    if (email) {
+      fetchUserDetails();
+    }
+  }, [email]);
 
   // Handle the View Certificate button click
   const handleViewCertificate = () => {
-    navigate(`/admin/view-certificate/${serial_number}`);
+    navigate(`/admin/view-certificate/${certificateDetails?.serial_number || serialNumber}`);
   };
 
   // Handle Delete Certificate button click
@@ -73,16 +96,24 @@ function VerifyCertificate() {
         throw new Error("Email is required for deletion");
       }
 
-      await deleteStatus(serial_number, email, token); // Pass both serial_number and email to the delete function
+      await deleteStatus(
+        certificateDetails?.serial_number || serialNumber,
+        certificateDetails?.email,
+        token
+      ); // Pass both serial_number and email to the delete function
       setIsLoading(false);
 
       // Navigate back with a success message
-      setSnackbarMessage(`Request ${serial_number} for ${email} Deleted Successfully!`);
+      setSnackbarMessage(
+        `Request ${
+          certificateDetails?.serial_number || serialNumber
+        } for ${email} Deleted Successfully!`
+      );
       setSnackbarType("success");
       setOpenSnackbar(true);
 
       navigate("/admin/request", {
-        state: { successMessage: `Request ${serial_number} for ${email} Deleted Successfully!` },
+        state: { successMessage: `Request ${serialNumber} for ${email} Deleted Successfully!` },
       });
     } catch (error) {
       setIsLoading(false);
@@ -123,6 +154,26 @@ function VerifyCertificate() {
     }
   }, [location.state, navigate]);
 
+  // Function to format the date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+
+    // Options for formatting the date and time
+    const options = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // 12-hour format (AM/PM)
+    };
+
+    // Format the date into "dd/mm/yyyy, h:mm AM/PM"
+    const formattedDate = date.toLocaleString("en-GB", options);
+
+    return formattedDate;
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -153,28 +204,67 @@ function VerifyCertificate() {
                 )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
+                    {/* Display Name */}
                     <MDInput
                       label="Name"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={name || certificateDetails?.name || ""}
+                      value={certificateDetails?.name || ""}
                       disabled
                     />
+
+                    {/* Display IC Number */}
+                    <MDInput
+                      label="IC Number"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.ic_number || ""}
+                      disabled
+                    />
+
+                    {/* Display Email */}
                     <MDInput
                       label="Email"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={email || userDetails?.email || ""}
+                      value={certificateDetails?.email || ""}
                       disabled
                     />
+
+                    {/* Display Serial Number */}
                     <MDInput
                       label="Serial Number"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={serial_number || serialNumber || ""}
+                      value={certificateDetails?.serial_number || serialNumber || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Created At"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={
+                        certificateDetails?.created_at
+                          ? formatDate(certificateDetails.created_at)
+                          : ""
+                      }
+                      disabled
+                    />
+                    <MDInput
+                      label="Update At"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={
+                        certificateDetails?.updated_at
+                          ? formatDate(certificateDetails.updated_at)
+                          : ""
+                      }
                       disabled
                     />
                     <MDInput
@@ -182,7 +272,7 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={status || userDetails?.status || ""}
+                      value={certificateDetails?.status || ""}
                       disabled
                     />
                   </MDBox>
@@ -209,21 +299,36 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {verificationAttempted && !userDetails && !isLoading && (
-                  <MDTypography variant="body2" color="error">
-                    {errorMessage}
-                  </MDTypography>
-                )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
-                      label="ID"
+                      label="Account Type"
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={userDetails?.id || ""}
+                      value={userDetails?.account_type || ""}
                       disabled
                     />
+                    {userDetails?.account_type === "potential_employer" && (
+                      <MDInput
+                        label="Company Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.company_name || ""}
+                        disabled
+                      />
+                    )}
+                    {userDetails?.account_type === "educational_instituition" && (
+                      <MDInput
+                        label="Instituition Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.instituition_name || ""}
+                        disabled
+                      />
+                    )}
                     <MDInput
                       label="Name"
                       variant="outlined"
@@ -232,6 +337,16 @@ function VerifyCertificate() {
                       value={userDetails?.name || ""}
                       disabled
                     />
+                    {userDetails?.account_type === "student" && (
+                      <MDInput
+                        label="Student ID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.student_id || ""}
+                        disabled
+                      />
+                    )}
                     <MDInput
                       label="Email"
                       variant="outlined"
@@ -246,6 +361,22 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={userDetails?.role || ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Created at"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={userDetails?.created_at ? formatDate(userDetails.created_at) : ""}
+                      disabled
+                    />
+                    <MDInput
+                      label="Account Status"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={userDetails?.status || ""}
                       disabled
                     />
                   </MDBox>
@@ -270,7 +401,6 @@ function VerifyCertificate() {
             color="warning"
             sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
             onClick={handleResendOTP}
-            disabled={status === "rejected" || status === "pending"} // Disable button if status is 'rejected' or 'pending'
           >
             Resend OTP
           </MDButton>

@@ -20,6 +20,7 @@ function VerifyCertificate() {
   const [serialNumber, setSerialNumber] = useState(""); // State for serial number
   const [name, setName] = useState(""); // State for name
   const [email, setEmail] = useState(""); // State for email
+  const [icNumber, setIcNumber] = useState(""); // State for IC number
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
   const [isLoading, setIsLoading] = useState(false); // Loading state for the button
   const [statusMessage, setStatusMessage] = useState(""); // Success/error status message
@@ -49,7 +50,7 @@ function VerifyCertificate() {
     fetchProfileDetails();
   }, [navigate]);
 
-  // Handle input change for the serial number
+  // Handle input change for any field
   const handleInputChange = (event, setter) => {
     setter(event.target.value);
   };
@@ -60,7 +61,7 @@ function VerifyCertificate() {
     setErrorMessage("");
 
     // Check if required fields are empty
-    if (!name || !serialNumber) {
+    if (!name || !serialNumber || !icNumber) {
       setStatusMessage("Please fill in all required fields.");
       setIsLoading(false);
       return; // Stop the function if required fields are empty
@@ -73,6 +74,7 @@ function VerifyCertificate() {
       name,
       email,
       serial_number: serialNumber,
+      ic_number: icNumber,
       status: "pending", // Default status as pending
     };
 
@@ -149,6 +151,15 @@ function VerifyCertificate() {
                       value={email}
                       disabled // Make this field non-editable
                       sx={{ mb: 2 }}
+                    />
+                    <MDInput
+                      label="Enter IC Number"
+                      variant="outlined"
+                      fullWidth
+                      value={icNumber}
+                      onChange={(e) => handleInputChange(e, setIcNumber)}
+                      sx={{ mb: 2 }}
+                      required
                     />
                     <MDInput
                       label="Enter Certificate Serial Number"

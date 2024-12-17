@@ -21,6 +21,7 @@ class StatusController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email',
                 'serial_number' => 'required|string|max:255',
+                'ic_number' => 'required|string|max:20', // Added validation for IC number
             ]);
             \Log::info('Validation passed', $validated); // Debug log
 
@@ -29,6 +30,7 @@ class StatusController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'serial_number' => $validated['serial_number'],
+                'ic_number' => $validated['ic_number'], // Added IC number
                 'status' => 'pending',
             ]);
             \Log::info('Status created successfully', $status->toArray()); // Debug log
@@ -48,11 +50,21 @@ class StatusController extends Controller
     }
 
     // Get status by serial number
-    public function getStatus($serialNumber)
+    public function getStatus(Request $request)
     {
         try {
-            // Find the status by the serial number
-            $status = Status::where('serial_number', $serialNumber)->first();
+            // Validate the input parameters
+            $request->validate([
+                'email' => 'required|email',
+                'serial_number' => 'required|string',
+                'created_at' => 'required|date', // Ensure full timestamp format
+            ]);
+
+            // Find the status using email, serial_number, and exact created_at timestamp
+            $status = Status::where('email', $request->email)
+                ->where('serial_number', $request->serial_number)
+                ->where('created_at', $request->created_at) // Exact match on timestamp
+                ->first();
 
             // If status exists, return it
             if ($status) {
@@ -192,6 +204,7 @@ class StatusController extends Controller
                 'name' => 'nullable|string|max:255', // Name is optional
                 'email' => 'nullable|email', // Email is optional
                 'serial_number' => 'nullable|string|max:255', // Serial number is optional
+                'ic_number' => 'nullable|string|max:20', // IC number is optional
             ]);
 
             // Find the status by serial_number and email
@@ -213,6 +226,9 @@ class StatusController extends Controller
             }
             if (isset($validated['serial_number'])) {
                 $status->serial_number = $validated['serial_number'];
+            }
+            if (isset($validated['ic_number'])) {
+                $status->ic_number = $validated['ic_number'];
             }
 
             // Save the updated status

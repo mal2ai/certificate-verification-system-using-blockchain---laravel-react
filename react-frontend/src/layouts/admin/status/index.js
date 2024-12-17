@@ -159,6 +159,7 @@ function Status() {
         email: rowData.email,
         serial_number: rowData.serial_number,
         status: rowData.status,
+        created_at: rowData.created_at,
       },
     });
   };
