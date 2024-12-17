@@ -123,7 +123,7 @@ function DataTable({
   return (
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+        <MDBox display="flex" justifyContent="space-between" alignItems="center" p={2}>
           {canSearch && (
             <MDBox width="12rem" ml="auto">
               <MDInput
