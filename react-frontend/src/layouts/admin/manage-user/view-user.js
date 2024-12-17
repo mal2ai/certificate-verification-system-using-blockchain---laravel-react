@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
+//ui
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -80,17 +83,33 @@ function ViewUser() {
                   User Details
                 </MDTypography>
               </MDBox>
-              <MDBox p={3}>
-                {isLoading && (
-                  <MDTypography variant="body2" color="dark">
-                    Loading details...
-                  </MDTypography>
+
+              <MDBox p={3} position="relative">
+                {isLoading && !userDetails && !errorMessage && (
+                  <MDBox
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    width="100%"
+                    height="100%"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    zIndex="10" // Ensures spinner is on top of other content
+                    bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+                  >
+                    <CircularProgress />
+                  </MDBox>
                 )}
+
+                {/* Display error message if there is an error */}
                 {!isLoading && errorMessage && (
                   <MDTypography variant="body2" color="error">
                     {errorMessage}
                   </MDTypography>
                 )}
+
+                {/* Display user details if not loading */}
                 {!isLoading && userDetails && (
                   <form onSubmit={(e) => e.preventDefault()}>
                     <MDBox mt={3}>

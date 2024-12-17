@@ -6,7 +6,8 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-import MDSnackbar from "components/MDSnackbar"; // Importing MDSnackbar
+import MDSnackbar from "components/MDSnackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -190,106 +191,131 @@ function VerifyCertificate() {
                 bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
+                position="relative" // Ensures the spinner is positioned correctly
               >
                 <MDTypography variant="h6" color="dark">
                   Request Details
                 </MDTypography>
               </MDBox>
-              <MDBox p={3}>
-                {verificationAttempted && !certificateDetails && !isLoading && (
-                  <MDTypography variant="body2" color="error">
-                    {errorMessage}
-                  </MDTypography>
+
+              {/* The content container that holds the entire card's content */}
+              <MDBox p={3} position="relative">
+                {isLoading &&
+                  !certificateDetails && ( // Check if the data is loading
+                    <MDBox
+                      position="absolute"
+                      top="0"
+                      left="0"
+                      width="100%"
+                      height="100%"
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      zIndex="10" // Makes sure the spinner is on top of other elements
+                      bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+                    >
+                      <CircularProgress />
+                    </MDBox>
+                  )}
+
+                {/* Render form only if certificateDetails is available */}
+                {!isLoading && certificateDetails && (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <MDBox mt={3}>
+                      {/* Display Name */}
+                      <MDInput
+                        label="Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.name || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display IC Number */}
+                      <MDInput
+                        label="IC Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.ic_number || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Email */}
+                      <MDInput
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.email || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Serial Number */}
+                      <MDInput
+                        label="Serial Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.serial_number || serialNumber || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Created At */}
+                      <MDInput
+                        label="Created At"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={
+                          certificateDetails?.created_at
+                            ? formatDate(certificateDetails.created_at)
+                            : ""
+                        }
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Updated At */}
+                      <MDInput
+                        label="Update At"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={
+                          certificateDetails?.updated_at
+                            ? formatDate(certificateDetails.updated_at)
+                            : ""
+                        }
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Status */}
+                      <MDInput
+                        label="Status"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.status || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    </MDBox>
+                  </form>
                 )}
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    {/* Display Name */}
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.name || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-
-                    {/* Display IC Number */}
-                    <MDInput
-                      label="IC Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.ic_number || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-
-                    {/* Display Email */}
-                    <MDInput
-                      label="Email"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.email || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-
-                    {/* Display Serial Number */}
-                    <MDInput
-                      label="Serial Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.serial_number || serialNumber || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Created At"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={
-                        certificateDetails?.created_at
-                          ? formatDate(certificateDetails.created_at)
-                          : ""
-                      }
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Update At"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={
-                        certificateDetails?.updated_at
-                          ? formatDate(certificateDetails.updated_at)
-                          : ""
-                      }
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Status"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.status || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </MDBox>
-                </form>
               </MDBox>
             </Card>
           </Grid>
@@ -306,112 +332,136 @@ function VerifyCertificate() {
                 bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
+                position="relative" // Ensures the spinner is positioned correctly
               >
                 <MDTypography variant="h6" color="dark">
                   Account Details
                 </MDTypography>
               </MDBox>
-              <MDBox p={3}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Account Type"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.account_type || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    {userDetails?.account_type === "potential_employer" && (
+
+              {/* The content container that holds the entire card's content */}
+              <MDBox p={3} position="relative">
+                {isLoading &&
+                  !userDetails && ( // Check if the data is loading
+                    <MDBox
+                      position="absolute"
+                      top="0"
+                      left="0"
+                      width="100%"
+                      height="100%"
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      zIndex="10" // Makes sure the spinner is on top of other elements
+                      bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+                    >
+                      <CircularProgress />
+                    </MDBox>
+                  )}
+
+                {/* Render form only if userDetails is available */}
+                {!isLoading && userDetails && (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <MDBox mt={3}>
                       <MDInput
-                        label="Company Name"
+                        label="Account Type"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
-                        value={userDetails?.company_name || ""}
+                        value={userDetails?.account_type || ""}
                         InputProps={{
                           readOnly: true,
                         }}
                       />
-                    )}
-                    {userDetails?.account_type === "educational_instituition" && (
+                      {userDetails?.account_type === "potential_employer" && (
+                        <MDInput
+                          label="Company Name"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails?.company_name || ""}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      )}
+                      {userDetails?.account_type === "educational_institution" && (
+                        <MDInput
+                          label="Institution Name"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails?.institution_name || ""}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      )}
                       <MDInput
-                        label="Instituition Name"
+                        label="Name"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
-                        value={userDetails?.instituition_name || ""}
+                        value={userDetails?.name || ""}
                         InputProps={{
                           readOnly: true,
                         }}
                       />
-                    )}
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.name || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    {userDetails?.account_type === "student" && (
+                      {userDetails?.account_type === "student" && (
+                        <MDInput
+                          label="Student ID"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={userDetails?.student_id || ""}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      )}
                       <MDInput
-                        label="Student ID"
+                        label="Email"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
-                        value={userDetails?.student_id || ""}
+                        value={userDetails?.email || ""}
                         InputProps={{
                           readOnly: true,
                         }}
                       />
-                    )}
-                    <MDInput
-                      label="Email"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.email || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Role"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.role || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Created at"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.created_at ? formatDate(userDetails.created_at) : ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Account Status"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={userDetails?.status || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </MDBox>
-                </form>
+                      <MDInput
+                        label="Role"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.role || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Created at"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.created_at ? formatDate(userDetails.created_at) : ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Account Status"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={userDetails?.status || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    </MDBox>
+                  </form>
+                )}
               </MDBox>
             </Card>
           </Grid>

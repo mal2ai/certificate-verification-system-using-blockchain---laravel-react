@@ -4,18 +4,10 @@ import { Navigate } from "react-router-dom";
 import Loading from "components/Loading/loading";
 import { getProfileDetails, logout } from "utils/api";
 
-const ProtectedRoute = ({ children, allowedRoles, refreshTimeout = 300000 }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const [isAuthorized, setIsAuthorized] = useState(null); // `null` for initial loading state
-  const [isRefreshing, setIsRefreshing] = useState(false); // To track if the page is refreshing
   const token = localStorage.getItem("token");
   const userRole = localStorage.getItem("role");
-
-  const refreshPage = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      window.location.reload(); // This will refresh the page
-    }, 1000); // Delay to allow for state update before page reload
-  };
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -51,16 +43,7 @@ const ProtectedRoute = ({ children, allowedRoles, refreshTimeout = 300000 }) => 
     };
 
     checkUserStatus();
-
-    const timer = setInterval(() => {
-      if (!isRefreshing) {
-        refreshPage(); // Refresh the page after a certain timeout
-      }
-    }, refreshTimeout);
-
-    // Cleanup the timer on component unmount
-    return () => clearInterval(timer);
-  }, [token, isRefreshing, refreshTimeout]);
+  }, [token]);
 
   // While the authorization check is in progress
   if (isAuthorized === null) {
@@ -118,13 +101,11 @@ const ProtectedRoute = ({ children, allowedRoles, refreshTimeout = 300000 }) => 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   allowedRoles: PropTypes.arrayOf(PropTypes.string),
-  refreshTimeout: PropTypes.number, // Timeout duration in milliseconds
 };
 
 // Set default props
 ProtectedRoute.defaultProps = {
   allowedRoles: [],
-  refreshTimeout: 300000, // Default to 5 minutes (300,000 milliseconds)
 };
 
 export default ProtectedRoute;

@@ -12,6 +12,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material Dashboard 2 React components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -135,162 +136,192 @@ function EditUser() {
                 bgColor="white"
                 borderRadius="lg"
                 coloredShadow="info"
+                position="relative"
               >
                 <MDTypography variant="h6" color="dark">
                   Edit User
                 </MDTypography>
               </MDBox>
-              <MDBox p={3}>
-                <form onSubmit={handleSubmit}>
-                  {/* Account Type Dropdown */}
-                  <MDBox mb={2}>
-                    <FormControl fullWidth>
-                      <InputLabel>Account Type</InputLabel>
-                      <Select
-                        value={isLoading ? "Loading..." : accountType}
-                        onChange={handleAccountTypeChange}
-                        label="Account Type"
-                        required
-                        readOnly
-                        sx={{
-                          height: "40px", // Adjust the height to your preference
-                          "& .MuiSelect-select": {
-                            padding: "10px 14px", // Add padding for inner spacing
-                          },
-                        }}
-                      >
-                        <MenuItem value="student">Student</MenuItem>
-                        <MenuItem value="potential_employer">Potential Employer</MenuItem>
-                        <MenuItem value="educational_institution">Educational Institution</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
 
-                  {/* Conditionally Render Fields Based on Account Type */}
-                  {accountType === "student" && (
+              <MDBox p={3} position="relative">
+                {/* Show spinner when loading */}
+                {isLoading && (
+                  <MDBox
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    width="100%"
+                    height="100%"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    zIndex="10" // Makes sure the spinner is on top of other elements
+                    bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+                  >
+                    <CircularProgress />
+                  </MDBox>
+                )}
+
+                {/* Main form content */}
+                {!isLoading && (
+                  <form onSubmit={handleSubmit}>
+                    {/* Account Type Dropdown */}
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <InputLabel>Account Type</InputLabel>
+                        <Select
+                          value={accountType}
+                          onChange={handleAccountTypeChange}
+                          label="Account Type"
+                          required
+                          sx={{
+                            height: "40px",
+                            "& .MuiSelect-select": {
+                              padding: "10px 14px",
+                            },
+                          }}
+                        >
+                          <MenuItem value="student">Student</MenuItem>
+                          <MenuItem value="potential_employer">Potential Employer</MenuItem>
+                          <MenuItem value="educational_institution">
+                            Educational Institution
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+
+                    {/* Conditionally Render Fields Based on Account Type */}
+                    {accountType === "student" && (
+                      <MDBox mb={2}>
+                        <MDInput
+                          type="text"
+                          label="Student ID"
+                          fullWidth
+                          value={studentId}
+                          onChange={handleStudentIdChange}
+                          disabled={isLoading}
+                        />
+                      </MDBox>
+                    )}
+
+                    {accountType === "potential_employer" && (
+                      <MDBox mb={2}>
+                        <MDInput
+                          type="text"
+                          label="Company Name"
+                          fullWidth
+                          value={companyName}
+                          onChange={handleCompanyNameChange}
+                          disabled={isLoading}
+                          required
+                        />
+                      </MDBox>
+                    )}
+
+                    {accountType === "educational_institution" && (
+                      <MDBox mb={2}>
+                        <MDInput
+                          type="text"
+                          label="Institution Name"
+                          fullWidth
+                          value={institutionName}
+                          onChange={handleInstitutionNameChange}
+                          disabled={isLoading}
+                        />
+                      </MDBox>
+                    )}
+
+                    {/* Name Input */}
                     <MDBox mb={2}>
                       <MDInput
                         type="text"
-                        label="Student ID"
+                        label="Name"
                         fullWidth
-                        value={isLoading ? "Loading..." : studentId}
-                        onChange={handleStudentIdChange}
+                        value={name}
+                        onChange={handleNameChange}
                         disabled={isLoading}
                       />
                     </MDBox>
-                  )}
 
-                  {accountType === "potential_employer" && (
+                    {/* Email Input */}
                     <MDBox mb={2}>
                       <MDInput
-                        type="text"
-                        label="Company Name"
+                        type="email"
+                        label="Email"
                         fullWidth
-                        value={isLoading ? "Loading..." : companyName}
-                        onChange={handleCompanyNameChange}
+                        value={email}
+                        onChange={handleEmailChange}
                         disabled={isLoading}
-                        required
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     </MDBox>
-                  )}
 
-                  {accountType === "educational_institution" && (
+                    {/* Role Dropdown */}
                     <MDBox mb={2}>
-                      <MDInput
-                        type="text"
-                        label="Institution Name"
-                        fullWidth
-                        value={isLoading ? "Loading..." : institutionName}
-                        onChange={handleInstitutionNameChange}
-                        disabled={isLoading}
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel>Role</InputLabel>
+                        <Select
+                          value={role}
+                          onChange={handleRoleChange}
+                          disabled={isLoading}
+                          label="Role"
+                          sx={{
+                            height: "40px",
+                            "& .MuiSelect-select": {
+                              padding: "10px 14px",
+                            },
+                          }}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Role
+                          </MenuItem>
+                          <MenuItem value="admin">Admin</MenuItem>
+                          <MenuItem value="user">User</MenuItem>
+                        </Select>
+                      </FormControl>
                     </MDBox>
-                  )}
 
-                  <MDBox mb={2}>
-                    <MDInput
-                      type="text"
-                      label="Name"
-                      fullWidth
-                      value={isLoading ? "Loading..." : name}
-                      onChange={handleNameChange}
-                      disabled={isLoading}
-                    />
-                  </MDBox>
-                  <MDBox mb={2}>
-                    <MDInput
-                      type="email"
-                      label="Email"
-                      fullWidth
-                      value={isLoading ? "Loading..." : email}
-                      onChange={handleEmailChange}
-                      disabled={isLoading}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </MDBox>
-                  <MDBox mb={2}>
-                    <FormControl fullWidth>
-                      <InputLabel>Role</InputLabel>
-                      <Select
-                        value={isLoading ? "Loading..." : role}
-                        onChange={handleRoleChange}
-                        disabled={isLoading}
-                        label="Role"
-                        sx={{
-                          height: "40px", // Adjust the height to your preference
-                          "& .MuiSelect-select": {
-                            padding: "10px 14px", // Add padding for inner spacing
-                          },
-                        }}
+                    {/* Status Dropdown */}
+                    <MDBox mb={2}>
+                      <FormControl fullWidth>
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          value={status}
+                          onChange={handleStatusChange}
+                          disabled={isLoading}
+                          label="Status"
+                          sx={{
+                            height: "40px",
+                            "& .MuiSelect-select": {
+                              padding: "10px 14px",
+                            },
+                          }}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Status
+                          </MenuItem>
+                          <MenuItem value="active">Active</MenuItem>
+                          <MenuItem value="inactive">Inactive</MenuItem>
+                          <MenuItem value="banned">Banned</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </MDBox>
+
+                    {/* Submit Button */}
+                    <MDBox display="flex" justifyContent="flex-end">
+                      <MDButton
+                        variant="gradient"
+                        color="dark"
+                        type="submit"
+                        disabled={loading || isLoading}
                       >
-                        <MenuItem value="" disabled>
-                          {isLoading ? "Loading..." : "Select Role"}
-                        </MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
-                        <MenuItem value="user">User</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
-
-                  {/* Status Dropdown */}
-                  <MDBox mb={2}>
-                    <FormControl fullWidth>
-                      <InputLabel>Status</InputLabel>
-                      <Select
-                        value={isLoading ? "Loading..." : status}
-                        onChange={handleStatusChange}
-                        disabled={isLoading}
-                        label="Status"
-                        sx={{
-                          height: "40px", // Adjust the height to your preference
-                          "& .MuiSelect-select": {
-                            padding: "10px 14px", // Add padding for inner spacing
-                          },
-                        }}
-                      >
-                        <MenuItem value="" disabled>
-                          {isLoading ? "Loading..." : "Select Status"}
-                        </MenuItem>
-                        <MenuItem value="active">Active</MenuItem>
-                        <MenuItem value="inactive">Inactive</MenuItem>
-                        <MenuItem value="banned">Banned</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
-
-                  <MDBox display="flex" justifyContent="flex-end">
-                    <MDButton
-                      variant="gradient"
-                      color="dark"
-                      type="submit"
-                      disabled={loading || isLoading}
-                    >
-                      {loading ? "Updating..." : "Update"}
-                    </MDButton>
-                  </MDBox>
-                </form>
+                        {loading ? "Updating..." : "Update"}
+                      </MDButton>
+                    </MDBox>
+                  </form>
+                )}
               </MDBox>
             </Card>
           </Grid>

@@ -10,6 +10,7 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material UI Table components
 import TableContainer from "@mui/material/TableContainer";
@@ -80,12 +81,31 @@ function DeleteUser() {
 
     return (
       <TableContainer>
+        {/* Show spinner when loading */}
+        {isLoading && (
+          <MDBox
+            position="absolute"
+            top="0"
+            left="0"
+            width="100%"
+            height="100%"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            zIndex="10" // Makes sure the spinner is on top of other elements
+            bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+          >
+            <CircularProgress />
+          </MDBox>
+        )}
+
         <Table>
           <TableBody>
             <TableRow>
               <TableCell>
                 <strong>Account Type</strong>
               </TableCell>
+              <TableCell>:</TableCell>
               <TableCell>{userDetails.account_type || "N/A"}</TableCell>
             </TableRow>
             {userDetails.account_type === "educational_institution" && (
@@ -93,6 +113,7 @@ function DeleteUser() {
                 <TableCell>
                   <strong>Institution Name</strong>
                 </TableCell>
+                <TableCell>:</TableCell>
                 <TableCell>{userDetails.institution_name || "N/A"}</TableCell>
               </TableRow>
             )}
@@ -101,6 +122,7 @@ function DeleteUser() {
                 <TableCell>
                   <strong>Company Name</strong>
                 </TableCell>
+                <TableCell>:</TableCell>
                 <TableCell>{userDetails.company_name || "N/A"}</TableCell>
               </TableRow>
             )}
@@ -108,6 +130,7 @@ function DeleteUser() {
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
+              <TableCell>:</TableCell>
               <TableCell>{userDetails.name}</TableCell>
             </TableRow>
             {/* Conditionally render the relevant input field based on account type */}
@@ -116,6 +139,7 @@ function DeleteUser() {
                 <TableCell>
                   <strong>Student ID</strong>
                 </TableCell>
+                <TableCell>:</TableCell>
                 <TableCell>{userDetails.student_id || "N/A"}</TableCell>
               </TableRow>
             )}
@@ -123,12 +147,14 @@ function DeleteUser() {
               <TableCell>
                 <strong>Email</strong>
               </TableCell>
+              <TableCell>:</TableCell>
               <TableCell>{userDetails.email}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Status</strong>
               </TableCell>
+              <TableCell>:</TableCell>
               <TableCell>{status || "N/A"}</TableCell>
             </TableRow>
           </TableBody>
@@ -161,15 +187,26 @@ function DeleteUser() {
                   Are you sure you want to delete this user?
                 </MDTypography>
               </MDBox>
+
               <MDBox pt={3} px={3}>
+                {/* Show spinner when loading */}
                 {isLoading ? (
-                  <MDTypography variant="h6" align="center">
-                    Loading user details...
-                  </MDTypography>
+                  <MDBox
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="100%"
+                    height="100%"
+                    bgcolor="rgba(255, 255, 255, 0.8)" // Slightly transparent background
+                  >
+                    <CircularProgress />
+                  </MDBox>
                 ) : (
+                  // Render account details or other content
                   renderAccountDetails()
                 )}
               </MDBox>
+
               <MDBox
                 display="flex"
                 justifyContent="center"
