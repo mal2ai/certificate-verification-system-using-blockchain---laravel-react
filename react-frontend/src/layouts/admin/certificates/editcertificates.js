@@ -34,6 +34,21 @@ function EditCertificate() {
   const [issuedDate, setIssuedDate] = useState("");
   const [certHash, setCertHash] = useState("");
 
+  const handleCourseNameChange = (e) => setCourseName(e.target.value);
+
+  const courseOptions = [
+    "Diploma Pengajian Muamalat",
+    "Diploma Pengurusan Haji dan Umrah",
+    "Diploma Pengurusan Industri Halal",
+    "Diploma Zakat dan Wakaf",
+    "Diploma Syariah Islamiyah",
+    "Diploma Teknologi Maklumat (DITe)",
+    "Diploma in Business Administration",
+    "Diploma Perakaunan",
+    "Diploma Kaunseling Islam",
+    "Sijil Aplikasi Muamalat (SAM)",
+  ];
+
   // Fetch existing certificate data using the serialNumber
   useEffect(() => {
     if (!serialNumber) {
@@ -214,15 +229,29 @@ function EditCertificate() {
                     />
                   </MDBox>
 
-                  <MDBox mb={2}>
-                    <MDInput
+                  <MDBox mb={3}>
+                    <MDTypography variant="body2" color="dark" sx={{ fontSize: "0.9rem" }}>
+                      Course Name:
+                    </MDTypography>
+                    <input
                       type="text"
-                      label="Course Name"
-                      fullWidth
+                      id="course_name"
+                      name="course_name"
                       value={isLoading ? "Loading..." : courseName}
-                      onChange={(e) => setCourseName(e.target.value)}
-                      disabled={isLoading} // Prevent editing during loading
+                      onChange={handleCourseNameChange}
+                      list="course-list"
+                      className="form-control"
+                      placeholder="Type to search..."
+                      style={{
+                        fontSize: "0.9rem", // Adjust the font size
+                        fontWeight: "normal", // Remove bold
+                      }}
                     />
+                    <datalist id="course-list">
+                      {courseOptions.map((course, index) => (
+                        <option key={index} value={course}></option>
+                      ))}
+                    </datalist>
                   </MDBox>
 
                   <MDBox mb={2}>
@@ -249,7 +278,7 @@ function EditCertificate() {
                     />
                   </MDBox>
                   <MDBox mb={2}>
-                    <MDTypography variant="body2" color="dark">
+                    <MDTypography variant="body2" color="dark" sx={{ fontSize: "0.9rem" }}>
                       Upload new certificate:
                     </MDTypography>
                     <MDInput type="file" fullWidth onChange={handleFileChange} />

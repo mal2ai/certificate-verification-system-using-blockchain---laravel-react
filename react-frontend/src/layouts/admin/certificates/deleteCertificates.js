@@ -145,46 +145,46 @@ function DeleteCertificate() {
                     <Table>
                       <TableBody>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Serial Number</strong>
                           </TableCell>
-                          <TableCell>{serialNumber}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{serialNumber}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Name</strong>
                           </TableCell>
-                          <TableCell>{name}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{name}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>IC Number</strong>
                           </TableCell>
-                          <TableCell>{icNumber}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{icNumber}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Student ID</strong>
                           </TableCell>
-                          <TableCell>{studentId}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{studentId}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Course Name</strong>
                           </TableCell>
-                          <TableCell>{courseName}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{courseName}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Issued Date</strong>
                           </TableCell>
-                          <TableCell>{issuedDate}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{issuedDate}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>CID</strong>
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <a
                               href={`http://127.0.0.1:8080/ipfs/${cid}`}
                               target="_blank"
@@ -195,10 +195,10 @@ function DeleteCertificate() {
                           </TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
                             <strong>File Hash</strong>
                           </TableCell>
-                          <TableCell>{certHash}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{certHash}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

@@ -509,18 +509,13 @@ function VerifyCertificate() {
 
         {/* View Certificate, Delete, and Resend OTP Buttons */}
         <MDBox mt={3} display="flex" justifyContent="center" gap={2}>
-          <MDButton
-            variant="gradient"
-            color="error"
-            sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
-            onClick={handleDelete}
-          >
+          <MDButton variant="gradient" color="error" sx={{ maxWidth: 200 }} onClick={handleDelete}>
             Delete Request
           </MDButton>
           <MDButton
             variant="contained"
             color="warning"
-            sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
+            sx={{ maxWidth: 200 }}
             onClick={handleResendOTP}
             disabled={
               certificateDetails?.status === "pending" || certificateDetails?.status === "rejected"
@@ -539,7 +534,7 @@ function VerifyCertificate() {
           <MDButton
             variant="contained"
             color="info"
-            sx={{ maxWidth: 200 }} // Adjust the maxWidth for a smaller button
+            sx={{ maxWidth: 200 }}
             onClick={handleViewCertificate}
           >
             View Certificate

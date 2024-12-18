@@ -52,8 +52,8 @@ function Status() {
     { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Status", accessor: "status" },
     {
-      Header: "Created at",
-      accessor: "created_at",
+      Header: "Timestamp",
+      accessor: "updated_at",
       Cell: ({ value }) => {
         // Malaysia timezone offset (GMT+8)
         const options = {

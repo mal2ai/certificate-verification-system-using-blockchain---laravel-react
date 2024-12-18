@@ -14,6 +14,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Divider from "@mui/material/Divider";
+import { FormControl, InputLabel } from "@mui/material";
 
 // Notification components
 import MDSnackbar from "components/MDSnackbar";
@@ -222,20 +223,8 @@ function AddCertificates() {
                       onChange={handleStudentIdChange}
                     />
                   </MDBox>
-
                   <MDBox mb={2}>
-                    <MDTypography variant="body2" color="dark">
-                      Issued Date:
-                    </MDTypography>
-                    <input
-                      type="datetime-local"
-                      className="form-control"
-                      value={issuedDate}
-                      onChange={handleIssuedDateChange}
-                    />
-                  </MDBox>
-                  <MDBox mb={2}>
-                    <MDTypography variant="body2" color="dark">
+                    <MDTypography variant="body2" color="dark" sx={{ fontSize: "0.9rem" }}>
                       Course Name:
                     </MDTypography>
                     <input
@@ -246,12 +235,32 @@ function AddCertificates() {
                       onChange={handleCourseNameChange}
                       list="course-list"
                       className="form-control"
+                      placeholder="Type to search..."
+                      style={{
+                        fontSize: "0.9rem", // Adjust the font size
+                        fontWeight: "normal", // Remove bold
+                      }}
                     />
                     <datalist id="course-list">
                       {courseOptions.map((course, index) => (
                         <option key={index} value={course}></option>
                       ))}
                     </datalist>
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDTypography variant="body2" color="dark" sx={{ fontSize: "0.9rem" }}>
+                      Issued Date:
+                    </MDTypography>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      value={issuedDate}
+                      onChange={handleIssuedDateChange}
+                      style={{
+                        fontSize: "0.9rem", // Adjust the font size
+                        fontWeight: "normal", // Remove bold
+                      }}
+                    />
                   </MDBox>
                 </form>
               </MDBox>
