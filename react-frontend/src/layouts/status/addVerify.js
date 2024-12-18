@@ -78,7 +78,8 @@ function VerifyCertificate() {
   };
 
   // Function to handle the verify button click and store status
-  const handleVerify = async () => {
+  const handleVerify = async (event) => {
+    event.preventDefault(); // Prevent the form from refreshing the page
     setIsLoading(true);
     setErrorMessage("");
 
@@ -136,39 +137,60 @@ function VerifyCertificate() {
     }
   };
 
+  useEffect(() => {
+    // Initialize the fileinput plugin
+    const $ = window.$;
+    if ($ && $.fn.fileinput) {
+      $("#input-b1").fileinput({
+        browseOnZoneClick: true,
+        showPreview: true,
+        showUpload: false, // Disable upload button if using custom upload handlers
+      });
+
+      // Attach the handleFileChange function to the file input's change event
+      $("#input-b1").on("change", handleFileChange);
+
+      // Cleanup event listener on component unmount
+      return () => {
+        $("#input-b1").off("change", handleFileChange);
+      };
+    }
+  }, [handleFileChange]);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={8}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Verify Certificate
-                </MDTypography>
-              </MDBox>
-              <MDBox p={3}>
-                {statusMessage && (
-                  <MDBox mt={2}>
-                    <MDTypography
-                      variant="body2"
-                      color={statusMessage.includes("successfully") ? "green" : "red"}
-                    >
-                      {statusMessage}
-                    </MDTypography>
-                  </MDBox>
-                )}
-                <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={handleVerify}>
+          <Grid container spacing={3} justifyContent="center">
+            {/* Left Card: Input Fields */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="white"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                >
+                  <MDTypography variant="h6" color="dark">
+                    Certificate Details
+                  </MDTypography>
+                </MDBox>
+                <MDBox p={3}>
+                  {statusMessage && (
+                    <MDBox mt={2}>
+                      <MDTypography
+                        variant="body2"
+                        color={statusMessage.includes("successfully") ? "green" : "red"}
+                      >
+                        {statusMessage}
+                      </MDTypography>
+                    </MDBox>
+                  )}
                   <MDBox mt={3}>
                     <MDInput
                       label="Your Name"
@@ -209,13 +231,36 @@ function VerifyCertificate() {
                       sx={{ mb: 2 }}
                       required
                     />
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </Grid>
+
+            {/* Right Card: File Upload */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="white"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                >
+                  <MDTypography variant="h6" color="dark">
+                    Upload File
+                  </MDTypography>
+                </MDBox>
+                <MDBox p={3}>
+                  <MDBox mt={3}>
                     <MDBox mb={2}>
-                      <MDTypography variant="body2" color="dark">
-                        Upload certificate:
-                      </MDTypography>
-                      <MDInput
+                      <input
+                        id="input-b1"
+                        name="input-b1"
                         type="file"
-                        fullWidth
+                        className="file"
                         onChange={handleFileChange}
                         accept=".pdf"
                         required
@@ -224,24 +269,23 @@ function VerifyCertificate() {
                     <MDButton
                       variant="gradient"
                       color="dark"
-                      onClick={handleVerify}
+                      type="submit"
                       sx={{
-                        width: "200px",
+                        width: "auto",
                         display: "block",
-                        margin: "0 auto",
+                        marginLeft: "auto",
                       }}
                       disabled={isLoading}
                     >
                       {isLoading ? "Saving..." : "Send Request"}
                     </MDButton>
                   </MDBox>
-                </form>
-              </MDBox>
-            </Card>
+                </MDBox>
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
+        </form>
       </MDBox>
-
       <Footer />
     </DashboardLayout>
   );

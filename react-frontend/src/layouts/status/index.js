@@ -55,8 +55,8 @@ function Status() {
     { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Status", accessor: "status" },
     {
-      Header: "Created at",
-      accessor: "created_at",
+      Header: "Timestamp",
+      accessor: "updated_at",
       Cell: ({ value }) => formatDate(value), // Format date for 'created_at'
     },
     {
