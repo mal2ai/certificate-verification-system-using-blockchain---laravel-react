@@ -145,6 +145,7 @@ function EditCertificate() {
         blockNumber: receipt.blockNumber?.toString() || "",
         gasUsed: receipt.gasUsed?.toString() || "",
         status: receipt.status ? "Success" : "Failed",
+        action: "Update",
       };
 
       // Step 4: Store transaction details in Laravel backend

@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
-import { getStatusBySerialNumber } from "utils/api";
+import { getStatusBySerialNumber, storeTransaction } from "utils/api";
 
 function VerifyCertificate() {
   const location = useLocation(); // Access the passed state from the navigate function
@@ -93,9 +93,16 @@ function VerifyCertificate() {
         blockNumber: verifyTx.blockNumber?.toString() || "",
         gasUsed: verifyTx.gasUsed?.toString() || "",
         status: verifyTx.status ? "Success" : "Failed",
+        action: "Verify",
       };
 
       setTransactionReceipt(receipt);
+
+      // Step 3: Store transaction details in Laravel backend
+      if (receipt) {
+        const token = localStorage.getItem("token");
+        await storeTransaction(receipt, token);
+      }
 
       // If the verification is successful, fetch the certificate details
       const certificate = await contract.methods.getCertificate(serialNumber).call();

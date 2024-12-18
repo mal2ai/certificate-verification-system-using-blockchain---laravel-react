@@ -23,6 +23,7 @@
     "chroma-js": "2.4.2",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "ipfs-http-client": "^60.0.1",
     "jwt-decode": "^4.0.0",
     "prop-types": "^15.8.1",

@@ -93,6 +93,7 @@ function DeleteCertificate() {
         blockNumber: receipt.blockNumber?.toString() || "",
         gasUsed: receipt.gasUsed?.toString() || "",
         status: receipt.status ? "Success" : "Failed",
+        action: "Delete",
       };
 
       // Step 3: Store transaction details in Laravel backend

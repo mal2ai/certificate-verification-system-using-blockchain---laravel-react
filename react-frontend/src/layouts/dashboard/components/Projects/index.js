@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { getTransactions } from "utils/api"; // Assuming your getTransactions function is in utils/api
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -71,33 +73,28 @@ function Projects() {
   const columns = [
     { Header: "Transaction Hash", accessor: "transaction_hash" },
     { Header: "Block Number", accessor: "block_number" },
-    { Header: "Gas Used", accessor: "gas_used" },
+    { Header: "Action", accessor: "action" },
     { Header: "Status", accessor: "status" },
-    { Header: "Created At", accessor: "created_at" },
+    { Header: "Timestamp", accessor: "updated_at" },
   ];
 
   // Map the transactions and format the date
   const rows = transactions
     .map((transaction) => {
-      const createdAt = new Date(transaction.created_at); // Parse created_at into Date object
+      const utcDate = new Date(transaction.updated_at);
 
-      // Format the date to dd/mm/yyyy, h:m am/pm
-      const formattedDate = createdAt.toLocaleString("en-GB", {
-        weekday: "short",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
+      // Convert the UTC date to Malaysia's timezone
+      const malaysiaTime = toZonedTime(utcDate, "Asia/Kuala_Lumpur");
+
+      // Format the date in Malaysia's timezone
+      const formattedDate = format(malaysiaTime, "E, dd/MM/yyyy, h:mm a");
 
       return {
         transaction_hash: transaction.transaction_hash,
         block_number: transaction.block_number,
-        gas_used: transaction.gas_used,
+        action: transaction.action,
         status: transaction.status,
-        created_at: formattedDate,
+        updated_at: formattedDate,
       };
     })
     .sort((a, b) => b.block_number - a.block_number);

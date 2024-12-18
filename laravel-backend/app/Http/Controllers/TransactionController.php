@@ -23,6 +23,7 @@ class TransactionController extends Controller
                 'blockNumber' => 'required|string',
                 'gasUsed' => 'required|string',
                 'status' => 'required|string',
+                'action' => 'required|string', // Add validation for the "action" attribute
             ]);
 
             DB::table('transactions')->insert([
@@ -32,6 +33,7 @@ class TransactionController extends Controller
                 'block_number' => $data['blockNumber'],
                 'gas_used' => $data['gasUsed'],
                 'status' => $data['status'],
+                'action' => $data['action'], // Include the "action" attribute
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
