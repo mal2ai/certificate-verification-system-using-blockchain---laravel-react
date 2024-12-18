@@ -17,5 +17,6 @@ class Status extends Model
         'serial_number',
         'ic_number',
         'status',
+        'file_hash',
     ];
 }

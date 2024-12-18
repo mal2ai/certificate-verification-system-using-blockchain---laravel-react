@@ -68,11 +68,31 @@ function AddCertificates() {
     }
 
     try {
-      // Step 1: Upload PDF to IPFS
+      // Step 1: Hash the uploaded file using the browser's SubtleCrypto API
+      const hash = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const buffer = reader.result; // File as ArrayBuffer
+            const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // Generate SHA-256 hash
+            const hashArray = Array.from(new Uint8Array(hashBuffer)); // Convert ArrayBuffer to byte array
+            const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join(""); // Convert byte array to hex string
+            resolve(hashHex);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+      });
+
+      console.log("Generated hash for the file:", hash);
+
+      // Step 2: Upload PDF to IPFS
       const ipfsCID = await uploadToIPFS(file);
       console.log("Uploaded to IPFS, CID:", ipfsCID);
 
-      // Step 2: Register certificate on blockchain
+      // Step 3: Register certificate on blockchain with the hash
       const { adminAccount, contract } = await getBlockchain();
       const receipt = await contract.methods
         .registerCertificate(
@@ -82,7 +102,8 @@ function AddCertificates() {
           icNumber,
           studentId,
           courseName,
-          issuedDate
+          issuedDate,
+          hash // Include the hash in the smart contract call
         )
         .send({
           from: adminAccount, // Use adminAccount here
@@ -99,7 +120,7 @@ function AddCertificates() {
         status: receipt.status ? "Success" : "Failed",
       };
 
-      // Step 3: Store transaction details in Laravel backend
+      // Step 4: Store transaction details in Laravel backend
       const token = localStorage.getItem("token"); // Retrieve token
       await storeTransaction(transactionData, token);
 

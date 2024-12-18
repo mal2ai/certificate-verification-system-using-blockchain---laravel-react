@@ -48,6 +48,7 @@ function VerifyCertificate() {
             studentId: certificate[4] || "",
             courseName: certificate[5] || "",
             issuedDate: certificate[6] || "",
+            certHash: certificate[7] || "",
             cid: certificate[2] || "", // Assuming `cid` is the IPFS CID
           };
           setCertificateDetails(newCertificate);
@@ -200,6 +201,16 @@ function VerifyCertificate() {
                       fullWidth
                       sx={{ mb: 2 }}
                       value={certificateDetails?.cid || ""}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                    <MDInput
+                      label="File Hash"
+                      variant="outlined"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      value={certificateDetails?.certHash || ""}
                       InputProps={{
                         readOnly: true,
                       }}

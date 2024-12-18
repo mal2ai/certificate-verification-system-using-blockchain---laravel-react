@@ -18,7 +18,7 @@ import Footer from "examples/Footer";
 function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation(); // Access passed state from previous page
-  const { id, email, serial_number, created_at } = location.state || {}; // Destructure the state
+  const { id, email, serial_number, created_at, file_hash } = location.state || {}; // Destructure the state
 
   const [otp, setOtp] = useState(""); // State for OTP
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
@@ -55,6 +55,7 @@ function VerifyOTP() {
             email,
             serial_number,
             created_at,
+            file_hash,
           },
         });
       } else {

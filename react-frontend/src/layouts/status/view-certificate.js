@@ -21,7 +21,7 @@ function VerifyCertificate() {
   const location = useLocation(); // Access the passed state from the navigate function
 
   // Destructure the passed data from location.state
-  const { email, serial_number, created_at } = location.state || {};
+  const { email, serial_number, created_at, file_hash } = location.state || {};
 
   // Blockchain state and functions
   const [certificateDetails, setCertificateDetails] = useState(null);
@@ -72,11 +72,20 @@ function VerifyCertificate() {
       setIsLoading(true);
       const { userAccount, contract } = await getBlockchain();
 
-      const verifyTx = await contract.methods.verifyCertificate(serialNumber).send({
+      // Check if fileHash is available in the state
+      if (!file_hash) {
+        setErrorMessage("File hash is missing.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Call the smart contract's verifyCertificate function with serialNumber and fileHash
+      const verifyTx = await contract.methods.verifyCertificate(serialNumber, file_hash).send({
         from: userAccount,
         gas: 3000000, // Set an appropriate gas limit
       });
 
+      // Create a transaction receipt object
       const receipt = {
         transactionHash: verifyTx.transactionHash || "",
         from: verifyTx.from || "",
@@ -88,6 +97,7 @@ function VerifyCertificate() {
 
       setTransactionReceipt(receipt);
 
+      // If the verification is successful, fetch the certificate details
       const certificate = await contract.methods.getCertificate(serialNumber).call();
       if (certificate) {
         setCertificateDetails({
@@ -109,7 +119,21 @@ function VerifyCertificate() {
     } catch (error) {
       setTransactionReceipt(null); // Reset transaction receipt on error
       setCertificateDetails(null);
-      setErrorMessage("Certificate not exist.");
+
+      // Handle error messages based on the type of failure
+      if (error.message.includes("Certificate hash does not match")) {
+        setErrorMessage("Certificate hash does not match.");
+      } else if (error.message.includes("Certificate not found")) {
+        setErrorMessage("Certificate not found.");
+      } else if (error?.data?.reason) {
+        // If there's a reason in the error data, display it
+        setErrorMessage(error.data.reason || "An unexpected error occurred.");
+      } else {
+        setErrorMessage(
+          "Certificate not found or your file has been tampered. If tampered, please provide original file."
+        );
+      }
+
       setIsLoading(false);
       setVerificationAttempted(true);
     }
@@ -148,85 +172,90 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {verificationAttempted && !certificateDetails && !isLoading && (
+                {/* Render error message only if there's an error */}
+                {verificationAttempted && !certificateDetails && !isLoading && errorMessage && (
                   <MDTypography variant="body2" color="error">
                     {errorMessage}
                   </MDTypography>
                 )}
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.name || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Student ID"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.studentId || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="IC Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.icNumber || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Serial Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.serialNumber || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Course Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.courseName || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Issued Date"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={formattedIssuedDate}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="CID"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.cid || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </MDBox>
-                </form>
+
+                {/* Only render the form if there's no error message */}
+                {!(verificationAttempted && !certificateDetails && !isLoading && errorMessage) && (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <MDBox mt={3}>
+                      <MDInput
+                        label="Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.name || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Student ID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.studentId || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="IC Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.icNumber || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Serial Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.serialNumber || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Course Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.courseName || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Issued Date"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={formattedIssuedDate}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="CID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.cid || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    </MDBox>
+                  </form>
+                )}
               </MDBox>
             </Card>
             <Card sx={{ marginTop: 5 }}>
@@ -356,75 +385,80 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {verificationAttempted && !certificateDetails && !isLoading && (
+                {/* Display error message if verification attempted, no certificate details, and no loading state */}
+                {verificationAttempted && !certificateDetails && !isLoading && errorMessage && (
                   <MDTypography variant="body2" color="error">
                     {errorMessage}
                   </MDTypography>
                 )}
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Transaction Hash"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.transactionHash || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="From"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.from || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="To"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.to || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Block Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.blockNumber?.toString() || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Gas Used"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.gasUsed?.toString() || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Status"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={transactionReceipt?.status || "N/A"}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </MDBox>
-                </form>
+
+                {/* Render the form only if no error message */}
+                {!(verificationAttempted && !certificateDetails && !isLoading && errorMessage) && (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <MDBox mt={3}>
+                      <MDInput
+                        label="Transaction Hash"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.transactionHash || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="From"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.from || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="To"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.to || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Block Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.blockNumber?.toString() || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Gas Used"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.gasUsed?.toString() || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Status"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={transactionReceipt?.status || "N/A"}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    </MDBox>
+                  </form>
+                )}
               </MDBox>
             </Card>
           </Grid>

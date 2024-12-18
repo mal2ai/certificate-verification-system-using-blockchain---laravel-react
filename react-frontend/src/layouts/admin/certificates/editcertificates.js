@@ -32,6 +32,7 @@ function EditCertificate() {
   const [studentId, setStudentId] = useState("");
   const [courseName, setCourseName] = useState("");
   const [issuedDate, setIssuedDate] = useState("");
+  const [certHash, setCertHash] = useState("");
 
   // Fetch existing certificate data using the serialNumber
   useEffect(() => {
@@ -53,6 +54,7 @@ function EditCertificate() {
           setStudentId(certificate[4] || "");
           setCourseName(certificate[5] || "");
           setIssuedDate(certificate[6] || "");
+          setCertHash(certificate[7] || "");
         }
 
         setIsLoading(false);
@@ -73,17 +75,48 @@ function EditCertificate() {
     setLoading(true);
 
     try {
-      // Step 1: Upload new PDF to IPFS (if a file is selected)
       let ipfsCID = cid; // Default CID if no new file is uploaded
+      let fileHash = certHash; // Default file hash if no new file is uploaded
+
       if (file) {
+        // Step 1: Hash the uploaded file using the browser's SubtleCrypto API
+        fileHash = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = async () => {
+            try {
+              const buffer = reader.result; // File as ArrayBuffer
+              const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // Generate SHA-256 hash
+              const hashArray = Array.from(new Uint8Array(hashBuffer)); // Convert ArrayBuffer to byte array
+              const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join(""); // Convert byte array to hex string
+              resolve(hashHex);
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+        });
+
+        console.log("Hashed file:", fileHash);
+
+        // Step 2: Upload the file to IPFS and get the CID
         ipfsCID = await uploadToIPFS(file);
         console.log("Uploaded to IPFS, CID:", ipfsCID);
       }
 
-      // Step 2: Update certificate on blockchain
+      // Step 3: Update certificate on blockchain with the file's hash and the IPFS CID
       const { adminAccount, contract, web3 } = await getBlockchain(); // Extract adminAccount
       const receipt = await contract.methods
-        .updateCertificate(serialNumber, name, ipfsCID, icNumber, studentId, courseName, issuedDate)
+        .updateCertificate(
+          serialNumber,
+          name,
+          ipfsCID,
+          icNumber,
+          studentId,
+          courseName,
+          issuedDate,
+          fileHash
+        ) // Include file hash here
         .send({
           from: adminAccount, // Use adminAccount instead of accounts[0]
           gas: 3000000, // Set an appropriate gas limit
@@ -99,7 +132,7 @@ function EditCertificate() {
         status: receipt.status ? "Success" : "Failed",
       };
 
-      // Step 3: Store transaction details in Laravel backend
+      // Step 4: Store transaction details in Laravel backend
       const token = localStorage.getItem("token"); // Retrieve token from localStorage
       await storeTransaction(transactionData, token); // Send transaction data to backend
 
@@ -200,6 +233,19 @@ function EditCertificate() {
                       value={isLoading ? "Loading..." : issuedDate}
                       onChange={(e) => setIssuedDate(e.target.value)}
                       disabled={isLoading} // Prevent editing during loading
+                    />
+                  </MDBox>
+                  <MDBox mb={2}>
+                    <MDInput
+                      type="text"
+                      label="File Hash"
+                      fullWidth
+                      value={isLoading ? "Loading..." : certHash}
+                      onChange={(e) => setCertHash(e.target.value)}
+                      disabled={isLoading} // Prevent editing during loading
+                      InputProps={{
+                        readOnly: true,
+                      }}
                     />
                   </MDBox>
                   <MDBox mb={2}>

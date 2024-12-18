@@ -22,6 +22,7 @@ class StatusController extends Controller
                 'email' => 'required|email',
                 'serial_number' => 'required|string|max:255',
                 'ic_number' => 'required|string|max:20', // Added validation for IC number
+                'file_hash' => 'required|string|max:64', // Validate file hash (SHA-256 is 64 characters)
             ]);
             \Log::info('Validation passed', $validated); // Debug log
 
@@ -31,6 +32,7 @@ class StatusController extends Controller
                 'email' => $validated['email'],
                 'serial_number' => $validated['serial_number'],
                 'ic_number' => $validated['ic_number'], // Added IC number
+                'file_hash' => $validated['file_hash'], // Store file hash in the database
                 'status' => 'pending',
             ]);
             \Log::info('Status created successfully', $status->toArray()); // Debug log
@@ -205,6 +207,7 @@ class StatusController extends Controller
                 'email' => 'nullable|email', // Email is optional
                 'serial_number' => 'nullable|string|max:255', // Serial number is optional
                 'ic_number' => 'nullable|string|max:20', // IC number is optional
+                'file_hash' => 'nullable|string|max:255', // file_hash is optional
             ]);
 
             // Find the status by serial_number and email
@@ -229,6 +232,9 @@ class StatusController extends Controller
             }
             if (isset($validated['ic_number'])) {
                 $status->ic_number = $validated['ic_number'];
+            }
+            if (isset($validated['file_hash'])) {
+                $status->file_hash = $validated['file_hash']; // Update file_hash if provided
             }
 
             // Save the updated status

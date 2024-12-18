@@ -12,6 +12,7 @@ contract CertificateRegistry {
         string studentId;
         string courseName;
         string issuedDate;
+        string certHash; // Hash of the certificate PDF
     }
 
     mapping(string => Certificate) private certificates;
@@ -26,6 +27,7 @@ contract CertificateRegistry {
         string studentId,
         string courseName,
         string issuedDate,
+        string certHash,
         address indexed sender,
         uint256 timestamp
     );
@@ -38,6 +40,7 @@ contract CertificateRegistry {
         string newStudentId,
         string newCourseName,
         string newIssuedDate,
+        string newCertHash,
         address indexed sender,
         uint256 timestamp
     );
@@ -51,7 +54,8 @@ contract CertificateRegistry {
     event CertificateVerified(
         string serialNumber,
         address indexed verifier,
-        uint256 timestamp
+        uint256 timestamp,
+        bool verified
     );
 
     // Modifier to restrict access to only the admin
@@ -73,7 +77,8 @@ contract CertificateRegistry {
         string memory icNumber,
         string memory studentId,
         string memory courseName,
-        string memory issuedDate
+        string memory issuedDate,
+        string memory certHash
     ) public onlyAdmin {
         certificates[serialNumber] = Certificate(
             serialNumber, 
@@ -82,7 +87,8 @@ contract CertificateRegistry {
             icNumber, 
             studentId, 
             courseName, 
-            issuedDate
+            issuedDate,
+            certHash
         );
         certificateSerialNumbers.push(serialNumber);
         
@@ -94,6 +100,7 @@ contract CertificateRegistry {
             studentId, 
             courseName, 
             issuedDate, 
+            certHash,
             msg.sender, 
             block.timestamp
         );
@@ -112,6 +119,7 @@ contract CertificateRegistry {
             string memory,
             string memory,
             string memory,
+            string memory,
             string memory
         )
     {
@@ -124,7 +132,8 @@ contract CertificateRegistry {
             cert.icNumber,
             cert.studentId,
             cert.courseName,
-            cert.issuedDate
+            cert.issuedDate,
+            cert.certHash
         );
     }
 
@@ -134,6 +143,7 @@ contract CertificateRegistry {
         view
         onlyAdmin
         returns (
+            string[] memory,
             string[] memory,
             string[] memory,
             string[] memory,
@@ -151,6 +161,7 @@ contract CertificateRegistry {
         string[] memory studentIds = new string[](length);
         string[] memory courseNames = new string[](length);
         string[] memory issuedDates = new string[](length);
+        string[] memory certHashes = new string[](length);
 
         for (uint256 i = 0; i < length; i++) {
             string memory serialNumber = certificateSerialNumbers[i];
@@ -162,6 +173,7 @@ contract CertificateRegistry {
             studentIds[i] = cert.studentId;
             courseNames[i] = cert.courseName;
             issuedDates[i] = cert.issuedDate;
+            certHashes[i] = cert.certHash;
         }
 
         return (
@@ -171,17 +183,24 @@ contract CertificateRegistry {
             icNumbers,
             studentIds,
             courseNames,
-            issuedDates
+            issuedDates,
+            certHashes
         );
     }
 
-    // Verify a certificate
-    function verifyCertificate(string memory serialNumber) public {
+    // Verify a certificate by comparing the provided hash with the stored hash
+    function verifyCertificate(string memory serialNumber, string memory providedHash) public {
         // Check if the certificate exists
-        require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
+        Certificate memory cert = certificates[serialNumber];
+        require(bytes(cert.serialNumber).length > 0, "Certificate not found");
 
-        // Emit an event to record the verification
-        emit CertificateVerified(serialNumber, msg.sender, block.timestamp);
+        // Compare the provided hash with the stored certHash
+        bool isVerified = keccak256(abi.encodePacked(cert.certHash)) == keccak256(abi.encodePacked(providedHash));
+
+        // Emit an event to record the verification result
+        emit CertificateVerified(serialNumber, msg.sender, block.timestamp, isVerified);
+
+        require(isVerified, "Certificate hash does not match");
     }
 
     // Update an existing certificate's details (only admin)
@@ -192,7 +211,8 @@ contract CertificateRegistry {
         string memory newIcNumber,
         string memory newStudentId,
         string memory newCourseName,
-        string memory newIssuedDate
+        string memory newIssuedDate,
+        string memory newCertHash
     ) public onlyAdmin {
         Certificate storage cert = certificates[serialNumber];
         require(bytes(cert.serialNumber).length > 0, "Certificate not found");
@@ -202,6 +222,7 @@ contract CertificateRegistry {
         cert.studentId = newStudentId;
         cert.courseName = newCourseName;
         cert.issuedDate = newIssuedDate;
+        cert.certHash = newCertHash;
 
         emit CertificateUpdated(
             serialNumber,
@@ -211,6 +232,7 @@ contract CertificateRegistry {
             newStudentId,
             newCourseName,
             newIssuedDate,
+            newCertHash,
             msg.sender,
             block.timestamp
         );

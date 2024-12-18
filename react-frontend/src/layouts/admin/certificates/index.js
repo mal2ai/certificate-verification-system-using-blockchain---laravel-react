@@ -125,15 +125,18 @@ function Certificates() {
       try {
         setLoading(true);
         const { adminAccount, contract } = await getBlockchain(); // Get adminAccount along with the contract
-        const data = await contract.methods.getAllCertificates().call({ from: adminAccount }); // Use adminAccount here
+        const data = await contract.methods.getAllCertificates().call({ from: adminAccount });
 
-        const rows = data[0].map((_, index) => ({
-          serialNumber: data[0][index],
-          name: data[1][index],
-          cid: data[2][index],
-          icNumber: data[3][index],
-          courseName: data[5][index],
-
+        // Each item in the data array is a struct representing a certificate
+        const rows = data.map((certificate, index) => ({
+          serialNumber: certificate[0], // Assuming this is the serial number field in the struct
+          name: certificate[1], // Assuming this is the name field in the struct
+          cid: certificate[2], // Assuming this is the IPFS CID field in the struct
+          icNumber: certificate[3], // Assuming this is the IC number field in the struct
+          studentId: certificate[4], // Assuming this is the student ID field in the struct
+          courseName: certificate[5], // Assuming this is the course name field in the struct
+          issuedDate: certificate[6], // Assuming this is the issued date field in the struct
+          certHash: certificate[7], // Assuming this is the certHash field in the struct
           id: index,
         }));
 

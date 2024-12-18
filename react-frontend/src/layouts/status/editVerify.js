@@ -15,6 +15,27 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
+// Function to calculate file hash using SHA-256
+const hashFile = async (file) => {
+  const hash = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const buffer = reader.result; // File as ArrayBuffer
+        const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // Generate SHA-256 hash
+        const hashArray = Array.from(new Uint8Array(hashBuffer)); // Convert ArrayBuffer to byte array
+        const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join(""); // Convert byte array to hex string
+        resolve(hashHex);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+  });
+  return hash;
+};
+
 function VerifyCertificate() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,6 +44,8 @@ function VerifyCertificate() {
   const [name, setName] = useState(""); // State for name
   const [email, setEmail] = useState(""); // State for email
   const [icNumber, setIcNumber] = useState(""); // State for IC number
+  const [certificateFile, setCertificateFile] = useState(null); // State for the certificate file
+  const [fileHash, setFileHash] = useState(""); // State for the file hash
   const [errorMessage, setErrorMessage] = useState(""); // Error message state
   const [isLoading, setIsLoading] = useState(false); // Loading state for the button
   const [statusMessage, setStatusMessage] = useState(""); // Success/error status message
@@ -43,12 +66,27 @@ function VerifyCertificate() {
     setter(event.target.value);
   };
 
+  // Handle file input change and update the file hash
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    setCertificateFile(file);
+
+    if (file) {
+      try {
+        const hash = await hashFile(file); // Get the file hash
+        setFileHash(hash); // Set the file hash state
+      } catch (error) {
+        setErrorMessage("Failed to hash the file.");
+      }
+    }
+  };
+
   // Function to handle the verify button click and update status details
   const handleVerify = async () => {
     setIsLoading(true);
     setErrorMessage("");
 
-    if (!name || !serialNumber || !icNumber) {
+    if (!name || !serialNumber || !icNumber || !certificateFile) {
       setStatusMessage("Please fill in all required fields.");
       setIsLoading(false);
       return; // Stop the function if required fields are empty
@@ -63,6 +101,7 @@ function VerifyCertificate() {
       serial_number: serialNumber, // New serial number to be updated
       ic_number: icNumber, // New IC number to be updated
       status: "pending", // Default status as pending
+      file_hash: fileHash, // Pass the file hash along with the data
     };
 
     try {
@@ -110,6 +149,13 @@ function VerifyCertificate() {
                     </MDTypography>
                   </MDBox>
                 )}
+                {errorMessage && (
+                  <MDBox mt={2}>
+                    <MDTypography variant="body2" color="red">
+                      {errorMessage}
+                    </MDTypography>
+                  </MDBox>
+                )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
                     <MDInput
@@ -152,6 +198,18 @@ function VerifyCertificate() {
                       sx={{ mb: 2 }}
                       required
                     />
+                    <MDBox mb={2}>
+                      <MDTypography variant="body2" color="dark">
+                        Upload certificate:
+                      </MDTypography>
+                      <MDInput
+                        type="file"
+                        fullWidth
+                        onChange={handleFileChange}
+                        accept=".pdf"
+                        required
+                      />
+                    </MDBox>
                     <MDButton
                       variant="gradient"
                       color="info"

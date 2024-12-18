@@ -155,6 +155,7 @@ function Status() {
           serial_number: rowData.serial_number,
           status: rowData.status,
           created_at: rowData.created_at,
+          file_hash: rowData.file_hash,
         },
       });
     } else {

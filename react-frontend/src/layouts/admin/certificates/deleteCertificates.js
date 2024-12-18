@@ -33,6 +33,7 @@ function DeleteCertificate() {
   const [studentId, setStudentId] = useState(""); // New state for Student ID
   const [courseName, setCourseName] = useState(""); // New state for Course Name
   const [issuedDate, setIssuedDate] = useState(""); // New state for Issued Date
+  const [certHash, setCertHash] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch certificate data using the serial number
@@ -51,6 +52,7 @@ function DeleteCertificate() {
           setStudentId(certificate[4] || ""); // Student ID is at index 4
           setCourseName(certificate[5] || ""); // Course Name is at index 5
           setIssuedDate(certificate[6] || ""); // Issued Date is at index 6
+          setCertHash(certificate[7] || "");
         }
 
         setIsLoading(false);
@@ -156,20 +158,6 @@ function DeleteCertificate() {
                         </TableRow>
                         <TableRow>
                           <TableCell>
-                            <strong>CID</strong>
-                          </TableCell>
-                          <TableCell>
-                            <a
-                              href={`http://127.0.0.1:8080/ipfs/${cid}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {cid}
-                            </a>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
                             <strong>IC Number</strong>
                           </TableCell>
                           <TableCell>{icNumber}</TableCell>
@@ -191,6 +179,26 @@ function DeleteCertificate() {
                             <strong>Issued Date</strong>
                           </TableCell>
                           <TableCell>{issuedDate}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>CID</strong>
+                          </TableCell>
+                          <TableCell>
+                            <a
+                              href={`http://127.0.0.1:8080/ipfs/${cid}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {cid}
+                            </a>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <strong>File Hash</strong>
+                          </TableCell>
+                          <TableCell>{certHash}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

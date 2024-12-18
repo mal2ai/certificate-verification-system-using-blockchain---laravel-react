@@ -12,6 +12,7 @@ contract CertificateRegistry {
         string studentId;
         string courseName;
         string issuedDate;
+        string certHash; // Hash of the certificate PDF
     }
 
     mapping(string => Certificate) private certificates;
@@ -20,28 +21,16 @@ contract CertificateRegistry {
     // Events for tracking transactions
     event CertificateRegistered(
         string serialNumber,
-        string name,
-        string cid,
-        string icNumber,
-        string studentId,
-        string courseName,
-        string issuedDate,
         address indexed sender,
         uint256 timestamp
     );
-    
+
     event CertificateUpdated(
         string serialNumber,
-        string newName,
-        string newCid,
-        string newIcNumber,
-        string newStudentId,
-        string newCourseName,
-        string newIssuedDate,
         address indexed sender,
         uint256 timestamp
     );
-    
+
     event CertificateDeleted(
         string serialNumber,
         address indexed sender,
@@ -51,21 +40,19 @@ contract CertificateRegistry {
     event CertificateVerified(
         string serialNumber,
         address indexed verifier,
-        uint256 timestamp
+        uint256 timestamp,
+        bool verified
     );
 
-    // Modifier to restrict access to only the admin
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only admin can perform this action");
         _;
     }
 
-    // Constructor to set the contract deployer as admin
     constructor() {
         admin = msg.sender;
     }
 
-    // Register a certificate (only admin)
     function registerCertificate(
         string memory serialNumber,
         string memory name,
@@ -73,118 +60,56 @@ contract CertificateRegistry {
         string memory icNumber,
         string memory studentId,
         string memory courseName,
-        string memory issuedDate
+        string memory issuedDate,
+        string memory certHash
     ) public onlyAdmin {
         certificates[serialNumber] = Certificate(
-            serialNumber, 
-            name, 
-            cid, 
-            icNumber, 
-            studentId, 
-            courseName, 
-            issuedDate
+            serialNumber,
+            name,
+            cid,
+            icNumber,
+            studentId,
+            courseName,
+            issuedDate,
+            certHash
         );
         certificateSerialNumbers.push(serialNumber);
-        
-        emit CertificateRegistered(
-            serialNumber, 
-            name, 
-            cid, 
-            icNumber, 
-            studentId, 
-            courseName, 
-            issuedDate, 
-            msg.sender, 
-            block.timestamp
-        );
+
+        emit CertificateRegistered(serialNumber, msg.sender, block.timestamp);
     }
 
-    // Get a specific certificate
-    function getCertificate(
-        string memory serialNumber
-    )
+    function getCertificate(string memory serialNumber)
         public
         view
-        returns (
-            string memory,
-            string memory,
-            string memory,
-            string memory,
-            string memory,
-            string memory,
-            string memory
-        )
+        returns (Certificate memory)
     {
         Certificate memory cert = certificates[serialNumber];
         require(bytes(cert.serialNumber).length > 0, "Certificate not found");
-        return (
-            cert.serialNumber,
-            cert.name,
-            cert.cid,
-            cert.icNumber,
-            cert.studentId,
-            cert.courseName,
-            cert.issuedDate
-        );
+        return cert;
     }
 
-    // Get all certificates' details (only admin)
-    function getAllCertificates()
-        public
-        view
-        onlyAdmin
-        returns (
-            string[] memory,
-            string[] memory,
-            string[] memory,
-            string[] memory,
-            string[] memory,
-            string[] memory,
-            string[] memory
-        )
-    {
+    function getAllCertificates() public view onlyAdmin returns (Certificate[] memory) {
         uint256 length = certificateSerialNumbers.length;
-        string[] memory serialNumbers = new string[](length);
-        string[] memory names = new string[](length);
-        string[] memory cids = new string[](length);
-        string[] memory icNumbers = new string[](length);
-        string[] memory studentIds = new string[](length);
-        string[] memory courseNames = new string[](length);
-        string[] memory issuedDates = new string[](length);
+        Certificate[] memory allCertificates = new Certificate[](length);
 
         for (uint256 i = 0; i < length; i++) {
-            string memory serialNumber = certificateSerialNumbers[i];
-            Certificate memory cert = certificates[serialNumber];
-            serialNumbers[i] = cert.serialNumber;
-            names[i] = cert.name;
-            cids[i] = cert.cid;
-            icNumbers[i] = cert.icNumber;
-            studentIds[i] = cert.studentId;
-            courseNames[i] = cert.courseName;
-            issuedDates[i] = cert.issuedDate;
+            allCertificates[i] = certificates[certificateSerialNumbers[i]];
         }
 
-        return (
-            serialNumbers,
-            names,
-            cids,
-            icNumbers,
-            studentIds,
-            courseNames,
-            issuedDates
-        );
+        return allCertificates;
     }
 
-    // Verify a certificate
-    function verifyCertificate(string memory serialNumber) public {
-        // Check if the certificate exists
-        require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
+    function verifyCertificate(string memory serialNumber, string memory providedHash) public {
+        Certificate memory cert = certificates[serialNumber];
+        require(bytes(cert.serialNumber).length > 0, "Certificate not found");
 
-        // Emit an event to record the verification
-        emit CertificateVerified(serialNumber, msg.sender, block.timestamp);
+        bool isVerified = keccak256(abi.encodePacked(cert.certHash)) == keccak256(abi.encodePacked(providedHash));
+
+        emit CertificateVerified(serialNumber, msg.sender, block.timestamp, isVerified);
+
+        require(isVerified, "Certificate hash does not match");
     }
 
-    // Update an existing certificate's details (only admin)
     function updateCertificate(
         string memory serialNumber,
         string memory newName,
@@ -192,52 +117,39 @@ contract CertificateRegistry {
         string memory newIcNumber,
         string memory newStudentId,
         string memory newCourseName,
-        string memory newIssuedDate
+        string memory newIssuedDate,
+        string memory newCertHash
     ) public onlyAdmin {
         Certificate storage cert = certificates[serialNumber];
         require(bytes(cert.serialNumber).length > 0, "Certificate not found");
+
         cert.name = newName;
         cert.cid = newCid;
         cert.icNumber = newIcNumber;
         cert.studentId = newStudentId;
         cert.courseName = newCourseName;
         cert.issuedDate = newIssuedDate;
+        cert.certHash = newCertHash;
 
-        emit CertificateUpdated(
-            serialNumber,
-            newName,
-            newCid,
-            newIcNumber,
-            newStudentId,
-            newCourseName,
-            newIssuedDate,
-            msg.sender,
-            block.timestamp
-        );
+        emit CertificateUpdated(serialNumber, msg.sender, block.timestamp);
     }
 
-    // Delete a certificate by serial number (only admin)
     function deleteCertificate(string memory serialNumber) public onlyAdmin {
         require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
+
         delete certificates[serialNumber];
 
-        uint256 indexToDelete = certificateSerialNumbers.length;
         for (uint256 i = 0; i < certificateSerialNumbers.length; i++) {
             if (keccak256(abi.encodePacked(certificateSerialNumbers[i])) == keccak256(abi.encodePacked(serialNumber))) {
-                indexToDelete = i;
+                certificateSerialNumbers[i] = certificateSerialNumbers[certificateSerialNumbers.length - 1];
+                certificateSerialNumbers.pop();
                 break;
             }
-        }
-
-        if (indexToDelete < certificateSerialNumbers.length) {
-            certificateSerialNumbers[indexToDelete] = certificateSerialNumbers[certificateSerialNumbers.length - 1];
-            certificateSerialNumbers.pop();
         }
 
         emit CertificateDeleted(serialNumber, msg.sender, block.timestamp);
     }
 
-    // Get the count of all registered certificates
     function getCertificatesCount() public view returns (uint256) {
         return certificateSerialNumbers.length;
     }
