@@ -16,6 +16,7 @@ import Footer from "examples/Footer";
 
 // API function to get user details by email, delete status, and send OTP
 import { getStatusBySerialNumber, deleteStatus, sendOTP, getUserDetailsByEmail } from "utils/api";
+import { getBlockchain } from "utils/blockchain";
 
 function VerifyCertificate() {
   const navigate = useNavigate();
@@ -141,6 +142,49 @@ function VerifyCertificate() {
       setSnackbarMessage(error.message || "Error sending OTP");
       setSnackbarType("error");
       setOpenSnackbar(true);
+    }
+  };
+
+  const handleVerify = async () => {
+    setIsLoading(true);
+    setErrorMessage("");
+
+    // Check if the necessary fields are filled
+    if (!certificateDetails?.serial_number || !certificateDetails?.file_hash) {
+      setSnackbarMessage("Please fill in all required fields.");
+      setSnackbarType("error");
+      setIsLoading(false);
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      // Retrieve user account and contract from the blockchain
+      const { adminAccount, contract } = await getBlockchain();
+
+      // Send transaction to verify the certificate using .send()
+      const verifyTx = await contract.methods
+        .verifyCertificate(certificateDetails?.serial_number, certificateDetails?.file_hash)
+        .send({
+          from: adminAccount, // Use the user account
+          gas: 3000000, // Set an appropriate gas limit
+        });
+
+      // Check if the transaction was successful
+      if (verifyTx.status) {
+        setSnackbarMessage("Certificate is valid.");
+        setSnackbarType("success");
+      } else {
+        setSnackbarMessage("Certificate not valid.");
+        setSnackbarType("error");
+      }
+      setOpenSnackbar(true);
+    } catch (error) {
+      setSnackbarMessage("Certificate not valid or file hash has been changed");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -270,25 +314,9 @@ function VerifyCertificate() {
                         }}
                       />
 
-                      {/* Display Created At */}
-                      <MDInput
-                        label="Created At"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={
-                          certificateDetails?.created_at
-                            ? formatDate(certificateDetails.created_at)
-                            : ""
-                        }
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-
                       {/* Display Updated At */}
                       <MDInput
-                        label="Update At"
+                        label="Timestamp"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
@@ -297,6 +325,18 @@ function VerifyCertificate() {
                             ? formatDate(certificateDetails.updated_at)
                             : ""
                         }
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+
+                      {/* Display Created At */}
+                      <MDInput
+                        label="File Hash"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.file_hash}
                         InputProps={{
                           readOnly: true,
                         }}
@@ -487,6 +527,14 @@ function VerifyCertificate() {
             }
           >
             Resend OTP
+          </MDButton>
+          <MDButton
+            variant="contained"
+            color="primary"
+            sx={{ maxWidth: 200 }}
+            onClick={handleVerify}
+          >
+            Verify
           </MDButton>
           <MDButton
             variant="contained"
