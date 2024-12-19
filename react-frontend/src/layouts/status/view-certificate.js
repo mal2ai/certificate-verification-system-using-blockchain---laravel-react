@@ -134,7 +134,10 @@ function VerifyCertificate() {
         setErrorMessage("Certificate not found.");
       } else if (error?.data?.reason) {
         // If there's a reason in the error data, display it
-        setErrorMessage(error.data.reason || "An unexpected error occurred.");
+        setErrorMessage(
+          error.data.reason ||
+            "Certificate not found or your file has been tampered. If tampered, please provide original file."
+        );
       } else {
         setErrorMessage(
           "Certificate not found or your file has been tampered. If tampered, please provide original file."

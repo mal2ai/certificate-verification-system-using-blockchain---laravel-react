@@ -74,7 +74,7 @@ class StatusController extends Controller
             }
 
             // If no status found, return a 404 error
-            return response()->json(['message' => 'Status not found'], 404);
+            return response()->json(['message' => 'Request not found'], 404);
         } catch (Exception $e) {
             // Return a 500 error in case of unexpected exceptions
             return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);

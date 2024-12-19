@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { getTransactions } from "utils/api"; // Assuming your getTransactions function is in utils/api
-import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { getTransactions } from "utils/api";
+import { formatInTimeZone } from "date-fns-tz";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -69,6 +68,20 @@ function Projects() {
     </Menu>
   );
 
+  const formatDate = (dateString) => {
+    try {
+      // Convert the date string to an ISO format with 'Z' indicating UTC
+      const utcDate = new Date(`${dateString}Z`); // Append 'Z' for UTC
+
+      // Format the date into Malaysia's timezone
+      const formattedDate = formatInTimeZone(utcDate, "Asia/Kuala_Lumpur", "dd/MM/yyyy, h:mm a");
+
+      return formattedDate;
+    } catch (error) {
+      return dateString; // Return the original date string if formatting fails
+    }
+  };
+
   // Define columns based on the transaction data structure
   const columns = [
     { Header: "Transaction Hash", accessor: "transaction_hash" },
@@ -81,14 +94,7 @@ function Projects() {
   // Map the transactions and format the date
   const rows = transactions
     .map((transaction) => {
-      const utcDate = new Date(transaction.updated_at);
-
-      // Convert the UTC date to Malaysia's timezone
-      const malaysiaTime = toZonedTime(utcDate, "Asia/Kuala_Lumpur");
-
-      // Format the date in Malaysia's timezone
-      const formattedDate = format(malaysiaTime, "E, dd/MM/yyyy, h:mm a");
-
+      const formattedDate = formatDate(transaction.updated_at);
       return {
         transaction_hash: transaction.transaction_hash,
         block_number: transaction.block_number,
