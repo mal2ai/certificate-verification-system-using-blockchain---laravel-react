@@ -17,6 +17,9 @@ import { format } from "date-fns";
 import { getBlockchain } from "utils/blockchain";
 import { getStatusBySerialNumber, storeTransaction } from "utils/api";
 
+// Material-UI loading spinner
+import CircularProgress from "@mui/material/CircularProgress";
+
 function VerifyCertificate() {
   const location = useLocation(); // Access the passed state from the navigate function
 
@@ -183,103 +186,124 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {/* Render error message only if there's an error */}
-                {verificationAttempted && !certificateDetails && !isLoading && errorMessage && (
-                  <MDTypography variant="body2" color="error">
-                    {errorMessage}
-                  </MDTypography>
-                )}
+                {/* Show loading indicator while fetching */}
+                {isLoading ? (
+                  <MDBox
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%", // Ensures the spinner is vertically centered within the parent
+                      width: "100%", // Ensures the spinner takes full width of the parent
+                    }}
+                  >
+                    <CircularProgress />
+                  </MDBox>
+                ) : (
+                  <>
+                    {verificationAttempted && !certificateDetails && !isLoading && errorMessage && (
+                      <MDTypography variant="body2" color="error">
+                        {errorMessage}
+                      </MDTypography>
+                    )}
 
-                {/* Only render the form if there's no error message */}
-                {!(verificationAttempted && !certificateDetails && !isLoading && errorMessage) && (
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <MDBox mt={3}>
-                      <MDInput
-                        label="Name"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.name || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Student ID"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.studentId || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="IC Number"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.icNumber || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Serial Number"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.serialNumber || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Course Name"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.courseName || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Issued Date"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={formattedIssuedDate}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="CertCID"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.cid || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="TransCID"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.transCID || ""}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                    </MDBox>
-                  </form>
+                    {!(
+                      verificationAttempted &&
+                      !certificateDetails &&
+                      !isLoading &&
+                      errorMessage
+                    ) && (
+                      <form onSubmit={(e) => e.preventDefault()}>
+                        <MDBox mt={3}>
+                          <MDInput
+                            label="Name"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.name || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Student ID"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.studentId || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="IC Number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.icNumber || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Serial Number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.serialNumber || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Course Name"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.courseName || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Issued Date"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.issuedDate || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="CertCID"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.cid || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="TransCID"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={certificateDetails?.transCID || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                        </MDBox>
+                      </form>
+                    )}
+                  </>
                 )}
               </MDBox>
             </Card>
 
+            {/* Requester Details Card */}
             <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
@@ -296,53 +320,79 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={status?.name || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Ic Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={status?.ic_number || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Email"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={status?.email || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Status"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={status?.status || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
+                {/* Show loading indicator while fetching */}
+                {isLoading ? (
+                  <MDBox
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%", // Ensures the spinner is vertically centered within the parent
+                      width: "100%", // Ensures the spinner takes full width of the parent
+                    }}
+                  >
+                    <CircularProgress />
                   </MDBox>
-                </form>
+                ) : (
+                  <>
+                    {status ? (
+                      <form onSubmit={(e) => e.preventDefault()}>
+                        <MDBox mt={3}>
+                          <MDInput
+                            label="Name"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={status?.name || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Ic Number"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={status?.ic_number || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Email"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={status?.email || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                          <MDInput
+                            label="Status"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={status?.status || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
+                        </MDBox>
+                      </form>
+                    ) : (
+                      errorMessage && (
+                        <MDTypography variant="body2" color="error">
+                          {errorMessage}
+                        </MDTypography>
+                      )
+                    )}
+                  </>
+                )}
               </MDBox>
             </Card>
 
+            {/* Blockchain Details Card */}
             <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
@@ -362,86 +412,102 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {/* Display error message if verification attempted, no certificate details, and no loading state */}
+                {/* Show error message if verification attempted, no certificate details, and no loading state */}
                 {verificationAttempted && !certificateDetails && !isLoading && errorMessage && (
                   <MDTypography variant="body2" color="error">
                     {errorMessage}
                   </MDTypography>
                 )}
 
-                {/* Render the form only if no error message */}
-                {!(verificationAttempted && !certificateDetails && !isLoading && errorMessage) && (
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <MDBox mt={3}>
-                      <MDInput
-                        label="Transaction Hash"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.transactionHash || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="From"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.from || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="To"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.to || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Block Number"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.blockNumber?.toString() || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Gas Used"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.gasUsed?.toString() || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                      <MDInput
-                        label="Status"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={transactionReceipt?.status || "N/A"}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
-                    </MDBox>
-                  </form>
+                {/* Render loading spinner if data is being fetched */}
+                {isLoading ? (
+                  <MDBox
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%", // Ensures the spinner is vertically centered within the parent
+                      width: "100%", // Ensures the spinner takes full width of the parent
+                    }}
+                  >
+                    <CircularProgress />
+                  </MDBox>
+                ) : (
+                  // Only render the form if no error message and data is not loading
+                  !(verificationAttempted && !certificateDetails && !isLoading && errorMessage) && (
+                    <form onSubmit={(e) => e.preventDefault()}>
+                      <MDBox mt={3}>
+                        <MDInput
+                          label="Transaction Hash"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.transactionHash || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                        <MDInput
+                          label="From"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.from || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                        <MDInput
+                          label="To"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.to || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                        <MDInput
+                          label="Block Number"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.blockNumber?.toString() || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                        <MDInput
+                          label="Gas Used"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.gasUsed?.toString() || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                        <MDInput
+                          label="Status"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={transactionReceipt?.status || "N/A"}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      </MDBox>
+                    </form>
+                  )
                 )}
               </MDBox>
             </Card>
           </Grid>
 
-          {/* Certificate PDF Preview Card */}
+          {/* Right side panel */}
           <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            {/* Certificate PDF Preview Card */}
             <Card>
               <MDBox
                 mt={-3}
@@ -457,7 +523,19 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {certificateDetails && certificateDetails.cid ? (
+                {/* Show loading spinner if the certificate details are loading */}
+                {isLoading ? (
+                  <MDBox
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <CircularProgress />
+                  </MDBox>
+                ) : certificateDetails && certificateDetails.cid ? (
                   <div
                     style={{
                       border: "1px solid #ccc",
@@ -485,6 +563,7 @@ function VerifyCertificate() {
               </MDBox>
             </Card>
 
+            {/* Transcript PDF Preview Card */}
             <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mt={-3}
@@ -500,7 +579,19 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {certificateDetails && certificateDetails.cid ? (
+                {/* Show loading spinner if the certificate details are loading */}
+                {isLoading ? (
+                  <MDBox
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <CircularProgress />
+                  </MDBox>
+                ) : certificateDetails && certificateDetails.transCID ? (
                   <div
                     style={{
                       border: "1px solid #ccc",
@@ -517,12 +608,12 @@ function VerifyCertificate() {
                       width="100%"
                       height="100%"
                       style={{ border: "none" }}
-                      title="Certificate PDF"
+                      title="Transcript PDF"
                     />
                   </div>
                 ) : (
                   <MDTypography variant="body2" color="textSecondary">
-                    No certificate data to display.
+                    No transcript data to display.
                   </MDTypography>
                 )}
               </MDBox>

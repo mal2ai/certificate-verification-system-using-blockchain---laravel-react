@@ -239,6 +239,8 @@ function Status() {
       status: "approved", // Change status to "approved"
     };
 
+    setLoading(true); // Show the loading indicator
+
     try {
       // Update status in the backend
       const response = await updateStatus(
@@ -272,6 +274,8 @@ function Status() {
       setSnackbarMessage("Failed to approve the request or send OTP.");
       setSnackbarType("error");
       setOpenSnackbar(true);
+    } finally {
+      setLoading(false); // Hide the loading indicator
     }
   };
 
