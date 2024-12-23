@@ -230,8 +230,8 @@ function Dashboard() {
                 <ReportsBarChart
                   color="info"
                   title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
+                  description="Last Performance"
+                  date="updated sent 2 days ago"
                   chart={reportsBarChartData}
                 />
               </MDBox>
