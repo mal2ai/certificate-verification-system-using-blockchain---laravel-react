@@ -142,7 +142,7 @@ function Logs() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="dark">
-                  Logs
+                  Logs - Certificates
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -152,7 +152,130 @@ function Logs() {
                   </div>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: logData }}
+                    table={{
+                      columns: columns.filter((column) => column.accessor !== "user_email"),
+                      rows: logData.filter((log) => log.module === "Certificates"), // Filter logs by module
+                    }}
+                    isSorted={true}
+                    defaultSortColumn="id"
+                    defaultSortDirection="desc"
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+                    showTotalEntries={true}
+                    canSearch={true}
+                  />
+                )}
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Logs - Request
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                {loading ? (
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <DataTable
+                    table={{
+                      columns,
+                      rows: logData.filter((log) => log.module === "Request"), // Filter logs by "Request" module
+                    }}
+                    isSorted={true}
+                    defaultSortColumn="id"
+                    defaultSortDirection="desc"
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+                    showTotalEntries={true}
+                    canSearch={true}
+                  />
+                )}
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Logs - Manage User
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                {loading ? (
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <DataTable
+                    table={{
+                      columns,
+                      rows: logData.filter((log) => log.module === "Manage User"), // Filter logs by "Request" module
+                    }}
+                    isSorted={true}
+                    defaultSortColumn="id"
+                    defaultSortDirection="desc"
+                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+                    showTotalEntries={true}
+                    canSearch={true}
+                  />
+                )}
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Logs - User/Verify
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                {loading ? (
+                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <DataTable
+                    table={{
+                      columns: columns.filter((column) => column.accessor !== "admin_email"),
+                      rows: logData.filter((log) => log.module === "User"), // Filter logs by "Request" module
+                    }}
                     isSorted={true}
                     defaultSortColumn="id"
                     defaultSortDirection="desc"
