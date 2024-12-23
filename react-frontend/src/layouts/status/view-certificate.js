@@ -115,6 +115,7 @@ function VerifyCertificate() {
           studentId: certificate[4] || "",
           courseName: certificate[5] || "",
           issuedDate: certificate[6] || "",
+          transCID: certificate[8] || "",
         });
       } else {
         setCertificateDetails(null);
@@ -254,11 +255,21 @@ function VerifyCertificate() {
                         }}
                       />
                       <MDInput
-                        label="CID"
+                        label="CertCID"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
                         value={certificateDetails?.cid || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="TransCID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.transCID || ""}
                         InputProps={{
                           readOnly: true,
                         }}
@@ -268,6 +279,7 @@ function VerifyCertificate() {
                 )}
               </MDBox>
             </Card>
+
             <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
@@ -330,52 +342,7 @@ function VerifyCertificate() {
                 </form>
               </MDBox>
             </Card>
-          </Grid>
 
-          {/* Certificate PDF Preview Card */}
-          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
-            <Card>
-              <MDBox
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Certificate PDF Preview
-                </MDTypography>
-              </MDBox>
-              <MDBox p={3}>
-                {certificateDetails && certificateDetails.cid ? (
-                  <div
-                    style={{
-                      border: "1px solid #ccc",
-                      height: "325px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      backgroundColor: "#f5f5f5",
-                    }}
-                  >
-                    {/* Use an iframe to display the PDF from IPFS */}
-                    <iframe
-                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.cid}`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: "none" }}
-                      title="Certificate PDF"
-                    />
-                  </div>
-                ) : (
-                  <MDTypography variant="body2" color="textSecondary">
-                    No certificate data to display.
-                  </MDTypography>
-                )}
-              </MDBox>
-            </Card>
             <Card sx={{ marginTop: 5 }}>
               <MDBox
                 mx={2}
@@ -468,6 +435,95 @@ function VerifyCertificate() {
                       />
                     </MDBox>
                   </form>
+                )}
+              </MDBox>
+            </Card>
+          </Grid>
+
+          {/* Certificate PDF Preview Card */}
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            <Card>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Certificate PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {certificateDetails && certificateDetails.cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "450px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.cid}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate data to display.
+                  </MDTypography>
+                )}
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Transcript PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {certificateDetails && certificateDetails.cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "450px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.transCID}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate data to display.
+                  </MDTypography>
                 )}
               </MDBox>
             </Card>

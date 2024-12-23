@@ -113,28 +113,41 @@ function Status() {
   ];
 
   // Fetch all status data when the component mounts
-  // Adding statusData to dependencies to refetch when data changes
-  // Fetch all status data when the component mounts
   useEffect(() => {
     const fetchStatuses = async () => {
       setLoading(true);
 
       try {
         const response = await getAllStatuses(localStorage.getItem("token"));
+
         if (response && response.data) {
-          setStatusData(response.data);
+          // Check if the response contains the "No statuses found" message
+          if (response.data.message === "No statuses found") {
+            setStatusData([]); // Set the status data to an empty array
+          } else {
+            setStatusData(response.data); // Set the valid data
+          }
+        } else {
+          setStatusData([]); // If there's no data in the response, set it to an empty array
         }
       } catch (error) {
-        setSnackbarMessage("Failed to fetch status data!");
-        setSnackbarType("error");
-        setOpenSnackbar(true);
+        if (error.response && error.response.status === 404) {
+          // Handle the 404 status code without showing an error notification
+          console.log("No statuses found (404)");
+          setStatusData([]); // Set empty status data
+        } else {
+          // Only show an error notification for other errors
+          setSnackbarMessage("Failed to fetch status data!");
+          setSnackbarType("error");
+          setOpenSnackbar(true);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchStatuses();
-  }, []); // Empty dependency array to run only once
+  }, []);
 
   // Handle success message if present in the location state
   useEffect(() => {
