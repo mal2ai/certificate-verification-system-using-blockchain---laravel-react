@@ -221,8 +221,9 @@ function VerifyCertificate() {
             </Card>
           </Grid>
 
-          {/* Certificate PDF Preview Card */}
+          {/* Right side panel */}
           <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            {/* Certificate PDF Preview Card */}
             <Card>
               <MDBox
                 mt={-3}
@@ -242,7 +243,7 @@ function VerifyCertificate() {
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "400px", // Reduced height for a smaller preview
+                      height: "250px", // Reduced height for a smaller preview
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -263,6 +264,62 @@ function VerifyCertificate() {
                     No certificate data to display.
                   </MDTypography>
                 )}
+              </MDBox>
+            </Card>
+
+            {/* Transcript PDF Preview Card */}
+            <Card sx={{ marginTop: 6 }}>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Transcript PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {/* {certificateDetails ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "250px", // Reduced height for a smaller preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No transcript data to display.
+                  </MDTypography>
+                )} */}
+                <MDTypography
+                  variant="body2"
+                  color="textSecondary"
+                  style={{
+                    display: "inline-flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%", // Optional: Full width
+                    textAlign: "center", // Center text inside
+                  }}
+                >
+                  Not develop yet.
+                </MDTypography>
               </MDBox>
             </Card>
           </Grid>

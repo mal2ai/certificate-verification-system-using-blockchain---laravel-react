@@ -7,12 +7,13 @@ contract CertificateRegistry {
     struct Certificate {
         string serialNumber;
         string name;
-        string cid; // IPFS CID for the PDF
+        string certCID; // IPFS CID for the PDF
         string icNumber;
         string studentId;
         string courseName;
         string issuedDate;
         string certHash; // Hash of the certificate PDF
+        string transCID; // IPFS CID for the transcript
     }
 
     mapping(string => Certificate) private certificates;
@@ -56,22 +57,24 @@ contract CertificateRegistry {
     function registerCertificate(
         string memory serialNumber,
         string memory name,
-        string memory cid,
+        string memory certCID,
         string memory icNumber,
         string memory studentId,
         string memory courseName,
         string memory issuedDate,
-        string memory certHash
+        string memory certHash,
+        string memory transCID
     ) public onlyAdmin {
         certificates[serialNumber] = Certificate(
             serialNumber,
             name,
-            cid,
+            certCID,
             icNumber,
             studentId,
             courseName,
             issuedDate,
-            certHash
+            certHash,
+            transCID
         );
         certificateSerialNumbers.push(serialNumber);
 
@@ -113,23 +116,25 @@ contract CertificateRegistry {
     function updateCertificate(
         string memory serialNumber,
         string memory newName,
-        string memory newCid,
+        string memory newCertCID,
         string memory newIcNumber,
         string memory newStudentId,
         string memory newCourseName,
         string memory newIssuedDate,
-        string memory newCertHash
+        string memory newCertHash,
+        string memory newTransCID
     ) public onlyAdmin {
         Certificate storage cert = certificates[serialNumber];
         require(bytes(cert.serialNumber).length > 0, "Certificate not found");
 
         cert.name = newName;
-        cert.cid = newCid;
+        cert.certCID = newCertCID;
         cert.icNumber = newIcNumber;
         cert.studentId = newStudentId;
         cert.courseName = newCourseName;
         cert.issuedDate = newIssuedDate;
         cert.certHash = newCertHash;
+        cert.transCID = newTransCID;
 
         emit CertificateUpdated(serialNumber, msg.sender, block.timestamp);
     }
