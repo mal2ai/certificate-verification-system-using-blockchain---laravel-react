@@ -51,6 +51,8 @@ function Logs() {
     { Header: "Admin Email", accessor: "admin_email" },
     { Header: "Action", accessor: "action" },
     { Header: "Module", accessor: "module" },
+    { Header: "Serial Number", accessor: "serial_number" },
+    { Header: "TX Hash", accessor: "tx_hash" },
     { Header: "Status", accessor: "status" },
     {
       Header: "Timestamp",
@@ -193,7 +195,7 @@ function Logs() {
                 ) : (
                   <DataTable
                     table={{
-                      columns,
+                      columns: columns.filter((column) => column.accessor !== "tx_hash"),
                       rows: logData.filter((log) => log.module === "Request"), // Filter logs by "Request" module
                     }}
                     isSorted={true}
@@ -233,7 +235,10 @@ function Logs() {
                 ) : (
                   <DataTable
                     table={{
-                      columns,
+                      columns: columns.filter(
+                        (column) =>
+                          column.accessor !== "tx_hash" && column.accessor !== "serial_number"
+                      ),
                       rows: logData.filter((log) => log.module === "Manage User"), // Filter logs by "Request" module
                     }}
                     isSorted={true}
