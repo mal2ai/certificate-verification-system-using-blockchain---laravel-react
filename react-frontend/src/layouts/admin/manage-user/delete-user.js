@@ -20,7 +20,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 
 // Utility to interact with API
-import { deleteUser, getUserById } from "utils/api";
+import { deleteUser, getUserById, createLog } from "utils/api";
 
 function DeleteUser() {
   const { id } = useParams(); // Assume userId is passed as a URL parameter
@@ -61,7 +61,16 @@ function DeleteUser() {
       // Call the deleteUser function to delete the user
       await deleteUser(id, token);
 
-      console.log(`User with ID ${id} deleted`);
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: userDetails.email,
+        admin_email: adminEmail,
+        action: "Delete",
+        module: "Manage User",
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // After successful deletion, navigate to the users page and pass the success message
       navigate("/admin/manage-user", {

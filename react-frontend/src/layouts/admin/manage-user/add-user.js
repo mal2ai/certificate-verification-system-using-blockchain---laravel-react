@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "utils/api"; // Import the register function
+import { register, createLog } from "utils/api";
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -73,6 +73,19 @@ function AddUser() {
     try {
       await register(data);
       setStatusMessage("User registered successfully.");
+
+      // Create a log after successful registration
+      const token = localStorage.getItem("token");
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: email,
+        admin_email: adminEmail,
+        action: "Register",
+        module: "Manage User",
+        status: "Success",
+      };
+      await createLog(logData, token);
+
       navigate("/admin/manage-user", {
         state: { successMessage: "User Registered Successfully!" },
       });

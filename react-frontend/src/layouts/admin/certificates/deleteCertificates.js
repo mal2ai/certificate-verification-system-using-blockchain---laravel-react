@@ -20,7 +20,7 @@ import TableRow from "@mui/material/TableRow";
 
 // Utility to interact with blockchain
 import { getBlockchain } from "utils/blockchain";
-import { storeTransaction } from "utils/api";
+import { storeTransaction, createLog } from "utils/api";
 import { Margin } from "@mui/icons-material";
 import { format } from "date-fns";
 
@@ -101,8 +101,21 @@ function DeleteCertificate() {
       };
 
       // Step 3: Store transaction details in Laravel backend
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
-      await storeTransaction(transactionData, token); // Send transaction data to backend
+      const token = localStorage.getItem("token");
+      await storeTransaction(transactionData, token);
+
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: null,
+        admin_email: adminEmail,
+        action: "Delete",
+        module: "Certificates",
+        serial_number: serialNumber,
+        tx_hash: receipt.transactionHash,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // After successful deletion, navigate to the certificates page and pass the success message
       navigate("/admin/certificates", {

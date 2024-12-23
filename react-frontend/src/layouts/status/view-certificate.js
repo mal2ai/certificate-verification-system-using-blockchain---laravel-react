@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
-import { getStatusBySerialNumber, storeTransaction } from "utils/api";
+import { getStatusBySerialNumber, storeTransaction, createLog } from "utils/api";
 
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
@@ -106,6 +106,19 @@ function VerifyCertificate() {
         const token = localStorage.getItem("token");
         await storeTransaction(receipt, token);
       }
+
+      // Create a log after successful registration
+      const token = localStorage.getItem("token");
+      const userEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: userEmail,
+        action: "Verify",
+        module: "User",
+        serial_number: serialNumber,
+        tx_hash: verifyTx.transactionHash,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // If the verification is successful, fetch the certificate details
       const certificate = await contract.methods.getCertificate(serialNumber).call();

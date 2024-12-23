@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { updateDetails } from "utils/api"; // Import the updateDetails function
+import { updateDetails, createLog } from "utils/api"; // Import the updateDetails function
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -110,6 +110,18 @@ function VerifyCertificate() {
       const previousSerialNumber = location.state.rowData.serial_number;
       await updateDetails(previousSerialNumber, email, data, token);
       setStatusMessage("Status updated successfully.");
+
+      // Create a log after successful registration
+      const userEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: userEmail,
+        action: "Update Request",
+        module: "User",
+        serial_number: serialNumber,
+        status: "Success",
+      };
+      await createLog(logData, token);
+
       navigate("/status", { state: { successMessage: "Update Successfully!" } });
     } catch (error) {
       setStatusMessage("Failed to update status.");

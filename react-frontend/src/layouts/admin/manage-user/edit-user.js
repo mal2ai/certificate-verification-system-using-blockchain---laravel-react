@@ -20,7 +20,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // Utility functions
-import { getUserById, updateUser } from "utils/api";
+import { getUserById, updateUser, createLog } from "utils/api";
 
 function EditUser() {
   const navigate = useNavigate();
@@ -108,6 +108,17 @@ function EditUser() {
       };
 
       await updateUser(id, data, token);
+
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: email,
+        admin_email: adminEmail,
+        action: "Update",
+        module: "Manage User",
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       navigate("/admin/manage-user", {
         state: { successMessage: "User updated successfully!" },

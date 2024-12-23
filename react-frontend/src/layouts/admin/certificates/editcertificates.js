@@ -18,7 +18,7 @@ import Footer from "examples/Footer";
 // Utility functions
 import { uploadToIPFS } from "utils/ipfs";
 import { getBlockchain } from "utils/blockchain";
-import { storeTransaction } from "utils/api";
+import { storeTransaction, createLog } from "utils/api";
 
 function EditCertificate() {
   const navigate = useNavigate();
@@ -166,6 +166,19 @@ function EditCertificate() {
       // Store transaction in the backend
       const token = localStorage.getItem("token");
       await storeTransaction(transactionData, token);
+
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: null,
+        admin_email: adminEmail,
+        action: "Update",
+        module: "Certificates",
+        serial_number: serialNumber,
+        tx_hash: receipt.transactionHash,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // After successful update, navigate to certificates page
       navigate("/admin/certificates", {

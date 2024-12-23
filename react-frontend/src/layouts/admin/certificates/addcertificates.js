@@ -22,7 +22,7 @@ import MDSnackbar from "components/MDSnackbar";
 // Utility functions
 import { uploadToIPFS } from "utils/ipfs";
 import { getBlockchain } from "utils/blockchain";
-import { storeTransaction } from "utils/api";
+import { storeTransaction, createLog } from "utils/api";
 
 function AddCertificates() {
   const navigate = useNavigate();
@@ -128,6 +128,19 @@ function AddCertificates() {
       // Step 6: Store transaction details in Laravel backend
       const token = localStorage.getItem("token"); // Retrieve token
       await storeTransaction(transactionData, token);
+
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: null,
+        admin_email: adminEmail,
+        action: "Register",
+        module: "Certificates",
+        serial_number: serialNumber,
+        tx_hash: receipt.transactionHash,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // Redirect after success
       navigate("/admin/certificates", {

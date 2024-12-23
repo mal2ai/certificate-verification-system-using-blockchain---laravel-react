@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { storeStatus, getProfileDetails } from "utils/api"; // Import the API functions
+import { storeStatus, getProfileDetails, createLog } from "utils/api"; // Import the API functions
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -109,6 +109,17 @@ function VerifyCertificate() {
       // Call storeStatus API function to store the status and file hash
       await storeStatus(data, token);
       setStatusMessage("Status stored successfully.");
+
+      // Create a log after successful registration
+      const userEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: userEmail,
+        action: "New Request",
+        module: "User",
+        serial_number: serialNumber,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       // Check the role from localStorage
       const role = localStorage.getItem("role"); // Get the role from localStorage

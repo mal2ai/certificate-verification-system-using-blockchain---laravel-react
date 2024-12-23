@@ -249,4 +249,22 @@ export const getTransactions = (token) => {
   });
 };
 
+// Create a new log entry
+export const createLog = (data, token) => {
+  return api.post("/logs", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Fetch all logs
+export const getLogs = (token) => {
+  return api.get("/logs", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;

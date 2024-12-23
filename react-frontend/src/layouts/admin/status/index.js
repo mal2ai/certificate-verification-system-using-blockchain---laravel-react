@@ -18,7 +18,7 @@ import DataTable from "examples/Tables/DataTable";
 import MDButton from "components/MDButton";
 
 // API function to get all statuses and update status
-import { getAllStatuses, updateStatus, sendOTP } from "utils/api";
+import { getAllStatuses, updateStatus, sendOTP, createLog } from "utils/api";
 
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
@@ -221,6 +221,19 @@ function Status() {
           )
         );
 
+        // Create a log after successful registration
+        const token = localStorage.getItem("token");
+        const adminEmail = localStorage.getItem("email");
+        const logData = {
+          user_email: rowData.email,
+          admin_email: adminEmail,
+          action: "Reject",
+          module: "Request",
+          serial_number: rowData.serial_number,
+          status: "Success",
+        };
+        await createLog(logData, token);
+
         setSnackbarMessage("Request has been rejected successfully.");
         setSnackbarType("success");
         setOpenSnackbar(true);
@@ -268,6 +281,19 @@ function Status() {
                   : item // Leave other items unchanged
             )
           );
+
+          // Create a log after successful registration
+          const token = localStorage.getItem("token");
+          const adminEmail = localStorage.getItem("email");
+          const logData = {
+            user_email: rowData.email,
+            admin_email: adminEmail,
+            action: "Approve",
+            module: "Request",
+            serial_number: rowData.serial_number,
+            status: "Success",
+          };
+          await createLog(logData, token);
         }
       }
     } catch (error) {

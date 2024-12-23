@@ -15,7 +15,13 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // API function to get user details by email, delete status, and send OTP
-import { getStatusBySerialNumber, deleteStatus, sendOTP, getUserDetailsByEmail } from "utils/api";
+import {
+  getStatusBySerialNumber,
+  deleteStatus,
+  sendOTP,
+  getUserDetailsByEmail,
+  createLog,
+} from "utils/api";
 import { getBlockchain } from "utils/blockchain";
 
 function VerifyCertificate() {
@@ -113,8 +119,24 @@ function VerifyCertificate() {
       setSnackbarType("success");
       setOpenSnackbar(true);
 
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: certificateDetails?.email,
+        admin_email: adminEmail,
+        action: "Delete",
+        module: "Request",
+        serial_number: certificateDetails?.serial_number || serialNumber,
+        status: "Success",
+      };
+      await createLog(logData, token);
+
       navigate("/admin/request", {
-        state: { successMessage: `Request ${serialNumber} for ${email} Deleted Successfully!` },
+        state: {
+          successMessage: `Request ${
+            certificateDetails?.serial_number || serialNumber
+          } for ${email} Deleted Successfully!`,
+        },
       });
     } catch (error) {
       setIsLoading(false);
@@ -132,6 +154,18 @@ function VerifyCertificate() {
       const token = localStorage.getItem("token"); // Get token from localStorage
       await sendOTP(email, certificateDetails?.id, token); // Call sendOTP function
       setIsLoading(false);
+
+      // Create a log after successful registration
+      const adminEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: certificateDetails?.email,
+        admin_email: adminEmail,
+        action: "Resend OTP",
+        module: "Request",
+        serial_number: certificateDetails?.serial_number || serialNumber,
+        status: "Success",
+      };
+      await createLog(logData, token);
 
       setSnackbarMessage("OTP sent successfully.");
       setSnackbarType("success");

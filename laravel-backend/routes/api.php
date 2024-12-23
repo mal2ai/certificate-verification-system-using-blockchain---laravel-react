@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\LogController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -59,4 +60,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // New route to display all stored transactions for auditing
     Route::get('/transactions', [TransactionController::class, 'getAllTransactions']);
+
+    //logs management
+    Route::post('/logs', [LogController::class, 'store']); // For creating a log
+    Route::get('/logs', [LogController::class, 'index']);  // For fetching logs
 });
