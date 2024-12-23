@@ -26,7 +26,8 @@ import { storeTransaction } from "utils/api";
 
 function AddCertificates() {
   const navigate = useNavigate();
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null); // For the certificate file
+  const [transcript, setTranscript] = useState(null); // For the transcript file
   const [name, setName] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [icNumber, setIcNumber] = useState("");
@@ -36,7 +37,9 @@ function AddCertificates() {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  // Handlers
+  const handleFileChange = (e) => setFile(e.target.files[0]); // For the certificate file
+  const handleTranscriptChange = (e) => setTranscript(e.target.files[0]); // For the transcript file
   const handleNameChange = (e) => setName(e.target.value);
   const handleSerialNumberChange = (e) => setSerialNumber(e.target.value);
   const handleIcNumberChange = (e) => setIcNumber(e.target.value);
@@ -62,49 +65,49 @@ function AddCertificates() {
     setLoading(true);
 
     // Step 1: Validate if the required fields are filled
-    if (!serialNumber || !name || !file || !icNumber || !studentId || !courseName || !issuedDate) {
-      setStatusMessage("Please fill in all required fields.");
+    if (
+      !serialNumber ||
+      !name ||
+      !file ||
+      !icNumber ||
+      !studentId ||
+      !courseName ||
+      !issuedDate ||
+      !transcript
+    ) {
+      setStatusMessage(
+        "Please fill in all required fields, including both the certificate and transcript files."
+      );
       setLoading(false);
       return; // Stop the function if any required field is missing
     }
 
     try {
-      // Step 1: Hash the uploaded file using the browser's SubtleCrypto API
-      const hash = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            const buffer = reader.result; // File as ArrayBuffer
-            const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // Generate SHA-256 hash
-            const hashArray = Array.from(new Uint8Array(hashBuffer)); // Convert ArrayBuffer to byte array
-            const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join(""); // Convert byte array to hex string
-            resolve(hashHex);
-          } catch (error) {
-            reject(error);
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
-      });
+      // Step 2: Hash the certificate file
+      const certificateHash = await generateFileHash(file);
+      console.log("Generated hash for the certificate file:", certificateHash);
 
-      console.log("Generated hash for the file:", hash);
+      // Step 3: Upload certificate PDF to IPFS
+      const certificateCID = await uploadToIPFS(file);
+      console.log("Uploaded certificate to IPFS, CID:", certificateCID);
 
-      // Step 2: Upload PDF to IPFS
-      const ipfsCID = await uploadToIPFS(file);
-      console.log("Uploaded to IPFS, CID:", ipfsCID);
+      // Step 4: Upload transcript PDF to IPFS (without hashing)
+      const transcriptCID = await uploadToIPFS(transcript);
+      console.log("Uploaded transcript to IPFS, CID:", transcriptCID);
 
-      // Step 3: Register certificate on blockchain with the hash
+      // Step 5: Register certificate on blockchain with the certificate hash, certificate CID, and transcript CID
       const { adminAccount, contract } = await getBlockchain();
       const receipt = await contract.methods
         .registerCertificate(
           serialNumber,
           name,
-          ipfsCID,
+          certificateCID,
           icNumber,
           studentId,
           courseName,
           issuedDate,
-          hash // Include the hash in the smart contract call
+          certificateHash, // Include certificate hash
+          transcriptCID // Include transcript CID
         )
         .send({
           from: adminAccount, // Use adminAccount here
@@ -122,22 +125,43 @@ function AddCertificates() {
         action: "Register",
       };
 
-      // Step 4: Store transaction details in Laravel backend
+      // Step 6: Store transaction details in Laravel backend
       const token = localStorage.getItem("token"); // Retrieve token
       await storeTransaction(transactionData, token);
 
       // Redirect after success
       navigate("/admin/certificates", {
-        state: { successMessage: "Certificate Added Successfully!" },
+        state: { successMessage: "Certificate and Transcript Added Successfully!" },
       });
     } catch (error) {
-      console.error("Error uploading or registering the certificate:", error);
-      alert("An error occurred while uploading or registering the certificate.");
+      console.error("Error uploading or registering the certificate and transcript:", error);
+      alert("An error occurred while uploading or registering the certificate and transcript.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper function to generate file hash
+  const generateFileHash = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const buffer = reader.result; // File as ArrayBuffer
+          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // Generate SHA-256 hash
+          const hashArray = Array.from(new Uint8Array(hashBuffer)); // Convert ArrayBuffer to byte array
+          const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join(""); // Convert byte array to hex string
+          resolve(hashHex);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+    });
+  };
+
+  // Certificate upload
   useEffect(() => {
     // Initialize the fileinput plugin
     const $ = window.$;
@@ -148,9 +172,27 @@ function AddCertificates() {
         showUpload: false, // Disable upload button if using custom upload handlers
       });
 
-      // Update the file state when the user selects a file
+      // Update the certificate file state when the user selects a file
       $("#input-b1").on("change", (e) => {
-        setFile(e.target.files[0]);
+        setFile(e.target.files[0]); // Set the file for the certificate
+      });
+    }
+  }, []);
+
+  // Transcript upload
+  useEffect(() => {
+    // Initialize the fileinput plugin
+    const $ = window.$;
+    if ($ && $.fn.fileinput) {
+      $("#input-b2").fileinput({
+        browseOnZoneClick: true,
+        showPreview: true,
+        showUpload: false, // Disable upload button if using custom upload handlers
+      });
+
+      // Update the transcript file state when the user selects a file
+      $("#input-b2").on("change", (e) => {
+        setTranscript(e.target.files[0]); // Set the file for the transcript
       });
     }
   }, []);
@@ -268,7 +310,7 @@ function AddCertificates() {
             </Card>
           </Grid>
 
-          {/* Certificate Upload Section */}
+          {/* transcript Upload Section */}
           <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
             <Card>
               <MDBox
@@ -288,7 +330,42 @@ function AddCertificates() {
               <MDBox p={3}>
                 <form onSubmit={handleSubmit}>
                   <MDBox mb={2}>
-                    <input id="input-b1" name="input-b1" type="file" className="file" />
+                    <input
+                      id="input-b1"
+                      name="input-b1"
+                      type="file"
+                      className="file"
+                      data-show-preview="false"
+                    />
+                  </MDBox>
+                </form>
+              </MDBox>
+            </Card>
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Upload Transcript
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                <form onSubmit={handleSubmit}>
+                  <MDBox mb={2}>
+                    <input
+                      id="input-b2"
+                      name="input-b2"
+                      type="file"
+                      className="file"
+                      data-show-preview="false"
+                    />
                   </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
                     <MDButton variant="gradient" color="dark" type="submit" disabled={loading}>

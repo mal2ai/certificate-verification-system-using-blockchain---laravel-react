@@ -49,7 +49,8 @@ function VerifyCertificate() {
             courseName: certificate[5] || "",
             issuedDate: certificate[6] || "",
             certHash: certificate[7] || "",
-            cid: certificate[2] || "", // Assuming `cid` is the IPFS CID
+            certCID: certificate[2] || "",
+            transCID: certificate[8] || "",
           };
           setCertificateDetails(newCertificate);
         } else {
@@ -200,7 +201,7 @@ function VerifyCertificate() {
                       variant="outlined"
                       fullWidth
                       sx={{ mb: 2 }}
-                      value={certificateDetails?.cid || ""}
+                      value={certificateDetails?.certCID || ""}
                       InputProps={{
                         readOnly: true,
                       }}
@@ -239,11 +240,11 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {certificateDetails && certificateDetails.cid ? (
+                {certificateDetails && certificateDetails.certCID ? (
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "250px", // Reduced height for a smaller preview
+                      height: "300px", // Reduced height for a smaller preview
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -252,7 +253,7 @@ function VerifyCertificate() {
                   >
                     {/* Use an iframe to display the PDF from IPFS */}
                     <iframe
-                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.cid}`}
+                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.certCID}`}
                       width="100%"
                       height="100%"
                       style={{ border: "none" }}
@@ -283,11 +284,11 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {/* {certificateDetails ? (
+                {certificateDetails && certificateDetails.transCID ? (
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "250px", // Reduced height for a smaller preview
+                      height: "300px", // Reduced height for a smaller preview
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -295,7 +296,7 @@ function VerifyCertificate() {
                     }}
                   >
                     <iframe
-                      src={`http://127.0.0.1:8080/ipfs/`}
+                      src={`http://127.0.0.1:8080/ipfs/${certificateDetails.transCID}`}
                       width="100%"
                       height="100%"
                       style={{ border: "none" }}
@@ -306,20 +307,7 @@ function VerifyCertificate() {
                   <MDTypography variant="body2" color="textSecondary">
                     No transcript data to display.
                   </MDTypography>
-                )} */}
-                <MDTypography
-                  variant="body2"
-                  color="textSecondary"
-                  style={{
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%", // Optional: Full width
-                    textAlign: "center", // Center text inside
-                  }}
-                >
-                  Not develop yet.
-                </MDTypography>
+                )}
               </MDBox>
             </Card>
           </Grid>

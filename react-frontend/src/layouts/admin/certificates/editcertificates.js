@@ -33,8 +33,16 @@ function EditCertificate() {
   const [courseName, setCourseName] = useState("");
   const [issuedDate, setIssuedDate] = useState("");
   const [certHash, setCertHash] = useState("");
+  const [transcript, setTranscript] = useState("");
+  const [transcriptFile, setTranscriptFile] = useState("");
 
   const handleCourseNameChange = (e) => setCourseName(e.target.value);
+  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleNameChange = (e) => setName(e.target.value);
+  const handleTranscriptChange = (e) => {
+    const file = e.target.files[0];
+    setTranscriptFile(file); // Store the file object temporarily
+  };
 
   const courseOptions = [
     "Diploma Pengajian Muamalat",
@@ -70,6 +78,7 @@ function EditCertificate() {
           setCourseName(certificate[5] || "");
           setIssuedDate(certificate[6] || "");
           setCertHash(certificate[7] || "");
+          setTranscript(certificate[8] || "");
         }
 
         setIsLoading(false);
@@ -82,19 +91,17 @@ function EditCertificate() {
     fetchCertificateData();
   }, [serialNumber]);
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-  const handleNameChange = (e) => setName(e.target.value);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      let ipfsCID = cid; // Default CID if no new file is uploaded
-      let fileHash = certHash; // Default file hash if no new file is uploaded
+      let ipfsCID = cid; // Default CID if no new certificate file is uploaded
+      let fileHash = certHash; // Default file hash if no new certificate file is uploaded
+      let transcriptCID = transcript; // Default CID if no new transcript file is uploaded
 
       if (file) {
-        // Step 1: Hash the uploaded file using the browser's SubtleCrypto API
+        // Handle certificate file upload (same as before)
         fileHash = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = async () => {
@@ -112,15 +119,22 @@ function EditCertificate() {
           reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
         });
 
-        console.log("Hashed file:", fileHash);
+        console.log("Hashed certificate file:", fileHash);
 
-        // Step 2: Upload the file to IPFS and get the CID
+        // Upload certificate file to IPFS
         ipfsCID = await uploadToIPFS(file);
-        console.log("Uploaded to IPFS, CID:", ipfsCID);
+        console.log("Uploaded certificate to IPFS, CID:", ipfsCID);
       }
 
-      // Step 3: Update certificate on blockchain with the file's hash and the IPFS CID
-      const { adminAccount, contract, web3 } = await getBlockchain(); // Extract adminAccount
+      if (transcriptFile) {
+        // Upload the transcript file to IPFS and get the CID
+        transcriptCID = await uploadToIPFS(transcriptFile);
+        console.log("Uploaded transcript to IPFS, CID:", transcriptCID);
+        setTranscript(transcriptCID); // Update the `transcript` state with the new CID
+      }
+
+      // Step 3: Update the certificate on blockchain with the updated file hashes and CIDs
+      const { adminAccount, contract, web3 } = await getBlockchain();
       const receipt = await contract.methods
         .updateCertificate(
           serialNumber,
@@ -130,14 +144,15 @@ function EditCertificate() {
           studentId,
           courseName,
           issuedDate,
-          fileHash
-        ) // Include file hash here
+          fileHash,
+          transcriptCID // Include transcript CID here
+        )
         .send({
-          from: adminAccount, // Use adminAccount instead of accounts[0]
-          gas: 3000000, // Set an appropriate gas limit
+          from: adminAccount,
+          gas: 3000000,
         });
 
-      // Prepare the transaction data
+      // Store transaction details in the backend
       const transactionData = {
         transactionHash: receipt.transactionHash || "",
         from: receipt.from || "",
@@ -148,17 +163,17 @@ function EditCertificate() {
         action: "Update",
       };
 
-      // Step 4: Store transaction details in Laravel backend
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
-      await storeTransaction(transactionData, token); // Send transaction data to backend
+      // Store transaction in the backend
+      const token = localStorage.getItem("token");
+      await storeTransaction(transactionData, token);
 
-      // After successful update, navigate to the certificates page and pass the success message
+      // After successful update, navigate to certificates page
       navigate("/admin/certificates", {
-        state: { successMessage: "Certificate Updated Successfully!" },
+        state: { successMessage: "Certificate and Transcript Updated Successfully!" },
       });
     } catch (error) {
-      console.error("Error updating the certificate:", error);
-      alert("An error occurred while updating the certificate. Please try again.");
+      console.error("Error updating certificate and transcript:", error);
+      alert("An error occurred while updating. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -170,7 +185,7 @@ function EditCertificate() {
       <MDBox pt={6} pb={3}>
         <Grid container justifyContent="center" spacing={3}>
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ marginTop: 2 }}>
               <MDBox
                 mx={2}
                 mt={-3}
@@ -284,6 +299,12 @@ function EditCertificate() {
                     </MDTypography>
                     <MDInput type="file" fullWidth onChange={handleFileChange} />
                   </MDBox>
+                  <MDBox mb={2}>
+                    <MDTypography variant="body2" color="dark" sx={{ fontSize: "0.9rem" }}>
+                      Upload new transcript:
+                    </MDTypography>
+                    <MDInput type="file" fullWidth onChange={handleTranscriptChange} />
+                  </MDBox>
                   <MDBox display="flex" justifyContent="flex-end">
                     <MDButton
                       variant="gradient"
@@ -299,8 +320,9 @@ function EditCertificate() {
             </Card>
           </Grid>
 
-          {/* Right side for PDF preview */}
-          <Grid item xs={12} md={6}>
+          {/* Right side panel */}
+          <Grid item xs={12} md={6} sx={{ marginTop: 2 }}>
+            {/* Certificate PDF Preview Card */}
             <Card>
               <MDBox
                 mt={-3}
@@ -312,7 +334,7 @@ function EditCertificate() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="dark">
-                  Existing Certificate PDF Preview
+                  Existing Certificate PDF
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
@@ -320,7 +342,7 @@ function EditCertificate() {
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "400px", // Adjust height for smaller preview
+                      height: "250px", // Reduced height for a smaller preview
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -338,7 +360,50 @@ function EditCertificate() {
                   </div>
                 ) : (
                   <MDTypography variant="body2" color="textSecondary">
-                    No certificate to display.
+                    No certificate data to display.
+                  </MDTypography>
+                )}
+              </MDBox>
+            </Card>
+
+            {/* Transcript PDF Preview Card */}
+            <Card sx={{ marginTop: 6 }}>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Existing Transcript PDF
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {transcript ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "250px", // Adjusted height for the preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${transcript}`} // Use the CID here
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Transcript PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No transcript data to display.
                   </MDTypography>
                 )}
               </MDBox>

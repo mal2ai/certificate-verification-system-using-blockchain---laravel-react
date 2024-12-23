@@ -21,6 +21,8 @@ import TableRow from "@mui/material/TableRow";
 // Utility to interact with blockchain
 import { getBlockchain } from "utils/blockchain";
 import { storeTransaction } from "utils/api";
+import { Margin } from "@mui/icons-material";
+import { format } from "date-fns";
 
 function DeleteCertificate() {
   const { serialNumber } = useParams();
@@ -35,6 +37,7 @@ function DeleteCertificate() {
   const [issuedDate, setIssuedDate] = useState(""); // New state for Issued Date
   const [certHash, setCertHash] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [transcript, setTranscript] = useState("");
 
   // Fetch certificate data using the serial number
   useEffect(() => {
@@ -53,6 +56,7 @@ function DeleteCertificate() {
           setCourseName(certificate[5] || ""); // Course Name is at index 5
           setIssuedDate(certificate[6] || ""); // Issued Date is at index 6
           setCertHash(certificate[7] || "");
+          setTranscript(certificate[8] || "");
         }
 
         setIsLoading(false);
@@ -109,6 +113,9 @@ function DeleteCertificate() {
       alert("Failed to delete certificate. Please try again.");
     }
   };
+
+  // Format the issuedDate to 'dd/MM/yyyy, h:mm a'
+  const formattedIssuedDate = issuedDate ? format(new Date(issuedDate), "dd/MM/yyyy, h:mm a") : "";
 
   return (
     <DashboardLayout>
@@ -179,15 +186,29 @@ function DeleteCertificate() {
                           <TableCell sx={{ fontSize: "12px" }}>
                             <strong>Issued Date</strong>
                           </TableCell>
-                          <TableCell sx={{ fontSize: "12px" }}>{issuedDate}</TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>{formattedIssuedDate}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell sx={{ fontSize: "12px" }}>
-                            <strong>CID</strong>
+                            <strong>CertCID</strong>
                           </TableCell>
                           <TableCell sx={{ fontSize: "12px" }}>
                             <a
                               href={`http://127.0.0.1:8080/ipfs/${cid}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {cid}
+                            </a>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell sx={{ fontSize: "12px" }}>
+                            <strong>TransCID</strong>
+                          </TableCell>
+                          <TableCell sx={{ fontSize: "12px" }}>
+                            <a
+                              href={`http://127.0.0.1:8080/ipfs/${transcript}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -258,7 +279,7 @@ function DeleteCertificate() {
                   <div
                     style={{
                       border: "1px solid #ccc",
-                      height: "400px", // Adjust height for smaller preview
+                      height: "250px", // Adjust height for smaller preview
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
@@ -268,6 +289,49 @@ function DeleteCertificate() {
                     {/* Use an iframe to display the PDF from IPFS */}
                     <iframe
                       src={`http://127.0.0.1:8080/ipfs/${cid}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: "none" }}
+                      title="Certificate PDF"
+                    />
+                  </div>
+                ) : (
+                  <MDTypography variant="body2" color="textSecondary">
+                    No certificate to display.
+                  </MDTypography>
+                )}
+              </MDBox>
+            </Card>
+
+            <Card sx={{ marginTop: 5 }}>
+              <MDBox
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="white"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="dark">
+                  Transcript PDF Preview
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                {cid ? (
+                  <div
+                    style={{
+                      border: "1px solid #ccc",
+                      height: "250px", // Adjust height for smaller preview
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  >
+                    {/* Use an iframe to display the PDF from IPFS */}
+                    <iframe
+                      src={`http://127.0.0.1:8080/ipfs/${transcript}`}
                       width="100%"
                       height="100%"
                       style={{ border: "none" }}
