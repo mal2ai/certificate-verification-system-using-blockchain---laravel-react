@@ -49,9 +49,9 @@ function Logs() {
     { Header: "ID", accessor: "id" },
     { Header: "User Email", accessor: "user_email" },
     { Header: "Admin Email", accessor: "admin_email" },
+    { Header: "Serial Number", accessor: "serial_number" },
     { Header: "Action", accessor: "action" },
     { Header: "Module", accessor: "module" },
-    { Header: "Serial Number", accessor: "serial_number" },
     { Header: "TX Hash", accessor: "tx_hash" },
     { Header: "Status", accessor: "status" },
     {

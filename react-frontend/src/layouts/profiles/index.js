@@ -45,6 +45,7 @@ function ProfileForm({ onSave }) {
   const [isDeleteClicked, setIsDeleteClicked] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Notification state
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -221,6 +222,14 @@ function ProfileForm({ onSave }) {
   const handleDeleteAccount = async (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
     setLoadingDelete(true);
+    setDeleteError("");
+
+    // Client-side validation for empty password
+    if (!currentPassword) {
+      setDeleteError("Password cannot be empty.");
+      setLoadingDelete(false);
+      return;
+    }
 
     try {
       // Data to be sent to the API (e.g., current password)
@@ -245,6 +254,11 @@ function ProfileForm({ onSave }) {
       setCurrentPassword(""); // Clear password field
     } catch (error) {
       // On error, show an error message
+      if (error.response && error.response.data.success === false) {
+        setDeleteError(error.response.data.message);
+      } else {
+        setDeleteError("Failed to delete your account. Please try again later.");
+      }
       console.error("Error ", error);
     } finally {
       setLoadingDelete(false); // Stop the loading spinner
@@ -516,6 +530,11 @@ function ProfileForm({ onSave }) {
                                         Are you sure you want to delete your account? This action
                                         cannot be undone.
                                       </MDTypography>
+                                      {deleteError && ( // Conditionally render the error message
+                                        <MDTypography variant="body2" color="error" mb={2}>
+                                          {deleteError}
+                                        </MDTypography>
+                                      )}
                                       <MDBox mb={3}>
                                         <MDInput
                                           type="password"
