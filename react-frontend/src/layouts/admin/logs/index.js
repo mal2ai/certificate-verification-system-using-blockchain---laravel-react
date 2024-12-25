@@ -279,7 +279,13 @@ function Logs() {
                   <DataTable
                     table={{
                       columns: columns.filter((column) => column.accessor !== "admin_email"),
-                      rows: logData.filter((log) => log.module === "User"), // Filter logs by "Request" module
+
+                      rows: logData
+                        .filter((log) => log.module === "User")
+                        .map((log) => ({
+                          ...log,
+                          tx_hash: log.tx_hash ? log.tx_hash : "N/A",
+                        })),
                     }}
                     isSorted={true}
                     defaultSortColumn="id"
