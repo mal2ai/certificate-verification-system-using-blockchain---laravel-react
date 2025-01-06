@@ -8,6 +8,10 @@ use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Mail\ActivationEmail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -113,11 +117,44 @@ class AuthController extends Controller
             ...$additionalData, // Insert the additional data (student_id, company_name, or institution_name)
         ]);
 
+        // Generate activation token
+        $token = Str::random(64);
+        \DB::table('activation_tokens')->insert([
+            'user_id' => $user->id,
+            'token' => $token,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Send activation email
+        $activationLink = url('/api/activate-account/' . $token);
+        Mail::to($user->email)->send(new ActivationEmail($user, $activationLink));
+
         // Return response with the user data (excluding password)
         return response()->json([
-            'message' => 'User created successfully',
+            'message' => 'Registration successful. Please check your email to activate your account.',
             'user' => $user->only('id', 'name', 'email', 'role', 'account_type', 'student_id', 'company_name', 'institution_name')
         ], 201);
+    }
+
+    public function activateAccount($token)
+    {
+        // Find the activation token
+        $activation = \DB::table('activation_tokens')->where('token', $token)->first();
+
+        if (!$activation) {
+            return response()->json(['message' => 'Invalid activation link'], 400);
+        }
+
+        // Activate the user
+        $user = User::find($activation->user_id);
+        $user->status = 'active';
+        $user->save();
+
+        // Delete the activation token
+        \DB::table('activation_tokens')->where('token', $token)->delete();
+
+        return response()->json(['message' => 'Account activated successfully. You can now log in.'], 200);
     }
 
     // Logout method

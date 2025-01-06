@@ -64,7 +64,7 @@ function Cover() {
     }
 
     try {
-      await register({
+      const response = await register({
         name,
         email,
         password,
@@ -74,8 +74,12 @@ function Cover() {
         company_name: companyName,
         institution_name: institutionName,
       });
-      alert("Your account has been successfully created, Please Log in.");
-      navigate("/sign-in"); // Redirect to sign-in page after registration
+
+      // Store the message in localStorage before navigating
+      localStorage.setItem("message", response.data.message);
+
+      // Navigate to the /sign-in page without passing the state
+      navigate("/sign-in");
     } catch (err) {
       setError("Error registering user. Please try again.");
     }

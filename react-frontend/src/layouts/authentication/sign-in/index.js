@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Ensure correct import of useNavigate
+import { useNavigate, useLocation } from "react-router-dom"; // Ensure correct import of useNavigate
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -28,11 +28,34 @@ import { login } from "utils/api"; // Assuming 'login' is a function you created
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 const Basic = () => {
+  const location = useLocation();
+  const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(true); // Keep it always true
   const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    // Check if message is in sessionStorage after a reload
+    const storedMessage = localStorage.getItem("message");
+    if (storedMessage) {
+      setMessage(storedMessage);
+      localStorage.removeItem("message"); // Clear the message after setting it
+    }
+
+    // Check if message is passed via location state
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      localStorage.setItem("message", location.state.message); // Store message in sessionStorage
+    }
+
+    // Clear message when the component is unmounted or page is refreshed
+    return () => {
+      setMessage(""); // Reset message state
+      localStorage.removeItem("message"); // Remove message from sessionStorage
+    };
+  }, [location.state?.message]);
 
   useEffect(() => {
     // Check if the token and role are present in localStorage
@@ -109,9 +132,17 @@ const Basic = () => {
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
-            {error && (
-              <MDTypography variant="body2" color="error" sx={{ marginBottom: 2 }}>
-                {error}
+            {(error || message) && (
+              <MDTypography
+                variant="body2"
+                color={error ? "error" : "success"} // Conditional color based on the message type
+                sx={{
+                  marginBottom: 2,
+                  textAlign: "center", // Center the text horizontally
+                  display: "block", // Ensures block-level centering
+                }}
+              >
+                {error || message} {/* Display either error or success message */}
               </MDTypography>
             )}
 

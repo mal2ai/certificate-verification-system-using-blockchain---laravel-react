@@ -12,6 +12,7 @@ use App\Http\Controllers\LogController;
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/activate-account/{token}', [AuthController::class, 'activateAccount']);
 
 // Protected routes (requires authentication via Sanctum)
 Route::middleware(['auth:sanctum'])->group(function () {
