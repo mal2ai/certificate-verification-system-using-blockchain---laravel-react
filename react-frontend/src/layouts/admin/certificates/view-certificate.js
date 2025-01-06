@@ -106,37 +106,42 @@ function VerifyCertificate() {
                 )}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
-                    <MDInput
-                      label="Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.name || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-
-                    <MDInput
-                      label="IC Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.icNumber || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Student ID"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.studentId || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
+                    {certificateDetails?.name && (
+                      <MDInput
+                        label="Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails.name}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.icNumber && (
+                      <MDInput
+                        label="IC Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.icNumber || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.studentId && (
+                      <MDInput
+                        label="Student ID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.studentId || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
                   </MDBox>
                 </form>
               </MDBox>
@@ -158,64 +163,73 @@ function VerifyCertificate() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                {verificationAttempted && !certificateDetails && !isLoading && (
+                {/* {verificationAttempted && !certificateDetails && !isLoading && (
                   <MDTypography variant="body2" color="error">
                     {errorMessage}
                   </MDTypography>
-                )}
+                )} */}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <MDBox mt={3}>
-                    <MDInput
-                      label="Serial Number"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={serialNumber || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-
-                    <MDInput
-                      label="Course Name"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.courseName || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Issued Date"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={formattedIssuedDate}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="CID"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.certCID || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="File Hash"
-                      variant="outlined"
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      value={certificateDetails?.certHash || ""}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
+                    {serialNumber && (
+                      <MDInput
+                        label="Serial Number"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={serialNumber || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.courseName && (
+                      <MDInput
+                        label="Course Name"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.courseName || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {formattedIssuedDate && (
+                      <MDInput
+                        label="Issued Date"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={formattedIssuedDate}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.certCID && (
+                      <MDInput
+                        label="CID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.certCID || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.certHash && (
+                      <MDInput
+                        label="File Hash"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.certHash || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
                   </MDBox>
                 </form>
               </MDBox>
