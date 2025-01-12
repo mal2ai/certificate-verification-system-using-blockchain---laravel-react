@@ -40,6 +40,10 @@ function Cover() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Reset error state before validation
+    setError("");
+
     if (password !== passwordConfirmation) {
       setError("Passwords don't match.");
       return;
@@ -66,6 +70,7 @@ function Cover() {
     }
 
     setLoading(true); // Set loading state to true
+
     try {
       const response = await register({
         name,
