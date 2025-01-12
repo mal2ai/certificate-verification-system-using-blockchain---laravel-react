@@ -227,6 +227,17 @@ function Cover() {
                 required
               />
             </MDBox>
+            <MDBox mb={1} ml={1}>
+              <MDTypography variant="caption" color="text" display="block">
+                <ul style={{ margin: 0, paddingLeft: "20px", listStyleType: "disc" }}>
+                  <li>Password must be at least 6 characters long</li>
+                  <li>Must include at least one special character</li>
+                  <li>Must include at least one uppercase letter</li>
+                  <li>Must include at least one lowercase letter</li>
+                  <li>Must include at least one number</li>
+                </ul>
+              </MDTypography>
+            </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Checkbox
                 checked={termsChecked}

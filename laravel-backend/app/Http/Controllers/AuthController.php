@@ -72,11 +72,19 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/'
+            ], // Password validation rule
             'account_type' => 'required|string|in:student,potential_employer,educational_institution', // Validate account_type
             'student_id' => 'nullable|string|max:255', // Only required if account_type is student
             'company_name' => 'nullable|string', // Only required if account_type is potential_employer
             'institution_name' => 'nullable|string', // Only required if account_type is educational_institution
+        ], [
+            'password.regex' => 'The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
         ]);
 
         // Add account_type specific data
