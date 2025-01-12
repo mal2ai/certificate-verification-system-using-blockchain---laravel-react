@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Ensure correct import of useNavigate
+import { useNavigate, useLocation } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress
 
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -22,7 +23,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Utils
-import { login } from "utils/api"; // Assuming 'login' is a function you created to handle authentication
+import { login } from "utils/api";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
@@ -33,82 +34,65 @@ const Basic = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [rememberMe, setRememberMe] = useState(true); // Keep it always true
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if message is in sessionStorage after a reload
     const storedMessage = localStorage.getItem("message");
     if (storedMessage) {
       setMessage(storedMessage);
-      localStorage.removeItem("message"); // Clear the message after setting it
+      localStorage.removeItem("message");
     }
 
-    // Check if message is passed via location state
     if (location.state?.message) {
       setMessage(location.state.message);
-      localStorage.setItem("message", location.state.message); // Store message in sessionStorage
+      localStorage.setItem("message", location.state.message);
     }
 
-    // Clear message when the component is unmounted or page is refreshed
     return () => {
-      setMessage(""); // Reset message state
-      localStorage.removeItem("message"); // Remove message from sessionStorage
+      setMessage("");
+      localStorage.removeItem("message");
     };
   }, [location.state?.message]);
 
   useEffect(() => {
-    // Check if the token and role are present in localStorage
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    // If the token exists and role is user, redirect to /status
     if (token && role === "user") {
       navigate("/status");
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the form from submitting normally
+    e.preventDefault();
+    setIsLoading(true); // Start loading spinner
 
     try {
-      // Attempt to log in with the provided credentials
       const response = await login({ email, password });
-      console.log("Login Response:", response); // Debugging
 
-      // Check if the response contains a token
       if (response.data && response.data.token) {
-        const token = response.data.token;
-        const role = response.data.role;
+        const { token, role } = response.data;
 
-        // Store token, role, and email in localStorage
         localStorage.setItem("token", token);
         localStorage.setItem("email", email);
         localStorage.setItem("role", role);
 
-        // Redirect based on role
-        if (role === "user") {
-          navigate("/status"); // Redirect to /status if role is user
-        } else {
-          navigate("/admin/dashboard"); // Redirect to /dashboard if role is admin or other
-        }
+        navigate(role === "user" ? "/status" : "/admin/dashboard");
       } else if (response.data && response.data.message) {
-        // Check if the response contains a message (e.g., account inactive)
-        setError(response.data.message); // Set the error state with the backend message
+        setError(response.data.message);
       } else {
-        // If the response doesn't contain a token or message, handle as an error
         setError("Invalid login credentials. Please check your email and password.");
       }
     } catch (err) {
-      // Catch any errors from the login API request
-      console.error("Login error:", err);
-
-      // Check if the error response contains a message (for example, account is inactive)
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message); // Display the error message from the backend
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
         setError("An error occurred during login. Please try again.");
       }
+    } finally {
+      setIsLoading(false); // Stop loading spinner
     }
   };
 
@@ -135,17 +119,16 @@ const Basic = () => {
             {(error || message) && (
               <MDTypography
                 variant="body2"
-                color={error ? "error" : "success"} // Conditional color based on the message type
+                color={error ? "error" : "success"}
                 sx={{
                   marginBottom: 2,
-                  textAlign: "center", // Center the text horizontally
-                  display: "block", // Ensures block-level centering
+                  textAlign: "center",
+                  display: "block",
                 }}
               >
-                {error || message} {/* Display either error or success message */}
+                {error || message}
               </MDTypography>
             )}
-
             <MDBox mb={2}>
               <MDInput
                 type="email"
@@ -167,10 +150,7 @@ const Basic = () => {
               />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch
-                checked={rememberMe} // Keep it always checked
-                onChange={(e) => setRememberMe(e.target.checked)} // Allow toggling
-              />
+              <Switch checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
               <MDTypography
                 variant="button"
                 fontWeight="regular"
@@ -181,8 +161,21 @@ const Basic = () => {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="dark" fullWidth type="submit">
-                Sign in
+              <MDButton
+                variant="gradient"
+                color="dark"
+                fullWidth
+                type="submit"
+                disabled={isLoading} // Disable button during loading
+              >
+                {isLoading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: "white" }} // Spinner styling
+                  />
+                ) : (
+                  "Sign in"
+                )}
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
@@ -190,12 +183,12 @@ const Basic = () => {
                 Don&apos;t have an account?{" "}
                 <MDButton
                   component={MuiLink}
-                  href="/sign-up" // Navigate to sign-up page
+                  href="/sign-up"
                   variant="button"
                   color="info"
                   fontWeight="medium"
                   textGradient
-                  sx={{ padding: 0 }} // Remove padding to make it look like a link
+                  sx={{ padding: 0 }}
                 >
                   Sign up
                 </MDButton>

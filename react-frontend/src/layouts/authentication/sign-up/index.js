@@ -10,6 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
+import CircularProgress from "@mui/material/CircularProgress"; // Import spinner component
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -34,6 +35,7 @@ function Cover() {
   const [institutionName, setInstitutionName] = useState("");
   const [error, setError] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -63,6 +65,7 @@ function Cover() {
       return;
     }
 
+    setLoading(true); // Set loading state to true
     try {
       const response = await register({
         name,
@@ -81,7 +84,12 @@ function Cover() {
       // Navigate to the /sign-in page without passing the state
       navigate("/sign-in");
     } catch (err) {
-      setError("Error registering user. Please try again.");
+      // Check if the error object has a response with data and a message
+      const errorMessage =
+        err?.response?.data?.message || "Error registering user. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -123,9 +131,9 @@ function Cover() {
                   label="Account Type"
                   required
                   sx={{
-                    height: "50px", // Adjust the height to your preference
+                    height: "50px",
                     "& .MuiSelect-select": {
-                      padding: "10px 14px", // Add padding for inner spacing
+                      padding: "10px 14px",
                     },
                   }}
                 >
@@ -136,7 +144,6 @@ function Cover() {
               </FormControl>
             </MDBox>
 
-            {/* Conditionally render input fields based on account type */}
             {accountType === "student" && (
               <MDBox mb={2}>
                 <MDInput
@@ -246,8 +253,14 @@ function Cover() {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="dark" fullWidth type="submit">
-                Sign up
+              <MDButton
+                variant="gradient"
+                color="dark"
+                fullWidth
+                type="submit"
+                disabled={loading} // Disable button during loading
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Sign up"}
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">

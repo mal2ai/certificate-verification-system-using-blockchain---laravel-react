@@ -154,7 +154,8 @@ class AuthController extends Controller
         // Delete the activation token
         \DB::table('activation_tokens')->where('token', $token)->delete();
 
-        return response()->json(['message' => 'Account activated successfully. You can now log in.'], 200);
+        // Return the Blade view
+        return view('account_activated');
     }
 
     // Logout method
