@@ -11,6 +11,12 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import CircularProgress from "@mui/material/CircularProgress"; // Import spinner component
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+
+// Material Icons
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -36,6 +42,8 @@ function Cover() {
   const [error, setError] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -212,24 +220,45 @@ function Cover() {
             </MDBox>
             <MDBox mb={2}>
               <MDInput
-                type="password"
+                type={showPassword ? "text" : "password"}
                 label="Password"
                 variant="standard"
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </MDBox>
             <MDBox mb={2}>
               <MDInput
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 label="Confirm Password"
                 variant="standard"
                 fullWidth
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </MDBox>
             <MDBox mb={1} ml={1}>

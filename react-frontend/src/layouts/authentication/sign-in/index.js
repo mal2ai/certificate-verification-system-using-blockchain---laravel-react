@@ -12,6 +12,8 @@ import CircularProgress from "@mui/material/CircularProgress"; // Import Circula
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
+import VisibilityIcon from "@mui/icons-material/Visibility"; // Import VisibilityIcon
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"; // Import VisibilityOffIcon
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -36,6 +38,7 @@ const Basic = () => {
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -139,15 +142,27 @@ const Basic = () => {
                 required
               />
             </MDBox>
-            <MDBox mb={2}>
+            <MDBox mb={2} sx={{ position: "relative" }}>
               <MDInput
-                type="password"
+                type={showPassword ? "text" : "password"} // Toggle between text and password
                 label="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 fullWidth
                 required
               />
+              <div
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                }}
+                onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+              >
+                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+              </div>
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
