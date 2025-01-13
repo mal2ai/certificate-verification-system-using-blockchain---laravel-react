@@ -11,68 +11,77 @@ use Illuminate\Support\Facades\Log;
 
 class OTPController extends Controller
 {
-    // Function to send OTP to the user's email
+    //funtions to sent OTP to the user
     public function sendOTP(Request $request)
     {
         \Log::info('sendOTP method is called');
-        
-        // Check if the user is an admin
+
+        // Ensure the user is an admin
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
         }
 
-        // Validate the email and status_id input
-        $request->validate([
-            'email' => 'required|email|exists:users,email', // Check if the email exists in the users table
-            'status_id' => 'required|exists:status,id', // Validate that the status_id exists in the status table
+        // Validate email and status_id input
+        $validatedData = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'status_id' => 'required|exists:status,id',
         ]);
 
-        $email = $request->input('email');
-        $status_id = $request->input('status_id');
-        
-        // Log the email and status_id being validated
-        \Log::info("Validating email: $email with status_id: $status_id");
+        $email = $validatedData['email'];
+        $status_id = $validatedData['status_id'];
 
-        // Try manually fetching the user
+        // Fetch the user
         $user = User::where('email', $email)->first();
-        \Log::info("User found: ", $user ? $user->toArray() : 'No user found');
 
         if (!$user) {
+            \Log::warning("User not found with email: $email");
             return response()->json(['message' => 'User not found.'], 404);
         }
 
-        // Fetch the status with the provided status_id
+        // Verify the status with the provided status_id
         $status = Status::find($status_id);
 
         if (!$status || $status->status !== 'approved') {
-            return response()->json(['message' => 'Invalid or unapproved status for this status_id.'], 400);
+            \Log::warning("Invalid or unapproved status for status_id: $status_id");
+            return response()->json(['message' => 'Invalid or unapproved status.'], 400);
         }
 
-        // Generate a 6-digit OTP
-        $otp = rand(100000, 999999);
-        
+        // Get the ic_number, serial_number, and updated_at from the status
+        $icNumber = $status->ic_number;
+        $serialNumber = $status->serial_number;
+        $updatedAt = $status->updated_at;
+
+        // Generate a secure 6-digit OTP
+        $otp = random_int(100000, 999999);
+
         // Hash the OTP using bcrypt
         $hashedOtp = bcrypt($otp);
 
-        // Store the hashed OTP and status_id in the database
-        $user->otp_code = $hashedOtp; // Assuming `otp_code` is a column in the `users` table
-        $user->status_id = $status_id; // Store the status_id for the user
-        $user->otp_sent_at = now(); // Store the timestamp when OTP was sent (optional)
-        $user->save();
+        // Update the user with the hashed OTP and status_id
+        $user->update([
+            'otp_code' => $hashedOtp,
+            'status_id' => $status_id,
+            'otp_sent_at' => now(),
+        ]);
 
         try {
-            // Send OTP to the user's email
-            Mail::send([], [], function ($message) use ($email, $otp) {
-                $message->to($email)
-                        ->subject('Your OTP Code')
-                        ->html("Your OTP code is: $otp");  // Sends as HTML content
+            // Pass user data, OTP, ic_number, serial_number, and updated_at to the Blade view
+            Mail::send('emails.otp_email', [
+                'otp' => $otp,
+                'user' => $user,
+                'ic_number' => $icNumber,
+                'serial_number' => $serialNumber,
+                'updated_at' => $updatedAt,
+            ], function ($message) use ($email) {
+                $message->to($email)->subject('KPBKL - Verifying Academic Certificates');
             });
         } catch (\Exception $e) {
-            \Log::error('Mail error: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to send OTP.'], 500);
+            \Log::error('Failed to send email: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to send OTP email.'], 500);
         }
 
-        \Log::debug("OTP: $otp");
+        // Log the OTP (debug purposes)
+        \Log::debug("OTP sent: $otp");
 
         return response()->json(['message' => 'OTP sent successfully!'], 200);
     }

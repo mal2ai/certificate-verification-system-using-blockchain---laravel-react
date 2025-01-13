@@ -81,9 +81,13 @@ function Status() {
             onClick={() => handleReject(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"}
+            disabled={
+              row.original.status === "approved" ||
+              row.original.status === "rejected" ||
+              row.original.rejectLoading
+            }
           >
-            Reject
+            {row.original.rejectLoading ? <CircularProgress size={24} color="inherit" /> : "Reject"}
           </MDButton>
 
           {/* Approve button */}
@@ -93,9 +97,17 @@ function Status() {
             onClick={() => handleApprove(row.original)}
             style={{ marginRight: "10px" }}
             size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"}
+            disabled={
+              row.original.status === "approved" ||
+              row.original.status === "rejected" ||
+              row.original.approveLoading
+            }
           >
-            Approve
+            {row.original.approveLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Approve"
+            )}
           </MDButton>
 
           {/* Info button */}
@@ -125,7 +137,14 @@ function Status() {
           if (response.data.message === "No statuses found") {
             setStatusData([]); // Set the status data to an empty array
           } else {
-            setStatusData(response.data); // Set the valid data
+            // Initialize rejectLoading and approveLoading for each row
+            const dataWithLoading = response.data.map((item) => ({
+              ...item,
+              rejectLoading: false, // Initialize rejectLoading for each row
+              approveLoading: false, // Initialize approveLoading for each row
+            }));
+
+            setStatusData(dataWithLoading); // Set the valid data with the loading properties
           }
         } else {
           setStatusData([]); // If there's no data in the response, set it to an empty array
@@ -198,64 +217,18 @@ function Status() {
   // Handle Reject button click
   const handleReject = async (rowData) => {
     const token = localStorage.getItem("token");
-    const updatedStatus = {
-      status: "rejected",
-    };
+    const updatedStatus = { status: "rejected" };
+
+    // Set loading state for Reject button only
+    setStatusData((prevData) =>
+      prevData.map((item) =>
+        item.serial_number === rowData.serial_number && item.email === rowData.email
+          ? { ...item, rejectLoading: true } // Set rejectLoading to true for this row
+          : item
+      )
+    );
 
     try {
-      // Pass both serial_number and email to update status
-      const response = await updateStatus(
-        rowData.serial_number,
-        rowData.email, // Add email here as part of the update
-        updatedStatus,
-        token
-      );
-
-      if (response.data) {
-        // After rejecting, refresh the status data based on both serial_number and email
-        setStatusData((prevData) =>
-          prevData.map((item) =>
-            item.serial_number === rowData.serial_number && item.email === rowData.email
-              ? { ...item, status: "rejected" }
-              : item
-          )
-        );
-
-        // Create a log after successful registration
-        const token = localStorage.getItem("token");
-        const adminEmail = localStorage.getItem("email");
-        const logData = {
-          user_email: rowData.email,
-          admin_email: adminEmail,
-          action: "Reject",
-          module: "Request",
-          serial_number: rowData.serial_number,
-          status: "Success",
-        };
-        await createLog(logData, token);
-
-        setSnackbarMessage("Request has been rejected successfully.");
-        setSnackbarType("success");
-        setOpenSnackbar(true);
-      }
-    } catch (error) {
-      setSnackbarMessage("Failed to reject the request.");
-      setSnackbarType("error");
-      setOpenSnackbar(true);
-    }
-  };
-
-  // Handle Approve button click
-  const handleApprove = async (rowData) => {
-    const token = localStorage.getItem("token");
-    const updatedStatus = {
-      status: "approved", // Change status to "approved"
-    };
-
-    setLoading(true); // Show the loading indicator
-
-    try {
-      // Update status in the backend
       const response = await updateStatus(
         rowData.serial_number,
         rowData.email,
@@ -264,44 +237,82 @@ function Status() {
       );
 
       if (response.data) {
-        // Send OTP after approving
+        setStatusData((prevData) =>
+          prevData.map((item) =>
+            item.serial_number === rowData.serial_number && item.email === rowData.email
+              ? { ...item, status: "rejected", rejectLoading: false } // Stop reject loading
+              : item
+          )
+        );
+        setSnackbarMessage("Request has been rejected successfully.");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      setSnackbarMessage("Failed to reject the request.");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+      // Stop reject loading if there was an error
+      setStatusData((prevData) =>
+        prevData.map((item) =>
+          item.serial_number === rowData.serial_number && item.email === rowData.email
+            ? { ...item, rejectLoading: false }
+            : item
+        )
+      );
+    }
+  };
+
+  // Handle Approve button click
+  const handleApprove = async (rowData) => {
+    const token = localStorage.getItem("token");
+    const updatedStatus = { status: "approved" };
+
+    // Set loading state for Approve button only
+    setStatusData((prevData) =>
+      prevData.map((item) =>
+        item.serial_number === rowData.serial_number && item.email === rowData.email
+          ? { ...item, approveLoading: true } // Set approveLoading to true for this row
+          : item
+      )
+    );
+
+    try {
+      const response = await updateStatus(
+        rowData.serial_number,
+        rowData.email,
+        updatedStatus,
+        token
+      );
+
+      if (response.data) {
         const otpResponse = await sendOTP(rowData.email, rowData.id, token);
-        console.log("OTP response:", otpResponse);
         if (otpResponse.data) {
           setSnackbarMessage("Request has been approved and OTP sent successfully.");
           setSnackbarType("success");
           setOpenSnackbar(true);
 
-          // Update the statusData state with the new approved status
           setStatusData((prevData) =>
-            prevData.map(
-              (item) =>
-                item.serial_number === rowData.serial_number && item.email === rowData.email
-                  ? { ...item, status: "approved" } // Update only the matching item
-                  : item // Leave other items unchanged
+            prevData.map((item) =>
+              item.serial_number === rowData.serial_number && item.email === rowData.email
+                ? { ...item, status: "approved", approveLoading: false } // Stop approve loading
+                : item
             )
           );
-
-          // Create a log after successful registration
-          const token = localStorage.getItem("token");
-          const adminEmail = localStorage.getItem("email");
-          const logData = {
-            user_email: rowData.email,
-            admin_email: adminEmail,
-            action: "Approve",
-            module: "Request",
-            serial_number: rowData.serial_number,
-            status: "Success",
-          };
-          await createLog(logData, token);
         }
       }
     } catch (error) {
       setSnackbarMessage("Failed to approve the request or send OTP.");
       setSnackbarType("error");
       setOpenSnackbar(true);
-    } finally {
-      setLoading(false); // Hide the loading indicator
+      // Stop approve loading if there was an error
+      setStatusData((prevData) =>
+        prevData.map((item) =>
+          item.serial_number === rowData.serial_number && item.email === rowData.email
+            ? { ...item, approveLoading: false }
+            : item
+        )
+      );
     }
   };
 
@@ -375,8 +386,10 @@ Status.propTypes = {
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired,
-    }),
-  }),
+      rejectLoading: PropTypes.bool, // Add rejectLoading as a boolean
+      approveLoading: PropTypes.bool, // Add approveLoading as a boolean
+    }).isRequired,
+  }).isRequired,
 };
 
 export default Status;

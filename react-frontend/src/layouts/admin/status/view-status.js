@@ -29,6 +29,10 @@ function VerifyCertificate() {
   const { serialNumber } = useParams();
   const location = useLocation(); // Accessing location state
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isResendingOTP, setIsResendingOTP] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const [certificateDetails, setCertificateDetails] = useState(null);
   const [userDetails, setUserDetails] = useState(null); // State to store user details
   const [errorMessage, setErrorMessage] = useState("");
@@ -95,8 +99,8 @@ function VerifyCertificate() {
 
   // Handle Delete Certificate button click
   const handleDelete = async () => {
+    setIsDeleting(true); // Show spinner for delete action
     try {
-      setIsLoading(true);
       const token = localStorage.getItem("token"); // Get token from localStorage
 
       if (!email) {
@@ -108,9 +112,10 @@ function VerifyCertificate() {
         certificateDetails?.email,
         token
       ); // Pass both serial_number and email to the delete function
-      setIsLoading(false);
 
-      // Navigate back with a success message
+      setIsDeleting(false); // Hide spinner after action is done
+
+      // Snackbar and log message
       setSnackbarMessage(
         `Request ${
           certificateDetails?.serial_number || serialNumber
@@ -119,7 +124,6 @@ function VerifyCertificate() {
       setSnackbarType("success");
       setOpenSnackbar(true);
 
-      // Create a log after successful registration
       const adminEmail = localStorage.getItem("email");
       const logData = {
         user_email: certificateDetails?.email,
@@ -139,7 +143,7 @@ function VerifyCertificate() {
         },
       });
     } catch (error) {
-      setIsLoading(false);
+      setIsDeleting(false); // Hide spinner in case of error
       setErrorMessage(error.message || "Error deleting request");
       setSnackbarMessage(error.message || "Error deleting request");
       setSnackbarType("error");
@@ -149,13 +153,13 @@ function VerifyCertificate() {
 
   // Handle Resend OTP button click
   const handleResendOTP = async () => {
+    setIsResendingOTP(true); // Show spinner for resend OTP action
     try {
-      setIsLoading(true);
       const token = localStorage.getItem("token"); // Get token from localStorage
       await sendOTP(email, certificateDetails?.id, token); // Call sendOTP function
-      setIsLoading(false);
+      setIsResendingOTP(false); // Hide spinner after action is done
 
-      // Create a log after successful registration
+      // Log and Snackbar message
       const adminEmail = localStorage.getItem("email");
       const logData = {
         user_email: certificateDetails?.email,
@@ -171,7 +175,7 @@ function VerifyCertificate() {
       setSnackbarType("success");
       setOpenSnackbar(true);
     } catch (error) {
-      setIsLoading(false);
+      setIsResendingOTP(false); // Hide spinner in case of error
       setErrorMessage(error.message || "Error sending OTP");
       setSnackbarMessage(error.message || "Error sending OTP");
       setSnackbarType("error");
@@ -180,20 +184,18 @@ function VerifyCertificate() {
   };
 
   const handleVerify = async () => {
-    setIsLoading(true);
-    setErrorMessage("");
+    setIsVerifying(true); // Show spinner for verify action
+    setErrorMessage(""); // Clear previous error messages
 
-    // Check if the necessary fields are filled
     if (!certificateDetails?.serial_number || !certificateDetails?.file_hash) {
       setSnackbarMessage("Please fill in all required fields.");
       setSnackbarType("error");
-      setIsLoading(false);
+      setIsVerifying(false); // Hide spinner if validation fails
       setOpenSnackbar(true);
       return;
     }
 
     try {
-      // Retrieve user account and contract from the blockchain
       const { adminAccount, contract } = await getBlockchain();
 
       // Send transaction to verify the certificate using .send()
@@ -204,7 +206,6 @@ function VerifyCertificate() {
           gas: 3000000, // Set an appropriate gas limit
         });
 
-      // Check if the transaction was successful
       if (verifyTx.status) {
         setSnackbarMessage("Certificate is valid.");
         setSnackbarType("success");
@@ -218,7 +219,7 @@ function VerifyCertificate() {
       setSnackbarType("error");
       setOpenSnackbar(true);
     } finally {
-      setIsLoading(false);
+      setIsVerifying(false); // Hide spinner after transaction completion
     }
   };
 
@@ -543,28 +544,44 @@ function VerifyCertificate() {
 
         {/* View Certificate, Delete, and Resend OTP Buttons */}
         <MDBox mt={3} display="flex" justifyContent="center" gap={2}>
-          <MDButton variant="gradient" color="error" sx={{ maxWidth: 200 }} onClick={handleDelete}>
-            Delete Request
+          {/* Delete Button */}
+          <MDButton
+            variant="gradient"
+            color="error"
+            sx={{ maxWidth: 200 }}
+            onClick={handleDelete}
+            disabled={isDeleting} // Disable button while loading
+          >
+            {isDeleting ? <CircularProgress size={24} color="inherit" /> : "Delete Request"}
           </MDButton>
+
+          {/* Resend OTP Button */}
           <MDButton
             variant="contained"
             color="warning"
             sx={{ maxWidth: 200 }}
             onClick={handleResendOTP}
             disabled={
-              certificateDetails?.status === "pending" || certificateDetails?.status === "rejected"
+              isResendingOTP ||
+              certificateDetails?.status === "pending" ||
+              certificateDetails?.status === "rejected"
             }
           >
-            Resend OTP
+            {isResendingOTP ? <CircularProgress size={24} color="inherit" /> : "Resend OTP"}
           </MDButton>
+
+          {/* Verify Button */}
           <MDButton
             variant="contained"
             color="primary"
             sx={{ maxWidth: 200 }}
             onClick={handleVerify}
+            disabled={isVerifying}
           >
-            Verify
+            {isVerifying ? <CircularProgress size={24} color="inherit" /> : "Verify"}
           </MDButton>
+
+          {/* View Certificate Button */}
           <MDButton
             variant="contained"
             color="info"

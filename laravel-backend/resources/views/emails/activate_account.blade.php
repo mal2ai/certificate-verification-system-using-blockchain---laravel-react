@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Activate Your Account</title>
+    <title>KPBKL - Activate Your Account</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,9 +75,9 @@
         <div class="header">
         <img src="https://www.kpbkl.edu.my/2025/wp-content/uploads/2024/08/kpbkl-logo-horizontal.webp" alt="Kolej Professional Baitumal Logo" style="max-width: 200px; width: 100%; height: auto;" />
             <h1>
-            <span style="color: red;">Kolej Professional Baitumal</span>
-            <span style="color: black;">Kuala Lumpur</span>
-        </h1>
+                <span style="color: red;">Kolej Professional Baitumal</span>
+                <span style="color: black;">Kuala Lumpur</span>
+            </h1>
         </div>
 
         <!-- Content -->
