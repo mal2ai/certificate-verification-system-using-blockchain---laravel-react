@@ -37,6 +37,9 @@ import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMob
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
 
+// Import the logo
+import logo from "assets/images/logo.png";
+
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
@@ -109,6 +112,9 @@ function DefaultNavbar({ transparent, light, action }) {
           lineHeight={1}
           pl={{ xs: 0, lg: 1 }}
         >
+          {/* Logo Image */}
+          <img src={logo} alt="Logo" style={{ height: 30, marginRight: 8 }} />{" "}
+          {/* Adjust size as needed */}
           <MDTypography variant="button" fontWeight="bold" color={light ? "white" : "dark"}>
             CERTIFY
           </MDTypography>

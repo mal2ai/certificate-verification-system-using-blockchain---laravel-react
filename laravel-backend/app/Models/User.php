@@ -19,11 +19,12 @@ class User extends Authenticatable
         'role',
         'otp_code',
         'otp_sent_at',
-        'status',          // New attribute for user status
-        'account_type',    // New attribute for account type
-        'student_id',      // Additional fields based on account_type
-        'company_name',    // Additional fields based on account_type
-        'institution_name' // Additional fields based on account_type
+        'status',
+        'account_type',
+        'student_id',
+        'company_name',
+        'institution_name',
+        'status_id'
     ];
 
     // Attributes hidden for serialization

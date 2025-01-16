@@ -13,11 +13,17 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
+
+// Icons
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 function AddUser() {
   const navigate = useNavigate();
@@ -32,6 +38,8 @@ function AddUser() {
   const [institutionName, setInstitutionName] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // For password visibility toggle
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false); // For password confirmation visibility toggle
 
   // Handle input change for form fields
   const handleInputChange = (event, setter) => {
@@ -63,7 +71,6 @@ function AddUser() {
       email,
       password,
       password_confirmation: passwordConfirmation,
-      status,
       account_type: accountType,
       student_id: accountType === "student" ? studentId : null,
       company_name: accountType === "potential_employer" ? companyName : null,
@@ -72,7 +79,7 @@ function AddUser() {
 
     try {
       await register(data);
-      setStatusMessage("User registered successfully.");
+      // setStatusMessage("User registered successfully.");
 
       // Create a log after successful registration
       const token = localStorage.getItem("token");
@@ -90,7 +97,9 @@ function AddUser() {
         state: { successMessage: "User Registered Successfully!" },
       });
     } catch (error) {
-      setStatusMessage("Failed to register user. Please try again.");
+      const errorMessage =
+        error.response?.data?.message || "Failed to register user. Please try again.";
+      setStatusMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -120,10 +129,7 @@ function AddUser() {
               <MDBox p={3}>
                 {statusMessage && (
                   <MDBox mt={2}>
-                    <MDTypography
-                      variant="body2"
-                      color={statusMessage.includes("successfully") ? "green" : "red"}
-                    >
+                    <MDTypography variant="body2" sx={{ color: "red" }}>
                       {statusMessage}
                     </MDTypography>
                   </MDBox>
@@ -212,29 +218,54 @@ function AddUser() {
                       sx={{ mb: 2 }}
                       required
                     />
+
+                    {/* Password Input with Toggle Visibility */}
                     <MDInput
                       label="Enter Password"
                       variant="outlined"
                       fullWidth
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => handleInputChange(e, setPassword)}
                       sx={{ mb: 2 }}
                       required
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
+
+                    {/* Confirm Password Input with Toggle Visibility */}
                     <MDInput
                       label="Confirm Password"
                       variant="outlined"
                       fullWidth
-                      type="password"
+                      type={showPasswordConfirmation ? "text" : "password"}
                       value={passwordConfirmation}
                       onChange={(e) => handleInputChange(e, setPasswordConfirmation)}
                       sx={{ mb: 2 }}
                       required
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                              edge="end"
+                            >
+                              {showPasswordConfirmation ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
 
                     {/* Status Dropdown */}
-                    <FormControl fullWidth>
+                    {/* <FormControl fullWidth>
                       <InputLabel>Status</InputLabel>
                       <Select
                         fullWidth
@@ -255,7 +286,7 @@ function AddUser() {
                         <MenuItem value="inactive">Inactive</MenuItem>
                         <MenuItem value="banned">Banned</MenuItem>
                       </Select>
-                    </FormControl>
+                    </FormControl> */}
 
                     <MDBox mt={3}>
                       <MDButton
