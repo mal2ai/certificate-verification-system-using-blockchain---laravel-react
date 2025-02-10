@@ -1,95 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Typography from "@mui/material/Typography";
+import LockIcon from "@mui/icons-material/Lock";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
-import MDButton from "components/MDButton";
 
 // API function to get status by email
 import { getStatusByEmail } from "utils/api";
-
-// Material-UI loading spinner
-import CircularProgress from "@mui/material/CircularProgress";
+import { verifyOTP } from "utils/api";
 
 // Notification
 import MDSnackbar from "components/MDSnackbar";
 
 function Status() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   // State to hold the status data
   const [statusData, setStatusData] = useState([]);
 
   // State to manage loading state
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Notification state
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false); // Close the snackbar
-  };
+  // OTP Modal state
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
 
   // Get the email from localStorage
   const email = localStorage.getItem("email");
-
-  // Columns for the DataTable
-  const columns = [
-    { Header: "Name", accessor: "name" },
-    { Header: "Email", accessor: "email" },
-    { Header: "Serial Number", accessor: "serial_number" },
-    { Header: "Status", accessor: "status" },
-    {
-      Header: "Timestamp",
-      accessor: "updated_at",
-      Cell: ({ value }) => formatDate(value), // Format date for 'created_at'
-    },
-    {
-      Header: "Actions",
-      accessor: "actions",
-      Cell: ({ row }) => (
-        <div>
-          {/* Edit button */}
-          <MDButton
-            variant="outlined"
-            color="info"
-            onClick={() => handleEdit(row.original)}
-            style={{ marginRight: "10px" }}
-            size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"}
-          >
-            Edit
-          </MDButton>
-
-          {/* View button */}
-          <MDButton
-            variant="outlined"
-            color="success"
-            onClick={() => handleView(row.original)}
-            size="small"
-            disabled={row.original.status === "pending" || row.original.status === "rejected"}
-          >
-            View
-          </MDButton>
-        </div>
-      ),
-    },
-  ];
 
   // Fetch status data when the component mounts
   useEffect(() => {
@@ -121,45 +89,71 @@ function Status() {
     }
   }, [email]);
 
-  // Handle success message if present in the location state
-  useEffect(() => {
-    if (location.state?.successMessage) {
-      setSnackbarMessage(location.state.successMessage);
-      setSnackbarType("success");
+  // Close the snackbar
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
+  // Close OTP modal
+  const handleCloseOtpModal = () => {
+    setOtpModalOpen(false);
+    setOtpCode("");
+  };
+
+  // Handle OTP Verification
+  const handleVerifyOtp = async () => {
+    if (!selectedRow) return;
+
+    setIsLoading(true);
+    setSnackbarMessage("");
+    setSnackbarType("");
+
+    // Extract email and id from the selected row
+    const { email, id, serial_number, created_at, file_hash } = selectedRow;
+
+    if (!otpCode.trim()) {
+      setSnackbarMessage("Please enter the OTP code.");
+      setSnackbarType("error");
       setOpenSnackbar(true);
-
-      navigate(location.pathname, { replace: true });
+      setIsLoading(false);
+      return;
     }
-  }, [location.state, navigate]);
 
-  // Handle verify button click
-  const handleVerify = () => {
-    navigate("/add-verify");
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await verifyOTP(email, otpCode, id, token);
+
+      if (response.status === 200) {
+        setSnackbarMessage(response.data.message || "OTP Verified Successfully.");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+
+        setIsOtpModalOpen(false); // Close modal
+
+        navigate("/view-certificate", {
+          state: { email, serial_number, created_at, file_hash },
+        });
+      } else {
+        setSnackbarMessage(response.data.message || "Invalid OTP. Please try again.");
+        setSnackbarType("error");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      setSnackbarMessage("Invalid OTP. Please try again.");
+      setSnackbarType("error");
+      setOpenSnackbar(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Handle Edit button click
-  const handleEdit = (rowData) => {
-    navigate(`/edit-verify`, { state: { rowData } });
-  };
-
-  // Handle View button click
+  // Handle View button click (Open OTP Modal)
   const handleView = (rowData) => {
-    // Check if the status is "approved"
     if (rowData.status === "approved") {
-      // If approved, navigate to the verify OTP page
-      navigate(`/verify-otp`, {
-        state: {
-          id: rowData.id,
-          name: rowData.name,
-          email: rowData.email,
-          serial_number: rowData.serial_number,
-          status: rowData.status,
-          created_at: rowData.created_at,
-          file_hash: rowData.file_hash,
-        },
-      });
+      setSelectedRow(rowData);
+      setOtpModalOpen(true);
     } else {
-      // If status is not "approved", show an error message in the snackbar
       setSnackbarMessage(
         <>
           Your request has not been approved yet <br /> or has been rejected.
@@ -169,6 +163,61 @@ function Status() {
       setOpenSnackbar(true);
     }
   };
+
+  const handleNewVerify = () => {
+    navigate("/add-verify");
+  };
+
+  // Handle Edit button click
+  const handleEdit = (rowData) => {
+    navigate(`/edit-verify`, { state: { rowData } });
+  };
+
+  // Table columns
+  const columns = [
+    { Header: "Name", accessor: "name" },
+    { Header: "Email", accessor: "email" },
+    { Header: "Serial Number", accessor: "serial_number" },
+    { Header: "Status", accessor: "status" },
+    {
+      Header: "Timestamp",
+      accessor: "updated_at",
+      Cell: ({ value }) => formatDate(value),
+    },
+    {
+      Header: "Actions",
+      accessor: "actions",
+      Cell: ({ row }) => (
+        <div>
+          {/* Edit button */}
+          <MDButton
+            variant="outlined"
+            color="info"
+            onClick={() => handleEdit(row.original)}
+            style={{ marginRight: "10px" }}
+            size="small"
+            disabled={row.original.status === "approved" || row.original.status === "rejected"}
+          >
+            Edit
+          </MDButton>
+
+          {/* View button */}
+          <MDButton
+            variant="outlined"
+            color="success"
+            onClick={() => {
+              setSelectedRow(row.original); // Store row data
+              setIsOtpModalOpen(true); // Open OTP modal
+            }}
+            size="small"
+            disabled={row.original.status === "pending" || row.original.status === "rejected"}
+          >
+            View
+          </MDButton>
+        </div>
+      ),
+    },
+  ];
 
   // Function to format the date
   const formatDate = (dateString) => {
@@ -213,7 +262,7 @@ function Status() {
                 <MDTypography variant="h6" color="dark">
                   Status
                 </MDTypography>
-                <MDButton variant="gradient" color="success" onClick={handleVerify}>
+                <MDButton variant="gradient" color="success" onClick={handleNewVerify}>
                   New Verify
                 </MDButton>
               </MDBox>
@@ -238,14 +287,70 @@ function Status() {
       </MDBox>
       <Footer />
 
+      {/* OTP Modal */}
+      {isOtpModalOpen && (
+        <Dialog
+          open={isOtpModalOpen}
+          onClose={() => setIsOtpModalOpen(false)}
+          maxWidth="sm" // Set a reasonable max width (options: 'xs', 'sm', 'md', 'lg', 'xl')
+          fullWidth // Ensures it takes the full width of the maxWidth
+          sx={{ "& .MuiDialog-paper": { width: "500px", height: "300px" } }} // Adjust width & height
+        >
+          <DialogTitle>
+            <LockIcon /> Enter OTP Code
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 2, textAlign: "center" }}>
+              Please enter the one-time password (OTP) code sent to your email to verify your
+              identity.
+            </Typography>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Please insert OTP code (numbers only)"
+              type="text" // Use text to remove spinner
+              fullWidth
+              variant="outlined"
+              value={otpCode}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  // Only allow numbers (no letters or special characters)
+                  setOtpCode(value);
+                }
+              }}
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }} // Ensure only numbers
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsOtpModalOpen(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleVerifyOtp()}
+              variant="contained"
+              disabled={!otpCode.trim()}
+              sx={{
+                backgroundColor: (theme) => theme.palette.primary, // Use theme color
+                color: "white !important", // Force text color to stay white
+                "&:hover": { backgroundColor: (theme) => theme.palette.secondary.dark }, // Adjust hover color
+              }}
+            >
+              Verify
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {/* Snackbar Notification */}
       <MDSnackbar
         color={snackbarType}
-        icon={snackbarType === "success" ? "check_circle" : "error"}
-        title={snackbarType === "success" ? "Success" : "Error"}
+        icon={snackbarType === "success" ? "check" : "warning"}
+        title="Notification"
         content={snackbarMessage}
         open={openSnackbar}
         onClose={handleCloseSnackbar}
-        closeColor="white"
+        close={() => setOpenSnackbar(false)}
         bgWhite
       />
     </DashboardLayout>
