@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import { Routes, Route, Navigate, useLocation, Link } from "react-router-dom";
 
 // ProtectedRoute component
-import ProtectedRoute from "components/ProtectedRoute"; // Assuming you have this component
+import ProtectedRoute from "components/ProtectedRoute";
+import RedirectToDashboard from "components/RedirectToDashboard";
 
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
@@ -221,6 +222,7 @@ export default function App() {
       <Routes>
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
+        <Route path="/" element={<RedirectToDashboard />} />
         {/* Protected Routes */}
         <Route
           path="/admin/certificates/add"
