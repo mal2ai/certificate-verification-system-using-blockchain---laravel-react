@@ -18,11 +18,11 @@ Route::get('/activate-account/{token}', [AuthController::class, 'activateAccount
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
-    
+
     // Status-related routes (only accessible by authenticated users)
     Route::post('/status', [StatusController::class, 'store']); // Create a new status request (pending)
     Route::get('/status', [StatusController::class, 'getStatus']);
-    Route::put('/status/{serialNumber}', [StatusController::class, 'updateStatus']);
+    Route::put('/status/{id}', [StatusController::class, 'updateStatus']);
     Route::get('/status/email/{email}', [StatusController::class, 'getStatusByEmail']);
     Route::get('/statuses', [StatusController::class, 'getAllStatuses']);
     Route::get('/status-count', [StatusController::class, 'countStatus']);
@@ -58,7 +58,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // New route to store blockchain transaction details
     Route::post('/store-transaction', [TransactionController::class, 'storeTransaction']);
-    
+
     // New route to display all stored transactions for auditing
     Route::get('/transactions', [TransactionController::class, 'getAllTransactions']);
 

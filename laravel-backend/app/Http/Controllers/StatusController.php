@@ -102,23 +102,20 @@ class StatusController extends Controller
     }
 
     // Update the status of a certificate (approved or rejected) based on serial_number
-    public function updateStatus(Request $request, $serialNumber)
+    public function updateStatus(Request $request, $id)
     {
         try {
             // Validate the incoming request data
             $validated = $request->validate([
                 'status' => 'required|in:approved,rejected', // Only allow approved or rejected statuses
-                'email' => 'required|email', // Validate email format
             ]);
 
-            // Find the status by serial_number and email
-            $status = Status::where('serial_number', $serialNumber)
-                            ->where('email', $validated['email']) // Ensure the email matches
-                            ->first();
+            // Find the status by ID
+            $status = Status::find($id);
 
             // If status not found, return a 404 error
             if (!$status) {
-                return response()->json(['message' => 'Status not found or email does not match'], 404);
+                return response()->json(['message' => 'Status not found'], 404);
             }
 
             // Update the status

@@ -3,7 +3,7 @@ import Web3 from "web3";
 // Connect to Ganache (Local Ethereum Node)
 const web3 = new Web3("http://127.0.0.1:7545"); // Replace with your Ganache RPC URL
 
-const contractAddress = "0xFA0a7E081201C77d0644CD77FBe210D689748fE1";
+const contractAddress = "0x269615c6B8009e1B1D65a3Bd514e411A4E6dA05f";
 const contractABI = [
   {
     inputs: [],

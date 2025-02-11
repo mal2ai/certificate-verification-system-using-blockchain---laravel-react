@@ -131,9 +131,9 @@ export const getStatusBySerialNumber = (email, serialNumber, createdAt, token) =
   });
 };
 
-export const updateStatus = (serialNumber, email, statusData, token) => {
+export const updateStatus = (id, email, statusData, token) => {
   return api.put(
-    `/status/${serialNumber}`,
+    `/status/${id}`, // Now using id instead of serialNumber
     { ...statusData, email }, // Include email in the request body
     {
       headers: {

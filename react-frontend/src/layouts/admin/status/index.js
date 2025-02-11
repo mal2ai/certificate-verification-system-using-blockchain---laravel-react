@@ -263,55 +263,50 @@ function Status() {
     }
   };
 
-  // Handle Approve button click
   const handleApprove = async (rowData) => {
     const token = localStorage.getItem("token");
     const updatedStatus = { status: "approved" };
 
-    // Set loading state for Approve button only
+    console.log("Approving row:", rowData);
+
+    // Set loading state for the specific row
     setStatusData((prevData) =>
-      prevData.map((item) =>
-        item.serial_number === rowData.serial_number && item.email === rowData.email
-          ? { ...item, approveLoading: true } // Set approveLoading to true for this row
-          : item
-      )
+      prevData.map((item) => (item.id === rowData.id ? { ...item, approveLoading: true } : item))
     );
 
     try {
-      const response = await updateStatus(
-        rowData.serial_number,
-        rowData.email,
-        updatedStatus,
-        token
-      );
+      // Update status using ID instead of serial_number
+      const response = await updateStatus(rowData.id, rowData.email, updatedStatus, token);
 
-      if (response.data) {
+      if (response?.data) {
         const otpResponse = await sendOTP(rowData.email, rowData.id, token);
-        if (otpResponse.data) {
-          setSnackbarMessage("Request has been approved and OTP sent successfully.");
+
+        if (otpResponse?.data) {
+          setSnackbarMessage("Request approved and OTP sent successfully.");
           setSnackbarType("success");
           setOpenSnackbar(true);
 
+          // Update the specific row's status and loading state
           setStatusData((prevData) =>
             prevData.map((item) =>
-              item.serial_number === rowData.serial_number && item.email === rowData.email
-                ? { ...item, status: "approved", approveLoading: false } // Stop approve loading
-                : item
+              item.id === rowData.id ? { ...item, status: "approved", approveLoading: false } : item
             )
           );
+          return;
         }
       }
+
+      throw new Error("Failed to send OTP");
     } catch (error) {
+      console.error("Error in handleApprove:", error);
+
       setSnackbarMessage("Failed to approve the request or send OTP.");
       setSnackbarType("error");
       setOpenSnackbar(true);
-      // Stop approve loading if there was an error
+
+      // Ensure approveLoading is set to false in case of failure
       setStatusData((prevData) =>
-        prevData.map((item) =>
-          item.serial_number === rowData.serial_number && item.email === rowData.email
-            ? { ...item, approveLoading: false }
-            : item
-        )
+        prevData.map((item) => (item.id === rowData.id ? { ...item, approveLoading: false } : item))
       );
     }
   };
