@@ -29,6 +29,9 @@ import MDInput from "components/MDInput";
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
 
+//api import
+import { logout } from "utils/api";
+
 // Custom styles for DashboardNavbar
 import {
   navbar,
@@ -142,12 +145,25 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleOpenLogoutDialog = () => setOpenLogoutDialog(true);
   const handleCloseLogoutDialog = () => setOpenLogoutDialog(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    if (token) {
+      try {
+        await logout(token); // Call the logout function from utils/api.js
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    }
+
+    // Clear local storage and session storage
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("email");
-    window.location.href = "/authentication/sign-in/basic"; // Redirect to login page
+
+    // Redirect to login page
+    window.location.href = "/";
   };
 
   const renderMenu = () => (

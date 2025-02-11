@@ -30,20 +30,22 @@ class AuthController extends Controller
 
             if ($user) {
                 // Check if the status is inactive or banned
-                if (in_array($user->status, ['inactive'])) {
-                    return response()->json(['message' => 'Your account is inactive.'], 403); // Forbidden
+                if ($user->status === 'inactive') {
+                    return response()->json(['message' => 'Your account is inactive.'], 403);
                 }
 
-                if (in_array($user->status, ['banned'])) {
-                    return response()->json(['message' => 'Your account is banned.'], 403); // Forbidden
+                if ($user->status === 'banned') {
+                    return response()->json(['message' => 'Your account is banned.'], 403);
                 }
 
                 // Check if the password is correct
                 if (Hash::check($validated['password'], $user->password)) {
-                    // Create token for the user
+                    // Revoke previous tokens if any exist
+                    $user->tokens()->delete(); // Delete all existing tokens for the user
+
+                    // Create a new token
                     $token = $user->createToken('API Token')->plainTextToken;
 
-                    // Return response with the token
                     return response()->json([
                         'message' => 'Login successful',
                         'token' => $token,
@@ -51,15 +53,12 @@ class AuthController extends Controller
                     ], 200);
                 }
 
-                // Return error if credentials are wrong
                 return response()->json(['message' => 'Invalid credentials'], 401);
             }
 
-            // Return error if user doesn't exist
             return response()->json(['message' => 'User not found'], 404);
 
         } catch (\Exception $e) {
-            // Log the error for debugging purposes
             Log::error('Login Error: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred during login'], 500);
