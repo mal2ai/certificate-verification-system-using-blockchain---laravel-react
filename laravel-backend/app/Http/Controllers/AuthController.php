@@ -31,11 +31,11 @@ class AuthController extends Controller
             if ($user) {
                 // Check if the status is inactive or banned
                 if ($user->status === 'inactive') {
-                    return response()->json(['message' => 'Your account is inactive.'], 403);
+                    return response()->json(['message' => 'Your account is inactive. Please activate your account first before login again.'], 403);
                 }
 
                 if ($user->status === 'banned') {
-                    return response()->json(['message' => 'Your account is banned.'], 403);
+                    return response()->json(['message' => 'Your account is banned. Contact administrator for inquiry.'], 403);
                 }
 
                 // Check if the password is correct

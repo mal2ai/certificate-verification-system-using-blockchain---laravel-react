@@ -63,6 +63,9 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
 
+//landing page
+import Landing from "layouts/landing/index";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -168,11 +171,14 @@ export default function App() {
     </MDBox>
   );
 
+  const isAuthenticated = !!localStorage.getItem("role") && !!localStorage.getItem("token");
+
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
-        {layout === "dashboard" && (
+
+        {layout === "dashboard" && isAuthenticated && pathname !== "/" && (
           <>
             <Sidenav
               color={sidenavColor}
@@ -187,7 +193,7 @@ export default function App() {
               onMouseLeave={handleOnMouseLeave}
             />
             <Configurator />
-            {configsButton}
+            {/* {configsButton} */}
           </>
         )}
         {layout === "vr" && <Configurator />}
@@ -200,7 +206,7 @@ export default function App() {
   ) : (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      {layout === "dashboard" && (
+      {layout === "dashboard" && isAuthenticated && pathname !== "/" && (
         <>
           <Sidenav
             color={sidenavColor}
@@ -215,14 +221,24 @@ export default function App() {
             onMouseLeave={handleOnMouseLeave}
           />
           <Configurator />
-          {configsButton}
+          {/* {configsButton} */}
         </>
       )}
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
-        <Route path="/" element={<RedirectToDashboard />} />
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/sign-in"
+          element={
+            <>
+              <RedirectToDashboard />
+              <SignIn />
+            </>
+          }
+        />
+        <Route path="/sign-up" element={<SignUp />} />
         {/* Protected Routes */}
         <Route
           path="/admin/certificates/add"
@@ -362,8 +378,6 @@ export default function App() {
         />
         {/* Non-Protected Routes */}
         {/* <Route path="/verify" element={<Verify />} /> */}
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
       </Routes>
     </ThemeProvider>
   );

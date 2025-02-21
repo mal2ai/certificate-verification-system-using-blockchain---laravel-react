@@ -27,14 +27,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/statuses', [StatusController::class, 'getAllStatuses']);
     Route::get('/status-count', [StatusController::class, 'countStatus']);
 
+    Route::get('/status/{status_id}', [StatusController::class, 'getStatusById']);
+    Route::post('/verification/serial-number', [StatusController::class, 'storeBySerialNumber']);
+    Route::post('/verification/file-hash', [StatusController::class, 'storeByFileHash']);
+
     // New route for updating status details (name, email, and serial_number)
-    Route::patch('/status/update-details/{serialNumber}/{email}', [StatusController::class, 'updateDetails']);
+    Route::patch('/status/update-details/{id}', [StatusController::class, 'updateDetailsById']);
 
     // New route to get user details by email, only accessible to admin
     Route::get('/user/details/{email}', [AuthController::class, 'getUserDetailsByEmail']);
 
     // Delete status route (only accessible by admin)
-    Route::delete('/status/{serialNumber}', [StatusController::class, 'deleteStatus']);
+    Route::delete('/status/{id}', [StatusController::class, 'deleteStatusById']);
 
     // User management routes (only accessible by admin)
     Route::get('/users', [UserController::class, 'index']); // View all users

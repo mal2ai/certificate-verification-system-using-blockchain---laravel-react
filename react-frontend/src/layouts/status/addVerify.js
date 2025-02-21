@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { storeStatus, getProfileDetails, createLog } from "utils/api"; // Import the API functions
+import {
+  storeStatus,
+  getProfileDetails,
+  createLog,
+  storeBySerialNumber,
+  storeByFileHash,
+} from "utils/api"; // Import the API functions
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -51,6 +57,65 @@ function VerifyCertificate() {
     fetchProfileDetails();
   }, [navigate]);
 
+  // Function to handle the verify button click and store status
+  const handleVerify = async (event) => {
+    event.preventDefault(); // Prevent the form from refreshing the page
+    setIsLoading(true);
+    setErrorMessage("");
+
+    // Check if required fields are empty
+    if (!name || !serialNumber || !icNumber) {
+      setStatusMessage("Please fill in all required fields and upload a file.");
+      setIsLoading(false);
+      return; // Stop the function if required fields or file is empty
+    }
+
+    try {
+      // Prepare data to send in the API request
+      const data = {
+        name,
+        email,
+        serial_number: serialNumber,
+        ic_number: icNumber,
+        status: "pending", // Default status as pending
+      };
+
+      const token = localStorage.getItem("token"); // Get token from localStorage
+
+      // Call storeStatus API function to store the status and file hash
+      await storeBySerialNumber(data, token);
+      setStatusMessage("Status stored successfully.");
+
+      // Create a log after successful registration
+      const userEmail = localStorage.getItem("email");
+      const logData = {
+        user_email: userEmail,
+        action: "New Request",
+        module: "User",
+        serial_number: serialNumber,
+        status: "Success",
+      };
+      await createLog(logData, token);
+
+      // Check the role from localStorage
+      const role = localStorage.getItem("role"); // Get the role from localStorage
+
+      // Conditionally navigate based on the role
+      if (role === "admin") {
+        navigate("/admin/request", { state: { successMessage: "Request Sent Successfully!" } });
+      } else if (role === "user") {
+        navigate("/status", { state: { successMessage: "Request Sent Successfully!" } });
+      } else {
+        // Optional: handle if role is not found (e.g., redirect to login)
+        navigate("/login");
+      }
+    } catch (error) {
+      setStatusMessage("Failed to store status.");
+    } finally {
+      setIsLoading(false); // Stop loading state
+    }
+  };
+
   // Handle input change for any field
   const handleInputChange = (event, setter) => {
     setter(event.target.value);
@@ -77,14 +142,14 @@ function VerifyCertificate() {
     return hash;
   };
 
-  // Function to handle the verify button click and store status
-  const handleVerify = async (event) => {
-    event.preventDefault(); // Prevent the form from refreshing the page
+  const handleVerifyByHash = async (event) => {
+    event.preventDefault();
+    console.log("Submit button clicked");
     setIsLoading(true);
     setErrorMessage("");
 
     // Check if required fields are empty
-    if (!name || !serialNumber || !icNumber || !file) {
+    if (!file) {
       setStatusMessage("Please fill in all required fields and upload a file.");
       setIsLoading(false);
       return; // Stop the function if required fields or file is empty
@@ -98,8 +163,6 @@ function VerifyCertificate() {
       const data = {
         name,
         email,
-        serial_number: serialNumber,
-        ic_number: icNumber,
         file_hash: fileHash, // Add the file hash
         status: "pending", // Default status as pending
       };
@@ -107,7 +170,7 @@ function VerifyCertificate() {
       const token = localStorage.getItem("token"); // Get token from localStorage
 
       // Call storeStatus API function to store the status and file hash
-      await storeStatus(data, token);
+      await storeByFileHash(data, token);
       setStatusMessage("Status stored successfully.");
 
       // Create a log after successful registration
@@ -172,10 +235,10 @@ function VerifyCertificate() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <form onSubmit={handleVerify}>
-          <Grid container spacing={3} justifyContent="center">
-            {/* Left Card: Input Fields */}
-            <Grid item xs={12} md={6}>
+        <Grid container spacing={3} justifyContent="center" alignItems="center">
+          {/* Left Card: Certificate Details Form */}
+          <Grid item xs={12} md={5}>
+            <form onSubmit={handleVerify}>
               <Card>
                 <MDBox
                   mx={2}
@@ -243,12 +306,34 @@ function VerifyCertificate() {
                       required
                     />
                   </MDBox>
+                  <MDButton
+                    variant="gradient"
+                    color="dark"
+                    type="submit"
+                    sx={{
+                      width: "auto",
+                      display: "block",
+                      marginLeft: "auto",
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Saving..." : "Send Request"}
+                  </MDButton>
                 </MDBox>
               </Card>
-            </Grid>
+            </form>
+          </Grid>
 
-            {/* Right Card: File Upload */}
-            <Grid item xs={12} md={6}>
+          {/* Divider with "OR" */}
+          <Grid item xs={12} md={2} textAlign="center">
+            <MDTypography variant="h6" fontWeight="bold">
+              OR
+            </MDTypography>
+          </Grid>
+
+          {/* Right Card: Upload File Form */}
+          <Grid item xs={12} md={5}>
+            <form onSubmit={handleVerifyByHash}>
               <Card>
                 <MDBox
                   mx={2}
@@ -293,9 +378,9 @@ function VerifyCertificate() {
                   </MDBox>
                 </MDBox>
               </Card>
-            </Grid>
+            </form>
           </Grid>
-        </form>
+        </Grid>
       </MDBox>
       <Footer />
     </DashboardLayout>

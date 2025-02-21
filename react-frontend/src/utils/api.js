@@ -151,9 +151,33 @@ export const storeStatus = (data, token) => {
   });
 };
 
+export const storeBySerialNumber = (data, token) => {
+  return api.post(`/verification/serial-number`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const storeByFileHash = (data, token) => {
+  return api.post(`/verification/file-hash`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 // New Status-related API to get status by email
 export const getStatusByEmail = (email, token) => {
   return api.get(`/status/email/${email}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getStatusById = (statusId, token) => {
+  return api.get(`/status/${statusId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -186,9 +210,9 @@ export const getUserDetailsByEmail = (email, token) => {
   });
 };
 
-// New Status-related API to delete a status by serial number (admin only)
-export const deleteStatus = (serialNumber, email, token) => {
-  return api.delete(`/status/${serialNumber}`, {
+// New Status-related API to delete a status by id (admin only)
+export const deleteStatusById = (id, email, token) => {
+  return api.delete(`/status/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -199,8 +223,8 @@ export const deleteStatus = (serialNumber, email, token) => {
 };
 
 // New Status-related API to update name, email, and serial_number
-export const updateDetails = (serialNumber, email, statusData, token) => {
-  return api.patch(`/status/update-details/${serialNumber}/${email}`, statusData, {
+export const updateDetailsById = (id, statusData, token) => {
+  return api.patch(`/status/update-details/${id}`, statusData, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

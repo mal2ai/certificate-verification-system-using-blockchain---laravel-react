@@ -16,11 +16,12 @@ import Footer from "examples/Footer";
 
 // API function to get user details by email, delete status, and send OTP
 import {
-  getStatusBySerialNumber,
-  deleteStatus,
+  updateDetailsById,
+  deleteStatusById,
   sendOTP,
   getUserDetailsByEmail,
   createLog,
+  getStatusById,
 } from "utils/api";
 import { getBlockchain } from "utils/blockchain";
 
@@ -44,7 +45,7 @@ function VerifyCertificate() {
   const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar visibility
 
   // Destructure the passed data from location.state
-  const { email, serial_number, created_at } = location.state || {}; // Only fetching email, serial_number, and created_at
+  const { id, email, serial_number, created_at } = location.state || {}; // Only fetching email, serial_number, and created_at
 
   // Fetch status details by email, serial_number, and created_at
   useEffect(() => {
@@ -53,7 +54,7 @@ function VerifyCertificate() {
         setIsLoading(true);
         const token = localStorage.getItem("token"); // Get token from localStorage (or from context)
 
-        const response = await getStatusBySerialNumber(email, serial_number, created_at, token);
+        const response = await getStatusById(id, token);
         setCertificateDetails(response.data); // Set certificate details in the state
 
         setIsLoading(false);
@@ -103,23 +104,17 @@ function VerifyCertificate() {
     try {
       const token = localStorage.getItem("token"); // Get token from localStorage
 
-      if (!email) {
-        throw new Error("Email is required for deletion");
+      if (!certificateDetails?.id) {
+        throw new Error("Status ID is required for deletion");
       }
 
-      await deleteStatus(
-        certificateDetails?.serial_number || serialNumber,
-        certificateDetails?.email,
-        token
-      ); // Pass both serial_number and email to the delete function
+      await deleteStatusById(certificateDetails?.id, certificateDetails?.email, token); // Pass ID and email to the delete function
 
       setIsDeleting(false); // Hide spinner after action is done
 
       // Snackbar and log message
       setSnackbarMessage(
-        `Request ${
-          certificateDetails?.serial_number || serialNumber
-        } for ${email} Deleted Successfully!`
+        `Request ${certificateDetails?.id} for ${certificateDetails?.email} Deleted Successfully!`
       );
       setSnackbarType("success");
       setOpenSnackbar(true);
@@ -130,16 +125,14 @@ function VerifyCertificate() {
         admin_email: adminEmail,
         action: "Delete",
         module: "Request",
-        serial_number: certificateDetails?.serial_number || serialNumber,
+        status_id: certificateDetails?.id,
         status: "Success",
       };
       await createLog(logData, token);
 
       navigate("/admin/request", {
         state: {
-          successMessage: `Request ${
-            certificateDetails?.serial_number || serialNumber
-          } for ${email} Deleted Successfully!`,
+          successMessage: `Request ${certificateDetails?.id} for ${certificateDetails?.email} Deleted Successfully!`,
         },
       });
     } catch (error) {
@@ -187,8 +180,8 @@ function VerifyCertificate() {
     setIsVerifying(true); // Show spinner for verify action
     setErrorMessage(""); // Clear previous error messages
 
-    if (!certificateDetails?.serial_number || !certificateDetails?.file_hash) {
-      setSnackbarMessage("Please fill in all required fields.");
+    if (!certificateDetails?.serial_number && !certificateDetails?.file_hash) {
+      setSnackbarMessage("Please provide at least Serial Number or File Hash.");
       setSnackbarType("error");
       setIsVerifying(false); // Hide spinner if validation fails
       setOpenSnackbar(true);
@@ -198,13 +191,55 @@ function VerifyCertificate() {
     try {
       const { adminAccount, contract } = await getBlockchain();
 
-      // Send transaction to verify the certificate using .send()
-      const verifyTx = await contract.methods
-        .verifyCertificate(certificateDetails?.serial_number, certificateDetails?.file_hash)
-        .send({
-          from: adminAccount, // Use the user account
-          gas: 3000000, // Set an appropriate gas limit
-        });
+      let verifyTx;
+
+      if (!certificateDetails?.serial_number) {
+        // Call verifyCertificateByHash when serial_number is empty
+        verifyTx = await contract.methods
+          .verifyCertificateByHash(certificateDetails?.file_hash)
+          .send({
+            from: adminAccount,
+            gas: 3000000,
+          });
+        console.log("Certificate Verification Result:", verifyTx);
+        // Extract serial number from event logs
+        const event = verifyTx.events?.CertificateVerified;
+        const serialNumber = event?.returnValues?.[0];
+
+        if (serialNumber) {
+          // Prepare data for the API request
+          const statusData = { serial_number: serialNumber };
+
+          // Call the API to update details
+          const token = localStorage.getItem("token");
+          await updateDetailsById(id, statusData, token);
+
+          console.log("Certificate details updated successfully.");
+          navigate("/admin/request", {
+            state: {
+              successMessage: `Request ${certificateDetails?.id} for ${certificateDetails?.email}, Verify Successfully!`,
+            },
+          });
+        } else {
+          console.warn("No serial number found in verification result.");
+        }
+      } else if (!certificateDetails?.file_hash) {
+        // Call verifyCertificate when file_hash is empty
+        verifyTx = await contract.methods
+          .verifyCertificate(certificateDetails?.serial_number)
+          .send({
+            from: adminAccount,
+            gas: 3000000,
+          });
+      } else {
+        // If both values are provided, default to verifying using serial_number
+        verifyTx = await contract.methods
+          .verifyCertificate(certificateDetails?.serial_number)
+          .send({
+            from: adminAccount,
+            gas: 3000000,
+          });
+      }
 
       if (verifyTx.status) {
         setSnackbarMessage("Certificate is valid.");
@@ -215,7 +250,7 @@ function VerifyCertificate() {
       }
       setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Certificate not valid or file hash has been changed");
+      setSnackbarMessage("Certificate not valid or file hash has been changed.");
       setSnackbarType("error");
       setOpenSnackbar(true);
     } finally {
@@ -343,7 +378,7 @@ function VerifyCertificate() {
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
-                        value={certificateDetails?.serial_number || serialNumber || ""}
+                        value={certificateDetails?.serial_number || serialNumber || "N/A"}
                         InputProps={{
                           readOnly: true,
                         }}
@@ -366,16 +401,18 @@ function VerifyCertificate() {
                       />
 
                       {/* Display Created At */}
-                      <MDInput
-                        label="File Hash"
-                        variant="outlined"
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        value={certificateDetails?.file_hash}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
+                      {certificateDetails?.file_hash && (
+                        <MDInput
+                          label="File Hash"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={certificateDetails.file_hash}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      )}
 
                       {/* Display Status */}
                       <MDInput
@@ -587,6 +624,7 @@ function VerifyCertificate() {
             color="info"
             sx={{ maxWidth: 200 }}
             onClick={handleViewCertificate}
+            disabled={!(certificateDetails?.serial_number || serialNumber)}
           >
             View Certificate
           </MDButton>

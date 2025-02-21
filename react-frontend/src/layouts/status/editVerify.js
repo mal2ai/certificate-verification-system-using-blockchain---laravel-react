@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { updateDetails, createLog } from "utils/api"; // Import the updateDetails function
+import { updateDetailsById, createLog } from "utils/api"; // Import the updateDetails function
 
 // UI
 import Grid from "@mui/material/Grid";
@@ -41,6 +41,7 @@ function VerifyCertificate() {
   const location = useLocation();
 
   const [serialNumber, setSerialNumber] = useState("");
+  const [id, setID] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [icNumber, setIcNumber] = useState("");
@@ -53,7 +54,8 @@ function VerifyCertificate() {
 
   useEffect(() => {
     if (location.state) {
-      const { name, email, serial_number, ic_number, file_hash } = location.state.rowData;
+      const { id, name, email, serial_number, ic_number, file_hash } = location.state.rowData;
+      setID(id);
       setName(name);
       setEmail(email);
       setSerialNumber(serial_number);
@@ -82,40 +84,49 @@ function VerifyCertificate() {
     }
   };
 
-  const handleVerify = async (event) => {
+  const handleVerify = async (event, formType) => {
     event.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
-
-    if (!name || !serialNumber || !icNumber) {
-      setStatusMessage("Please fill in all required fields.");
-      setIsLoading(false);
-      return;
-    }
+    setStatusMessage("");
 
     const token = localStorage.getItem("token");
     const email = localStorage.getItem("email");
 
-    const data = {
+    if (formType === "updateDetails") {
+      // Validate required fields for updating details
+      if (!name || !serialNumber || !icNumber) {
+        setStatusMessage("Please fill in all required fields.");
+        setIsLoading(false);
+        return;
+      }
+    } else if (formType === "uploadFile") {
+      // Ensure file is selected
+      if (!certificateFile) {
+        setStatusMessage("Please select a file to upload.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    let data = {
       name,
       email,
       serial_number: serialNumber,
       ic_number: icNumber,
       status: "pending",
-      file_hash: fileHash, // Use the existing or new file hash
+      file_hash: fileHash,
       cid: certificateFile ? "" : cid, // Use the existing CID if no new file is uploaded
     };
 
     try {
-      const previousSerialNumber = location.state.rowData.serial_number;
-      await updateDetails(previousSerialNumber, email, data, token);
+      await updateDetailsById(id, data, token);
       setStatusMessage("Status updated successfully.");
 
-      // Create a log after successful registration
-      const userEmail = localStorage.getItem("email");
+      // Create a log entry
       const logData = {
-        user_email: userEmail,
-        action: "Update Request",
+        user_email: email,
+        action: formType === "uploadFile" ? "Upload Certificate" : "Update Request",
         module: "User",
         serial_number: serialNumber,
         status: "Success",
@@ -125,6 +136,7 @@ function VerifyCertificate() {
       navigate("/status", { state: { successMessage: "Update Successfully!" } });
     } catch (error) {
       setStatusMessage("Failed to update status.");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -154,151 +166,268 @@ function VerifyCertificate() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
-        <form onSubmit={handleVerify}>
-          <Grid container spacing={3} justifyContent="center">
-            {/* Left Card: Input Fields */}
-            <Grid item xs={12} md={6}>
-              <Card>
-                <MDBox
-                  mx={2}
-                  mt={-3}
-                  py={3}
-                  px={2}
-                  variant="gradient"
-                  bgColor="white"
-                  borderRadius="lg"
-                  coloredShadow="info"
-                >
-                  <MDTypography variant="h6" color="dark">
-                    Update Verify Certificate
-                  </MDTypography>
-                </MDBox>
-                <MDBox p={3}>
-                  {statusMessage && (
-                    <MDBox mt={2}>
-                      <MDTypography
-                        variant="body2"
-                        color={statusMessage.includes("successfully") ? "green" : "red"}
-                      >
-                        {statusMessage}
-                      </MDTypography>
-                    </MDBox>
-                  )}
-                  {errorMessage && (
-                    <MDBox mt={2}>
-                      <MDTypography variant="body2" color="red">
-                        {errorMessage}
-                      </MDTypography>
-                    </MDBox>
-                  )}
+        {!fileHash || fileHash === "N/A" ? (
+          // Show Update Verify Certificate Card only if fileHash is empty
+          <form onSubmit={(event) => handleVerify(event, "updateDetails")}>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="white"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="dark">
+                      Update Verify Certificate
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox p={3}>
+                    {statusMessage && (
+                      <MDBox mt={2}>
+                        <MDTypography
+                          variant="body2"
+                          color={statusMessage.includes("successfully") ? "green" : "red"}
+                        >
+                          {statusMessage}
+                        </MDTypography>
+                      </MDBox>
+                    )}
+                    {errorMessage && (
+                      <MDBox mt={2}>
+                        <MDTypography variant="body2" color="red">
+                          {errorMessage}
+                        </MDTypography>
+                      </MDBox>
+                    )}
 
-                  <MDBox mt={3}>
-                    <MDInput
-                      label="Enter Your Name"
-                      variant="outlined"
-                      fullWidth
-                      value={name}
-                      onChange={(e) => handleInputChange(e, setName)}
-                      sx={{ mb: 2 }}
-                      required
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    <MDInput
-                      label="Enter Your Email"
-                      variant="outlined"
-                      fullWidth
-                      value={email}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                      sx={{ mb: 2 }}
-                    />
-                    <MDInput
-                      label="Enter IC Number"
-                      variant="outlined"
-                      fullWidth
-                      value={icNumber}
-                      onChange={(e) => handleInputChange(e, setIcNumber)}
-                      sx={{ mb: 2 }}
-                      required
-                    />
-                    <MDInput
-                      label="Enter Certificate Serial Number"
-                      variant="outlined"
-                      fullWidth
-                      value={serialNumber}
-                      onChange={(e) => handleInputChange(e, setSerialNumber)}
-                      sx={{ mb: 2 }}
-                      required
-                    />
+                    <MDBox mt={3}>
+                      <MDInput
+                        label="Enter Your Name"
+                        variant="outlined"
+                        fullWidth
+                        value={name}
+                        onChange={(e) => handleInputChange(e, setName)}
+                        sx={{ mb: 2 }}
+                        required
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Enter Your Email"
+                        variant="outlined"
+                        fullWidth
+                        value={email}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                        sx={{ mb: 2 }}
+                      />
+                      <MDInput
+                        label="Enter IC Number"
+                        variant="outlined"
+                        fullWidth
+                        value={icNumber}
+                        onChange={(e) => handleInputChange(e, setIcNumber)}
+                        sx={{ mb: 2 }}
+                        required
+                      />
+                      <MDInput
+                        label="Enter Certificate Serial Number"
+                        variant="outlined"
+                        fullWidth
+                        value={serialNumber}
+                        onChange={(e) => handleInputChange(e, setSerialNumber)}
+                        sx={{ mb: 2 }}
+                        required
+                      />
+                    </MDBox>
+
+                    <MDBox mt={3} display="flex" justifyContent="flex-end">
+                      <MDButton variant="gradient" color="dark" type="submit" disabled={isLoading}>
+                        {isLoading ? "Saving..." : "UPDATE"}
+                      </MDButton>
+                    </MDBox>
+                  </MDBox>
+                </Card>
+              </Grid>
+            </Grid>
+          </form>
+        ) : !serialNumber || serialNumber === "" ? (
+          // Show Upload File Card only if serialNumber is empty
+          <form onSubmit={(event) => handleVerify(event, "uploadFile")}>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="white"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="dark">
+                      Upload File
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox p={3}>
+                    <MDBox mt={3}>
+                      <MDBox mb={2}>
+                        <input
+                          id="input-b1"
+                          name="input-b1"
+                          type="file"
+                          className="file"
+                          onChange={handleFileChange}
+                          accept=".pdf"
+                        />
+                      </MDBox>
+                    </MDBox>
+
                     <MDInput
                       label="Current File Hash"
                       variant="outlined"
                       fullWidth
-                      value={fileHash || "N/A"}
+                      value={fileHash}
                       sx={{ mb: 2 }}
                       InputProps={{
                         readOnly: true,
                       }}
-                      required
                     />
-                  </MDBox>
-                </MDBox>
-              </Card>
-            </Grid>
 
-            {/* Right Card: File Upload */}
-            <Grid item xs={12} md={6}>
-              <Card>
-                <MDBox
-                  mx={2}
-                  mt={-3}
-                  py={3}
-                  px={2}
-                  variant="gradient"
-                  bgColor="white"
-                  borderRadius="lg"
-                  coloredShadow="info"
-                >
-                  <MDTypography variant="h6" color="dark">
-                    Upload File
-                  </MDTypography>
-                </MDBox>
-                <MDBox p={3}>
-                  <MDBox mt={3}>
-                    <MDBox mb={2}>
-                      <input
-                        id="input-b1"
-                        name="input-b1"
-                        type="file"
-                        className="file"
-                        onChange={handleFileChange}
-                        accept=".pdf"
+                    <MDBox mt={3} display="flex" justifyContent="flex-end">
+                      <MDButton variant="gradient" color="dark" type="submit" disabled={isLoading}>
+                        {isLoading ? "Saving..." : "UPDATE"}
+                      </MDButton>
+                    </MDBox>
+                  </MDBox>
+                </Card>
+              </Grid>
+            </Grid>
+          </form>
+        ) : (
+          // Default case when both fileHash and serialNumber exist
+          <form onSubmit={(event) => handleVerify(event, "both")}>
+            <Grid container spacing={3} justifyContent="center">
+              {/* Left Card: Update Verify Certificate */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="white"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="dark">
+                      Update Verify Certificate
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox p={3}>
+                    <MDBox mt={3}>
+                      <MDInput
+                        label="Enter Your Name"
+                        variant="outlined"
+                        fullWidth
+                        value={name}
+                        sx={{ mb: 2 }}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Enter Your Email"
+                        variant="outlined"
+                        fullWidth
+                        value={email}
+                        sx={{ mb: 2 }}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                      <MDInput
+                        label="Enter IC Number"
+                        variant="outlined"
+                        fullWidth
+                        value={icNumber}
+                        onChange={(e) => handleInputChange(e, setIcNumber)}
+                        sx={{ mb: 2 }}
+                      />
+                      <MDInput
+                        label="Enter Certificate Serial Number"
+                        variant="outlined"
+                        fullWidth
+                        value={serialNumber}
+                        sx={{ mb: 2 }}
+                      />
+                      <MDInput
+                        label="Current File Hash"
+                        variant="outlined"
+                        fullWidth
+                        value={fileHash}
+                        sx={{ mb: 2 }}
+                        InputProps={{
+                          readOnly: true,
+                        }}
                       />
                     </MDBox>
-                    <MDButton
-                      variant="gradient"
-                      color="dark"
-                      type="submit"
-                      sx={{
-                        width: "auto",
-                        display: "block",
-                        marginLeft: "auto",
-                      }}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Saving..." : "Update"}
-                    </MDButton>
                   </MDBox>
-                </MDBox>
-              </Card>
-            </Grid>
-          </Grid>
-        </form>
-      </MDBox>
+                </Card>
+              </Grid>
 
+              {/* Right Card: Upload File */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <MDBox
+                    mx={2}
+                    mt={-3}
+                    py={3}
+                    px={2}
+                    variant="gradient"
+                    bgColor="white"
+                    borderRadius="lg"
+                    coloredShadow="info"
+                  >
+                    <MDTypography variant="h6" color="dark">
+                      Upload File
+                    </MDTypography>
+                  </MDBox>
+                  <MDBox p={3}>
+                    <MDBox mt={3}>
+                      <MDBox mb={2}>
+                        <input
+                          id="input-b1"
+                          name="input-b1"
+                          type="file"
+                          className="file"
+                          onChange={handleFileChange}
+                          accept=".pdf"
+                        />
+                      </MDBox>
+                    </MDBox>
+                    <MDBox mt={3} display="flex" justifyContent="flex-end">
+                      <MDButton variant="gradient" color="dark" type="submit" disabled={isLoading}>
+                        {isLoading ? "Saving..." : "UPDATE"}
+                      </MDButton>
+                    </MDBox>
+                  </MDBox>
+                </Card>
+              </Grid>
+            </Grid>
+          </form>
+        )}
+      </MDBox>
       <Footer />
     </DashboardLayout>
   );

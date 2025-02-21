@@ -47,6 +47,7 @@ function Status() {
 
   // Columns for the DataTable
   const columns = [
+    { Header: "ID", accessor: "id" },
     { Header: "Name", accessor: "name" },
     { Header: "Email", accessor: "email" },
     { Header: "Serial Number", accessor: "serial_number" },
@@ -126,46 +127,51 @@ function Status() {
 
   // Fetch all status data when the component mounts
   useEffect(() => {
-    const fetchStatuses = async () => {
-      setLoading(true);
+    const fetchStatuses = async (isFirstLoad = false) => {
+      if (isFirstLoad) setLoading(true); // Show spinner only on initial load
 
       try {
         const response = await getAllStatuses(localStorage.getItem("token"));
 
         if (response && response.data) {
-          // Check if the response contains the "No statuses found" message
           if (response.data.message === "No statuses found") {
-            setStatusData([]); // Set the status data to an empty array
+            setStatusData([]);
           } else {
-            // Initialize rejectLoading and approveLoading for each row
             const dataWithLoading = response.data.map((item) => ({
               ...item,
-              rejectLoading: false, // Initialize rejectLoading for each row
-              approveLoading: false, // Initialize approveLoading for each row
+              rejectLoading: false,
+              approveLoading: false,
             }));
 
-            setStatusData(dataWithLoading); // Set the valid data with the loading properties
+            setStatusData(dataWithLoading);
           }
         } else {
-          setStatusData([]); // If there's no data in the response, set it to an empty array
+          setStatusData([]);
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          // Handle the 404 status code without showing an error notification
           console.log("No statuses found (404)");
-          setStatusData([]); // Set empty status data
+          setStatusData([]);
         } else {
-          // Only show an error notification for other errors
           setSnackbarMessage("Failed to fetch status data!");
           setSnackbarType("error");
           setOpenSnackbar(true);
         }
       } finally {
-        setLoading(false);
+        if (isFirstLoad) setLoading(false); // Hide spinner only after first load
       }
     };
 
-    fetchStatuses();
+    // Fetch statuses initially (with loading)
+    fetchStatuses(true);
+
+    // Set up an interval to refresh statuses every 10 seconds (without loading)
+    const interval = setInterval(() => {
+      fetchStatuses(false);
+    }, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Handle success message if present in the location state
@@ -187,6 +193,7 @@ function Status() {
   const handleInfo = (rowData) => {
     navigate(`/admin/view-request`, {
       state: {
+        id: rowData.id,
         name: rowData.name,
         email: rowData.email,
         serial_number: rowData.serial_number,

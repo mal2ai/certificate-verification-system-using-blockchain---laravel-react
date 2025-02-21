@@ -14,6 +14,7 @@ import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import CircularProgress from "@mui/material/CircularProgress";
+import MDTypography from "components/MDTypography";
 
 // Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
@@ -25,6 +26,7 @@ import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 //image
 import block from "assets/images/3d-cube.png";
+import logo from "assets/images/logo.png";
 
 //utils
 import { getBlockchain } from "utils/blockchain";
@@ -32,8 +34,8 @@ import { countUsers, countStatus } from "utils/api"; // Import the countUsers fu
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
-  const [currentBlock, setCurrentBlock] = useState(null);
-  const [certificateCount, setCertificateCount] = useState(null);
+  const [currentBlock, setCurrentBlock] = useState("NULL");
+  const [certificateCount, setCertificateCount] = useState("NULL");
   const [userCount, setUserCount] = useState(null); // State for user count
   const [loading, setLoading] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -42,62 +44,102 @@ function Dashboard() {
 
   // Fetch blockchain data when component mounts
   useEffect(() => {
-    const fetchBlockchainData = async () => {
-      const { currentBlock, contract, web3, accounts } = await getBlockchain();
-      setCurrentBlock(currentBlock); // Update state with current block number
+    const fetchBlockchainData = async (isInitialLoad = false) => {
+      if (isInitialLoad) {
+        setLoading(true); // Show spinner only on the first load
+      }
 
-      // Fetch certificate count once blockchain data is available
       try {
+        const { currentBlock, contract } = await getBlockchain();
+        setCurrentBlock(currentBlock); // Update state with current block number
+
+        // Fetch certificate count once blockchain data is available
         const count = await contract.methods.getCertificatesCount().call();
         const certificateCount = count.toString(); // Convert BigInt to string
 
         setCertificateCount(certificateCount); // Set state with certificate count
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching certificate count:", error);
-        setLoading(false);
+      } finally {
+        if (isInitialLoad) {
+          setLoading(false); // Hide spinner only on first load
+        }
       }
     };
 
-    fetchBlockchainData();
+    // Initial fetch with spinner
+    fetchBlockchainData(true);
+
+    // Set interval to fetch certificate count every 10 seconds without showing the spinner
+    const intervalId = setInterval(() => fetchBlockchainData(false), 10000);
+
+    // Cleanup function to clear interval when component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   // Fetch user count from API
   useEffect(() => {
-    const fetchUserCount = async () => {
+    const fetchUserCount = async (isInitialLoad = false) => {
+      if (isInitialLoad) {
+        setLoadingUsers(true); // Show spinner only on the first load
+      }
+
       try {
         // Get token from localStorage
         const token = localStorage.getItem("token");
 
-        // Call the countUsers API function here with the token
+        // Call the countUsers API function with the token
         const response = await countUsers(token); // Passing token from localStorage
 
         setUserCount(response.data.count); // Assuming the response contains a 'count' property
-        setLoadingUsers(false); // Update loading state
       } catch (error) {
         console.error("Error fetching user count:", error);
-        setLoadingUsers(false);
+      } finally {
+        if (isInitialLoad) {
+          setLoadingUsers(false); // Hide spinner only after the first load
+        }
       }
     };
 
-    fetchUserCount();
+    // Initial fetch with spinner
+    fetchUserCount(true);
+
+    // Set interval to fetch user count every 10 seconds without showing the spinner
+    const intervalId = setInterval(() => fetchUserCount(false), 10000);
+
+    // Cleanup function to clear interval when component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   // Fetch status count from API (for "pending" statuses)
   useEffect(() => {
-    const fetchStatusCount = async () => {
+    const fetchStatusCount = async (isInitialLoad = false) => {
+      if (isInitialLoad) {
+        setLoadingStatus(true); // Show spinner only on the first load
+      }
+
       try {
         const token = localStorage.getItem("token");
-        const response = await countStatus(token); // Passing token from localStorage
-        setStatusCount(response.data.count || 0); // Assuming the response contains a 'count' property
-        setLoadingStatus(false); // Update loading state
+        const response = await countStatus(token); // Call API with token
+
+        setStatusCount(response.data.count); // Update status count
       } catch (error) {
         console.error("Error fetching status count:", error);
-        setLoadingStatus(false);
+      } finally {
+        if (isInitialLoad) {
+          setLoadingStatus(false); // Hide spinner only after the first load
+        }
       }
     };
 
-    fetchStatusCount();
+    // Initial fetch with spinner
+    fetchStatusCount(true);
+
+    // Set interval to update the status count every 10 seconds
+    const intervalId = setInterval(() => fetchStatusCount(false), 10000);
+
+    // Cleanup function to clear interval when component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   // Convert BigInt to string or number for display
@@ -110,6 +152,75 @@ function Dashboard() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        <Grid container spacing={3} alignItems="center" sx={{ mb: 3 }}>
+          {/* Left Section: Logo & Text */}
+          <Grid item xs={12} md={6} lg={9}>
+            <MDBox
+              sx={{
+                minHeight: "160px", // Height of the card
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                padding: "20px",
+                borderRadius: "10px",
+                backgroundColor: "#ffffff",
+                boxShadow: 3,
+              }}
+            >
+              <img
+                src={logo}
+                alt="Kolej Professional Baitumal Logo"
+                style={{ width: "70px", height: "70px", marginRight: "20px" }}
+              />
+              <MDBox>
+                <MDTypography variant="h5" fontWeight="bold">
+                  Kolej Professional Baitumal Kuala Lumpur
+                </MDTypography>
+                <MDTypography variant="body2" mt={1}>
+                  A cutting-edge certificate verification system powered by blockchain technology,
+                  ensuring secure and tamper-proof authentication of academic and professional
+                  credentials.
+                </MDTypography>
+              </MDBox>
+            </MDBox>
+          </Grid>
+
+          {/* Right Section: iFrame */}
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox
+              sx={{
+                overflow: "hidden",
+                borderRadius: "10px",
+                display: { xs: "none", md: "flex" },
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "5px",
+                width: "100%",
+                height: "160px", // Ensure it has enough height
+                backgroundColor: "#ffffff",
+                boxShadow: 3,
+              }}
+            >
+              <iframe
+                src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=medium&timezone=Asia%2FKuala_Lumpur"
+                width="100%"
+                height="115"
+                frameBorder="0"
+                seamless
+                style={{
+                  pointerEvents: "none",
+                  display: "block",
+                  margin: "auto",
+                  border: "none",
+                  background: "transparent",
+                }}
+                title="Kuala Lumpur Time Widget"
+              ></iframe>
+            </MDBox>
+          </Grid>
+        </Grid>
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
@@ -223,7 +334,7 @@ function Dashboard() {
             </MDBox>
           </Grid>
         </Grid>
-        <MDBox mt={4.5}>
+        {/* <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
@@ -263,7 +374,7 @@ function Dashboard() {
               </MDBox>
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12}>

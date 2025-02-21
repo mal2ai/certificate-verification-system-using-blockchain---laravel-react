@@ -52,6 +52,7 @@ function VerifyOTP() {
         // Navigate to view certificate page with additional data passed via state
         navigate("/view-certificate", {
           state: {
+            id,
             email,
             serial_number,
             created_at,

@@ -17,7 +17,6 @@ contract CertificateRegistry {
     }
 
     mapping(string => Certificate) private certificates;
-    mapping(string => string) private certHashToSerial; 
     string[] private certificateSerialNumbers; // To store all serial numbers
 
     // Events for tracking transactions
@@ -66,9 +65,6 @@ contract CertificateRegistry {
         string memory certHash,
         string memory transCID
     ) public onlyAdmin {
-        require(bytes(certificates[serialNumber].serialNumber).length == 0, "Certificate already registered");
-        require(bytes(certHashToSerial[certHash]).length == 0, "Certificate hash already exists");
-
         certificates[serialNumber] = Certificate(
             serialNumber,
             name,
@@ -80,9 +76,7 @@ contract CertificateRegistry {
             certHash,
             transCID
         );
-
         certificateSerialNumbers.push(serialNumber);
-        certHashToSerial[certHash] = serialNumber; // Store hash-to-serial mapping
 
         emit CertificateRegistered(serialNumber, msg.sender, block.timestamp);
     }
@@ -97,15 +91,18 @@ contract CertificateRegistry {
         return cert;
     }
 
-    function getCertificateByHash(string memory certHash)
+    function getCertificateByHash(string memory providedHash)
         public
         view
         returns (Certificate memory)
     {
-        string memory serialNumber = certHashToSerial[certHash];
-        require(bytes(serialNumber).length > 0, "Certificate not found");
-
-        return certificates[serialNumber];
+        for (uint256 i = 0; i < certificateSerialNumbers.length; i++) {
+            Certificate memory cert = certificates[certificateSerialNumbers[i]];
+            if (keccak256(abi.encodePacked(cert.certHash)) == keccak256(abi.encodePacked(providedHash))) {
+                return cert;
+            }
+        }
+        revert("Certificate not found");
     }
 
     function getAllCertificates() public view onlyAdmin returns (Certificate[] memory) {
@@ -119,18 +116,26 @@ contract CertificateRegistry {
         return allCertificates;
     }
 
-    function verifyCertificate(string memory serialNumber) public {
-        require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
+    function verifyBySerialNumber(string memory serialNumber) public {
+        Certificate memory cert = certificates[serialNumber];
+        require(bytes(cert.serialNumber).length > 0, "Certificate not found");
 
         emit CertificateVerified(serialNumber, msg.sender, block.timestamp, true);
     }
 
-    function verifyCertificateByHash(string memory certHash) public returns (string memory) {
-        string memory serialNumber = certHashToSerial[certHash];
-        require(bytes(serialNumber).length > 0, "Certificate not found");
+    function verifyByCertHash(string memory providedHash) public {
+        bool isVerified = false;
 
-        emit CertificateVerified(serialNumber, msg.sender, block.timestamp, true);
-        return serialNumber;
+        for (uint256 i = 0; i < certificateSerialNumbers.length; i++) {
+            Certificate memory cert = certificates[certificateSerialNumbers[i]];
+            if (keccak256(abi.encodePacked(cert.certHash)) == keccak256(abi.encodePacked(providedHash))) {
+                isVerified = true;
+                emit CertificateVerified(cert.serialNumber, msg.sender, block.timestamp, true);
+                return;
+            }
+        }
+
+        require(isVerified, "Certificate hash not found");
     }
 
     function updateCertificate(

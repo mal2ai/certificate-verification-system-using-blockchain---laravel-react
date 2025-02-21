@@ -1,20 +1,27 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const RedirectToDashboard = () => {
   const token = localStorage.getItem("token");
   const userRole = localStorage.getItem("role");
+  const location = useLocation();
 
-  if (!token) {
-    return <Navigate to="/sign-in" />;
+  // Allow the Landing page ("/") without redirecting
+  if (location.pathname === "/") {
+    return null; // Do nothing, show Landing page
   }
 
-  if (userRole === "admin") {
-    return <Navigate to="/admin/dashboard" />;
-  } else if (userRole === "user") {
-    return <Navigate to="/status" />;
+  // Redirect only if user is on "/sign-in" and already authenticated
+  if (token) {
+    if (location.pathname === "/sign-in") {
+      if (userRole === "admin") {
+        return <Navigate to="/admin/dashboard" replace />;
+      } else if (userRole === "user") {
+        return <Navigate to="/status" replace />;
+      }
+    }
   }
 
-  return <Navigate to="/sign-in" />;
+  return null; // Otherwise, don't redirect
 };
 
 export default RedirectToDashboard;

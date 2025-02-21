@@ -62,30 +62,39 @@ function Status() {
   // Fetch status data when the component mounts
   useEffect(() => {
     if (email) {
-      const fetchStatus = async () => {
-        setLoading(true);
+      const fetchStatus = async (isInitialLoad = false) => {
+        if (isInitialLoad) {
+          setLoading(true); // Show spinner only on the first load
+        }
 
         try {
           const response = await getStatusByEmail(email, localStorage.getItem("token"));
 
           if (response && response.data) {
             if (response.data.length === 0) {
-              // If the data is empty, display a message in the table
               setStatusData([{ status: "No request", name: "", email: "", serial_number: "" }]);
             } else {
               setStatusData(response.data);
             }
           }
         } catch (error) {
-          // Handle the error, but don't show an error message if data is empty
           setSnackbarMessage("Failed to fetch status data!");
           setSnackbarType("error");
         } finally {
-          setLoading(false);
+          if (isInitialLoad) {
+            setLoading(false); // Hide spinner only on first load
+          }
         }
       };
 
-      fetchStatus();
+      // Initial fetch with loading indicator
+      fetchStatus(true);
+
+      // Set interval to fetch data every 10 seconds (without triggering the spinner)
+      const intervalId = setInterval(() => fetchStatus(false), 10000);
+
+      // Cleanup function to clear interval when component unmounts
+      return () => clearInterval(intervalId);
     }
   }, [email]);
 
@@ -132,7 +141,7 @@ function Status() {
         setIsOtpModalOpen(false); // Close modal
 
         navigate("/view-certificate", {
-          state: { email, serial_number, created_at, file_hash },
+          state: { id, email, serial_number, created_at, file_hash },
         });
       } else {
         setSnackbarMessage(response.data.message || "Invalid OTP. Please try again.");

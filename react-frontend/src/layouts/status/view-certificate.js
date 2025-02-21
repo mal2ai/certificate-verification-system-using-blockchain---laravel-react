@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 // Blockchain utility function
 import { getBlockchain } from "utils/blockchain";
-import { getStatusBySerialNumber, storeTransaction, createLog } from "utils/api";
+import { getStatusById, storeTransaction, createLog } from "utils/api";
 
 // Material-UI loading spinner
 import CircularProgress from "@mui/material/CircularProgress";
@@ -24,7 +24,7 @@ function VerifyCertificate() {
   const location = useLocation(); // Access the passed state from the navigate function
 
   // Destructure the passed data from location.state
-  const { email, serial_number, created_at, file_hash } = location.state || {};
+  const { id, email, serial_number, created_at, file_hash } = location.state || {};
 
   // Blockchain state and functions
   const [certificateDetails, setCertificateDetails] = useState(null);
@@ -49,7 +49,7 @@ function VerifyCertificate() {
         setIsLoading(true);
         const token = localStorage.getItem("token"); // Get token from localStorage (or from context)
 
-        const response = await getStatusBySerialNumber(email, serial_number, created_at, token);
+        const response = await getStatusById(id, token); // Call getStatusById with id and token
         setStatus(response.data);
 
         setIsLoading(false);
@@ -65,28 +65,52 @@ function VerifyCertificate() {
 
   // Fetch certificate data from the blockchain using the serial number
   useEffect(() => {
-    if (serial_number) {
-      fetchCertificateData(serial_number);
+    if (serial_number || file_hash) {
+      fetchCertificateData(serial_number, file_hash);
     }
-  }, [serial_number]);
+  }, [serial_number, file_hash]);
 
-  const fetchCertificateData = async (serialNumber) => {
+  const fetchCertificateData = async (serialNumber, file_hash) => {
+    console.log("file hash: ", file_hash);
     try {
       setIsLoading(true);
       const { userAccount, contract } = await getBlockchain();
+      let verifyTx, certificate;
 
-      // Check if fileHash is available in the state
-      if (!file_hash) {
-        setErrorMessage("File hash is missing.");
+      if (serialNumber) {
+        // If serial number is available, use verifyCertificate
+        verifyTx = await contract.methods.verifyCertificate(serialNumber, file_hash).send({
+          from: userAccount,
+          gas: 3000000,
+        });
+        console.log("Method Call: verifyCertificate-serial number");
+      } else if (file_hash) {
+        console.log("Method Call: verifyCertificateByHash");
+        try {
+          // If serial number is empty but file hash is available, use verifyCertificateByHash
+          verifyTx = await contract.methods.verifyCertificateByHash(file_hash).send({
+            from: userAccount,
+            gas: 3000000,
+          });
+
+          // Extract serial number from event logs
+          const event = verifyTx.events?.CertificateVerified;
+          serialNumber = event?.returnValues?.[0]; // Extract serial number from event logs
+
+          if (!serialNumber) {
+            throw new Error("Certificate not found.");
+          }
+        } catch (error) {
+          setErrorMessage("Certificate not found.");
+          setVerificationAttempted(true);
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        setErrorMessage("Both Serial Number and File Hash are missing.");
         setIsLoading(false);
         return;
       }
-
-      // Call the smart contract's verifyCertificate function with serialNumber and fileHash
-      const verifyTx = await contract.methods.verifyCertificate(serialNumber, file_hash).send({
-        from: userAccount,
-        gas: 3000000, // Set an appropriate gas limit
-      });
 
       // Create a transaction receipt object
       const receipt = {
@@ -101,13 +125,13 @@ function VerifyCertificate() {
 
       setTransactionReceipt(receipt);
 
-      // Step 3: Store transaction details in Laravel backend
+      // Store transaction details in Laravel backend
       if (receipt) {
         const token = localStorage.getItem("token");
         await storeTransaction(receipt, token);
       }
 
-      // Create a log after successful registration
+      // Create a log after successful verification
       const token = localStorage.getItem("token");
       const userEmail = localStorage.getItem("email");
       const logData = {
@@ -120,8 +144,9 @@ function VerifyCertificate() {
       };
       await createLog(logData, token);
 
-      // If the verification is successful, fetch the certificate details
-      const certificate = await contract.methods.getCertificate(serialNumber).call();
+      // Fetch certificate details after successful verification
+      certificate = await contract.methods.getCertificate(serialNumber).call();
+
       if (certificate) {
         setCertificateDetails({
           serialNumber,
@@ -141,23 +166,22 @@ function VerifyCertificate() {
       setIsLoading(false);
       setVerificationAttempted(true);
     } catch (error) {
-      setTransactionReceipt(null); // Reset transaction receipt on error
+      setTransactionReceipt(null);
       setCertificateDetails(null);
 
-      // Handle error messages based on the type of failure
+      // Handle error messages
       if (error.message.includes("Certificate hash does not match")) {
         setErrorMessage("Certificate hash does not match.");
       } else if (error.message.includes("Certificate not found")) {
         setErrorMessage("Certificate not found.");
       } else if (error?.data?.reason) {
-        // If there's a reason in the error data, display it
         setErrorMessage(
           error.data.reason ||
-            "Certificate not found or your file has been tampered. If tampered, please provide original file."
+            "Certificate not found or your file has been tampered. If tampered, please provide the original file."
         );
       } else {
         setErrorMessage(
-          "Certificate not found or your file has been tampered. If tampered, please provide original file."
+          "Certificate not found or your file has been tampered. If tampered, please provide the original file."
         );
       }
 
@@ -361,16 +385,18 @@ function VerifyCertificate() {
                               readOnly: true,
                             }}
                           />
-                          <MDInput
-                            label="Ic Number"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={status?.ic_number || ""}
-                            InputProps={{
-                              readOnly: true,
-                            }}
-                          />
+                          {status?.ic_number?.trim() && (
+                            <MDInput
+                              label="IC Number"
+                              variant="outlined"
+                              fullWidth
+                              sx={{ mb: 2 }}
+                              value={status.ic_number}
+                              InputProps={{
+                                readOnly: true,
+                              }}
+                            />
+                          )}
                           <MDInput
                             label="Email"
                             variant="outlined"
@@ -381,6 +407,30 @@ function VerifyCertificate() {
                               readOnly: true,
                             }}
                           />
+                          {certificateDetails?.serialNumber?.trim() && (
+                            <MDInput
+                              label="Serial Number"
+                              variant="outlined"
+                              fullWidth
+                              sx={{ mb: 2 }}
+                              value={certificateDetails.serialNumber}
+                              InputProps={{
+                                readOnly: true,
+                              }}
+                            />
+                          )}
+                          {file_hash?.trim() && (
+                            <MDInput
+                              label="File Hash"
+                              variant="outlined"
+                              fullWidth
+                              sx={{ mb: 2 }}
+                              value={file_hash}
+                              InputProps={{
+                                readOnly: true,
+                              }}
+                            />
+                          )}
                           <MDInput
                             label="Status"
                             variant="outlined"

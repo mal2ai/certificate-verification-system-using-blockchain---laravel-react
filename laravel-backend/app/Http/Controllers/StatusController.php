@@ -51,6 +51,84 @@ class StatusController extends Controller
         }
     }
 
+    public function storeBySerialNumber(Request $request)
+    {
+        try {
+            \Log::info('Request received for serial number verification', $request->all());
+
+            // Validate input
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'serial_number' => 'required|string|max:255',
+                'ic_number' => 'required|string|max:20',
+            ]);
+
+            \Log::info('Validation passed for serial number', $validated);
+
+            // Insert into database
+            $status = Status::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'serial_number' => $validated['serial_number'],
+                'ic_number' => $validated['ic_number'],
+                'status' => 'pending',
+            ]);
+
+            \Log::info('Status created successfully by serial number', $status->toArray());
+
+            return response()->json([
+                'message' => 'Verification request created successfully (Serial Number)',
+                'status' => 'pending',
+                'data' => $status,
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Error in storeBySerialNumber', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
+    public function storeByFileHash(Request $request)
+    {
+        try {
+            \Log::info('Request received for file hash verification', $request->all());
+
+            // Validate input
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'file_hash' => 'required|string|max:64', // Hash must be 64 characters for SHA-256
+            ]);
+
+            \Log::info('Validation passed for file hash', $validated);
+
+            // Insert into database
+            $status = Status::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'file_hash' => $validated['file_hash'],
+                'status' => 'pending',
+            ]);
+
+            \Log::info('Status created successfully by file hash', $status->toArray());
+
+            return response()->json([
+                'message' => 'Verification request created successfully (File Hash)',
+                'status' => 'pending',
+                'data' => $status,
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Error in storeByFileHash', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
     // Get status by serial number
     public function getStatus(Request $request)
     {
@@ -95,6 +173,26 @@ class StatusController extends Controller
 
             // If no status found, return a 404 error
             return response()->json(['message' => 'Status not found for the provided email'], 404);
+        } catch (Exception $e) {
+            // Return a 500 error in case of unexpected exceptions
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Get status by ID
+    public function getStatusById($status_id)
+    {
+        try {
+            // Find the status by ID
+            $status = Status::where('id', $status_id)->first();
+
+            // If status exists, return it
+            if ($status) {
+                return response()->json($status);
+            }
+
+            // If no status found, return a 404 error
+            return response()->json(['message' => 'Status not found for the provided ID'], 404);
         } catch (Exception $e) {
             // Return a 500 error in case of unexpected exceptions
             return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
@@ -160,8 +258,8 @@ class StatusController extends Controller
         }
     }
 
-    // Delete a status by serial number
-    public function deleteStatus(Request $request, $serialNumber)
+    // Delete a status by id
+    public function deleteStatusById(Request $request, $id)
     {
         try {
             // Check if the authenticated user is an admin
@@ -169,13 +267,8 @@ class StatusController extends Controller
                 return response()->json(['message' => 'You are not authorized to delete this status.'], 403);
             }
 
-            // Extract the email from the request
-            $email = $request->input('email');
-
-            // Find the status by serial number and email
-            $status = Status::where('serial_number', $serialNumber)
-                ->where('email', $email)
-                ->first();
+            // Find the status by ID
+            $status = Status::find($id);
 
             // If status not found, return a 404 error
             if (!$status) {
@@ -193,9 +286,8 @@ class StatusController extends Controller
         }
     }
 
-
-    // Update name, email, and serial number by serial number and email
-    public function updateDetails(Request $request, $serialNumber, $email)
+    // Update name, email, and serial number by id
+    public function updateDetailsById(Request $request, $id)
     {
         try {
             // Validate the incoming request data
@@ -207,10 +299,8 @@ class StatusController extends Controller
                 'file_hash' => 'nullable|string|max:255', // file_hash is optional
             ]);
 
-            // Find the status by serial_number and email
-            $status = Status::where('serial_number', $serialNumber)
-                            ->where('email', $email)
-                            ->first();
+            // Find the status by ID
+            $status = Status::find($id);
 
             // If status not found, return a 404 error
             if (!$status) {
@@ -231,7 +321,7 @@ class StatusController extends Controller
                 $status->ic_number = $validated['ic_number'];
             }
             if (isset($validated['file_hash'])) {
-                $status->file_hash = $validated['file_hash']; // Update file_hash if provided
+                $status->file_hash = $validated['file_hash'];
             }
 
             // Save the updated status
