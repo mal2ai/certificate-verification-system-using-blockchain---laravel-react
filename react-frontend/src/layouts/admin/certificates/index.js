@@ -121,35 +121,49 @@ function Certificates() {
   const [certificateAdded, setCertificateAdded] = useState(false);
 
   useEffect(() => {
+    let isInitialLoad = true; // Track if it's the first load
+
     const fetchCertificates = async () => {
       try {
-        setLoading(true);
-        const { adminAccount, contract } = await getBlockchain(); // Get adminAccount along with the contract
+        if (isInitialLoad) setLoading(true); // Show spinner only on the first load
+
+        const { adminAccount, contract } = await getBlockchain();
         const data = await contract.methods.getAllCertificates().call({ from: adminAccount });
 
-        // Each item in the data array is a struct representing a certificate
         const rows = data.map((certificate, index) => ({
-          serialNumber: certificate[0], // Assuming this is the serial number field in the struct
-          name: certificate[1], // Assuming this is the name field in the struct
-          cid: certificate[2], // Assuming this is the IPFS CID field in the struct
-          icNumber: certificate[3], // Assuming this is the IC number field in the struct
-          studentId: certificate[4], // Assuming this is the student ID field in the struct
-          courseName: certificate[5], // Assuming this is the course name field in the struct
-          issuedDate: certificate[6], // Assuming this is the issued date field in the struct
-          certHash: certificate[7], // Assuming this is the certHash field in the struct
+          serialNumber: certificate[0],
+          name: certificate[1],
+          cid: certificate[2],
+          icNumber: certificate[3],
+          studentId: certificate[4],
+          courseName: certificate[5],
+          issuedDate: certificate[6],
+          certHash: certificate[7],
           id: index,
         }));
 
         setCertificates(rows);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching certificates:", error);
-        setLoading(false);
+      } finally {
+        if (isInitialLoad) {
+          setLoading(false); // Hide spinner after the first load
+          isInitialLoad = false; // Prevent further spinner displays
+        }
       }
     };
 
+    // Fetch certificates initially
     fetchCertificates();
-  }, [certificateAdded]); // Refresh certificates when certificate is added
+
+    // Set up an interval to refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchCertificates();
+    }, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [certificateAdded]);
 
   // Handle success message if present in the location state
   useEffect(() => {

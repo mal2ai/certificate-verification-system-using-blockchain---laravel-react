@@ -97,12 +97,15 @@ function ManageUser() {
 
   // Fetch all users when the component mounts
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
+    let isInitialLoad = true; // Track if it's the first load
 
+    const fetchUsers = async () => {
       try {
+        if (isInitialLoad) setLoading(true); // Show spinner only on the first load
+
         const token = localStorage.getItem("token");
         const response = await getAllUsers(token);
+
         if (response && response.data) {
           setUserData(response.data);
 
@@ -117,11 +120,23 @@ function ManageUser() {
         setSnackbarType("error");
         setOpenSnackbar(true);
       } finally {
-        setLoading(false);
+        if (isInitialLoad) {
+          setLoading(false); // Hide spinner after the first load
+          isInitialLoad = false; // Prevent further spinner displays
+        }
       }
     };
 
+    // Fetch users initially
     fetchUsers();
+
+    // Set up an interval to refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchUsers();
+    }, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Handle success message if present in the location state
