@@ -384,6 +384,20 @@ function VerifyCertificate() {
                         }}
                       />
 
+                      {/* Display Created At */}
+                      {certificateDetails?.file_hash && (
+                        <MDInput
+                          label="File Hash"
+                          variant="outlined"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          value={certificateDetails.file_hash}
+                          InputProps={{
+                            readOnly: true,
+                          }}
+                        />
+                      )}
+
                       {/* Display Updated At */}
                       <MDInput
                         label="Timestamp"
@@ -399,20 +413,6 @@ function VerifyCertificate() {
                           readOnly: true,
                         }}
                       />
-
-                      {/* Display Created At */}
-                      {certificateDetails?.file_hash && (
-                        <MDInput
-                          label="File Hash"
-                          variant="outlined"
-                          fullWidth
-                          sx={{ mb: 2 }}
-                          value={certificateDetails.file_hash}
-                          InputProps={{
-                            readOnly: true,
-                          }}
-                        />
-                      )}
 
                       {/* Display Status */}
                       <MDInput

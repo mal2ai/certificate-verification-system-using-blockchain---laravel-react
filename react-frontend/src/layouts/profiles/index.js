@@ -22,6 +22,12 @@ import Footer from "examples/Footer";
 // MDSnackbar component
 import MDSnackbar from "components/MDSnackbar";
 
+// Icons
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+
 // API functions
 import { getProfileDetails, updateProfileDetails, changePassword, deleteAccount } from "utils/api";
 
@@ -35,7 +41,11 @@ function ProfileForm({ onSave }) {
   const [institutionName, setInstitutionName] = useState(""); // To store the institution name
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingName, setLoadingName] = useState(false); // Loading state for name input
   const [loadingEmail, setLoadingEmail] = useState(false); // Loading state for email input
@@ -54,6 +64,10 @@ function ProfileForm({ onSave }) {
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   // Handle success message if present in the location state
   useEffect(() => {
@@ -182,7 +196,7 @@ function ProfileForm({ onSave }) {
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
     if (newPassword !== confirmPassword) {
-      alert("New password and confirm password do not match!");
+      setPasswordError("New password and confirm password do not match!");
       return;
     }
     if (token) {
@@ -204,8 +218,7 @@ function ProfileForm({ onSave }) {
         setSnackbarType("success");
         setOpenSnackbar(true);
       } catch (error) {
-        console.error("Error changing password:", error);
-        setSnackbarMessage("Error changing password.");
+        setSnackbarMessage(error.response.data.message);
         setSnackbarType("error");
         setOpenSnackbar(true);
       } finally {
@@ -428,49 +441,100 @@ function ProfileForm({ onSave }) {
                       <Grid item xs={12} md={8}>
                         <Card sx={{ height: "100%" }}>
                           <MDBox p={3}>
+                            {passwordError && ( // Conditionally render the error message
+                              <MDTypography variant="body2" color="error" mb={2}>
+                                {passwordError}
+                              </MDTypography>
+                            )}
                             <form onSubmit={handlePasswordSubmit}>
+                              {/* Current Password */}
                               <MDBox mb={3}>
                                 <MDInput
-                                  type="password"
+                                  type={showCurrentPassword ? "text" : "password"}
                                   label="Current Password"
                                   name="current_password"
-                                  value={currentPassword || ""}
+                                  value={currentPassword}
                                   onChange={(e) => setCurrentPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
-                                    endAdornment: loadingPassword ? (
-                                      <CircularProgress size={20} />
-                                    ) : null,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        {loadingPassword ? (
+                                          <CircularProgress size={20} />
+                                        ) : (
+                                          <IconButton
+                                            onClick={() => setShowCurrentPassword((prev) => !prev)}
+                                            edge="end"
+                                          >
+                                            {showCurrentPassword ? (
+                                              <VisibilityOff />
+                                            ) : (
+                                              <Visibility />
+                                            )}
+                                          </IconButton>
+                                        )}
+                                      </InputAdornment>
+                                    ),
                                   }}
                                 />
                               </MDBox>
+
+                              {/* New Password */}
                               <MDBox mb={3}>
                                 <MDInput
-                                  type="password"
+                                  type={showNewPassword ? "text" : "password"}
                                   label="New Password"
                                   name="new_password"
-                                  value={newPassword || ""}
+                                  value={newPassword}
                                   onChange={(e) => setNewPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
-                                    endAdornment: loadingPassword ? (
-                                      <CircularProgress size={20} />
-                                    ) : null,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        {loadingPassword ? (
+                                          <CircularProgress size={20} />
+                                        ) : (
+                                          <IconButton
+                                            onClick={() => setShowNewPassword((prev) => !prev)}
+                                            edge="end"
+                                          >
+                                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                          </IconButton>
+                                        )}
+                                      </InputAdornment>
+                                    ),
                                   }}
                                 />
                               </MDBox>
+
+                              {/* Confirm Password */}
                               <MDBox mb={3}>
                                 <MDInput
-                                  type="password"
+                                  type={showConfirmPassword ? "text" : "password"}
                                   label="Confirm Password"
                                   name="confirm_password"
-                                  value={confirmPassword || ""}
+                                  value={confirmPassword}
                                   onChange={(e) => setConfirmPassword(e.target.value)}
                                   fullWidth
                                   InputProps={{
-                                    endAdornment: loadingPassword ? (
-                                      <CircularProgress size={20} />
-                                    ) : null,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        {loadingPassword ? (
+                                          <CircularProgress size={20} />
+                                        ) : (
+                                          <IconButton
+                                            onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                            edge="end"
+                                          >
+                                            {showConfirmPassword ? (
+                                              <VisibilityOff />
+                                            ) : (
+                                              <Visibility />
+                                            )}
+                                          </IconButton>
+                                        )}
+                                      </InputAdornment>
+                                    ),
                                   }}
                                 />
                               </MDBox>

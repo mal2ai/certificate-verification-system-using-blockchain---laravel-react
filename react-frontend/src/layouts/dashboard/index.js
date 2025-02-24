@@ -171,13 +171,13 @@ function Dashboard() {
               <img
                 src={logo}
                 alt="Kolej Professional Baitumal Logo"
-                style={{ width: "70px", height: "70px", marginRight: "20px" }}
+                style={{ width: "65px", height: "65px", marginRight: "20px" }}
               />
               <MDBox>
-                <MDTypography variant="h5" fontWeight="bold">
+                <MDTypography variant="h5" fontWeight="bold" sx={{ fontSize: "1rem" }}>
                   Kolej Professional Baitumal Kuala Lumpur
                 </MDTypography>
-                <MDTypography variant="body2" mt={1}>
+                <MDTypography variant="body2" mt={1} sx={{ fontSize: "0.95rem" }}>
                   A cutting-edge certificate verification system powered by blockchain technology,
                   ensuring secure and tamper-proof authentication of academic and professional
                   credentials.

@@ -78,12 +78,19 @@ function VerifyCertificate() {
       let verifyTx, certificate;
 
       if (serialNumber) {
-        // If serial number is available, use verifyCertificate
-        verifyTx = await contract.methods.verifyCertificate(serialNumber, file_hash).send({
-          from: userAccount,
-          gas: 3000000,
-        });
-        console.log("Method Call: verifyCertificate-serial number");
+        try {
+          // If serial number is available, use verifyCertificate
+          verifyTx = await contract.methods.verifyCertificate(serialNumber, file_hash).send({
+            from: userAccount,
+            gas: 3000000,
+          });
+          console.log("Method Call: verifyCertificate-serial number");
+        } catch (error) {
+          setErrorMessage("Certificate not found.");
+          setVerificationAttempted(true);
+          setIsLoading(false);
+          return;
+        }
       } else if (file_hash) {
         console.log("Method Call: verifyCertificateByHash");
         try {
@@ -385,6 +392,16 @@ function VerifyCertificate() {
                               readOnly: true,
                             }}
                           />
+                          <MDInput
+                            label="Email"
+                            variant="outlined"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            value={status?.email || ""}
+                            InputProps={{
+                              readOnly: true,
+                            }}
+                          />
                           {status?.ic_number?.trim() && (
                             <MDInput
                               label="IC Number"
@@ -397,28 +414,20 @@ function VerifyCertificate() {
                               }}
                             />
                           )}
-                          <MDInput
-                            label="Email"
-                            variant="outlined"
-                            fullWidth
-                            sx={{ mb: 2 }}
-                            value={status?.email || ""}
-                            InputProps={{
-                              readOnly: true,
-                            }}
-                          />
-                          {certificateDetails?.serialNumber?.trim() && (
+
+                          {(certificateDetails?.serialNumber?.trim() || serial_number) && (
                             <MDInput
                               label="Serial Number"
                               variant="outlined"
                               fullWidth
                               sx={{ mb: 2 }}
-                              value={certificateDetails.serialNumber}
+                              value={certificateDetails?.serialNumber || serial_number}
                               InputProps={{
                                 readOnly: true,
                               }}
                             />
                           )}
+
                           {file_hash?.trim() && (
                             <MDInput
                               label="File Hash"
