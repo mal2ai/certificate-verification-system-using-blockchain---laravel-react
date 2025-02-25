@@ -9,6 +9,7 @@ import Card from "@mui/material/Card";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import { Tabs, Tab } from "@mui/material";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -41,8 +42,22 @@ function Status() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
 
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const pendingStatusData = statusData.filter((item) => item.status === "pending");
   const approvedStatusData = statusData.filter((item) => item.status === "approved");
+  const rejectedStatusData = statusData.filter((item) => item.status === "rejected");
+
+  const selectedRows =
+    selectedTab === 0
+      ? pendingStatusData
+      : selectedTab === 1
+      ? approvedStatusData
+      : rejectedStatusData;
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false); // Close the snackbar
@@ -209,69 +224,45 @@ function Status() {
     });
   };
 
-  // Handle View button click
-  // const handleView = (rowData) => {
-  //   if (rowData.status === "approved") {
-  //     navigate(`/view-certificate`, {
-  //       state: {
-  //         name: rowData.name,
-  //         email: rowData.email,
-  //         serial_number: rowData.serial_number,
-  //         status: rowData.status,
-  //       },
-  //     });
-  //   } else {
-  //     setSnackbarMessage("Your request has not been approved yet or has been rejected.");
-  //     setSnackbarType("error");
-  //     setOpenSnackbar(true);
-  //   }
-  // };
-
   // Handle Reject button click
   const handleReject = async (rowData) => {
     const token = localStorage.getItem("token");
     const updatedStatus = { status: "rejected" };
 
-    // Set loading state for Reject button only
+    // Set loading state for the specific row being rejected
     setStatusData((prevData) =>
       prevData.map((item) =>
-        item.serial_number === rowData.serial_number && item.email === rowData.email
-          ? { ...item, rejectLoading: true } // Set rejectLoading to true for this row
+        item.id === rowData.id
+          ? { ...item, rejectLoading: true } // Set rejectLoading to true
           : item
       )
     );
 
     try {
-      const response = await updateStatus(
-        rowData.serial_number,
-        rowData.email,
-        updatedStatus,
-        token
-      );
+      const response = await updateStatus(rowData.id, rowData.email, updatedStatus, token);
 
       if (response.data) {
         setStatusData((prevData) =>
           prevData.map((item) =>
-            item.serial_number === rowData.serial_number && item.email === rowData.email
-              ? { ...item, status: "rejected", rejectLoading: false } // Stop reject loading
+            item.id === rowData.id
+              ? { ...item, status: "rejected", rejectLoading: false } // Update status and stop loading
               : item
           )
         );
         setSnackbarMessage("Request has been rejected successfully.");
         setSnackbarType("success");
-        setOpenSnackbar(true);
+      } else {
+        throw new Error("Invalid response data");
       }
     } catch (error) {
       setSnackbarMessage("Failed to reject the request.");
       setSnackbarType("error");
+    } finally {
       setOpenSnackbar(true);
-      // Stop reject loading if there was an error
+
+      // Ensure loading state is reset in case of success or error
       setStatusData((prevData) =>
-        prevData.map((item) =>
-          item.serial_number === rowData.serial_number && item.email === rowData.email
-            ? { ...item, rejectLoading: false }
-            : item
-        )
+        prevData.map((item) => (item.id === rowData.id ? { ...item, rejectLoading: false } : item))
       );
     }
   };
@@ -327,8 +318,25 @@ function Status() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3}>
-        <Grid container spacing={6}>
+      <MDBox pt={3} pb={3}>
+        <Grid container spacing={6} justifyContent="center">
+          {/* Tabs Section */}
+          <Grid item xs={12} display="flex" justifyContent="center">
+            <Tabs
+              value={selectedTab}
+              onChange={handleTabChange}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="fullWidth"
+              sx={{ width: "100%", maxWidth: "1000px" }} // Adjust maxWidth as needed
+            >
+              <Tab label="Pending Requests" />
+              <Tab label="Approved Requests" />
+              <Tab label="Rejected Requests" />
+            </Tabs>
+          </Grid>
+
+          {/* Table Section */}
           <Grid item xs={12}>
             <Card>
               <MDBox
@@ -341,61 +349,13 @@ function Status() {
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
-                justifyContent="space-between"
-                alignItems="center"
+                flexDirection="column"
               >
                 <MDTypography variant="h6" color="dark">
-                  Pending Requests
+                  Verification Requests
                 </MDTypography>
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  onClick={() => navigate("/add-verify")}
-                >
-                  New Verify
-                </MDButton>
               </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{ columns, rows: pendingStatusData }}
-                    isSorted={true}
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
-          </Grid>
-        </Grid>
-      </MDBox>
 
-      <MDBox pb={3}>
-        <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <Card sx={{ mt: 4 }}>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Approved Requests
-                </MDTypography>
-              </MDBox>
               <MDBox pt={3}>
                 {loading ? (
                   <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
@@ -403,7 +363,10 @@ function Status() {
                   </div>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: approvedStatusData }}
+                    table={{
+                      columns,
+                      rows: selectedRows,
+                    }}
                     isSorted={true}
                     entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
                     showTotalEntries={true}

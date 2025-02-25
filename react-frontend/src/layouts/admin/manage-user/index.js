@@ -9,6 +9,7 @@ import Card from "@mui/material/Card";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import { Tabs, Tab } from "@mui/material";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -42,6 +43,12 @@ function ManageUser() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
+
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false); // Close the snackbar
@@ -167,54 +174,24 @@ function ManageUser() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={3} pb={3}>
         <Grid container spacing={6}>
-          {/* Table for user role */}
-          <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Manage Users
-                </MDTypography>
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  onClick={() => navigate("/admin/add-user")}
-                >
-                  Add User
-                </MDButton>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{ columns, rows: userRoleData }}
-                    isSorted={true}
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
+          {/* Tabs for Users and Admins */}
+          <Grid item xs={12} display="flex" justifyContent="center">
+            <Tabs
+              value={selectedTab}
+              onChange={handleTabChange}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="fullWidth"
+              sx={{ width: "100%", maxWidth: "800px" }} // Adjust maxWidth as needed
+            >
+              <Tab label="Users" />
+              <Tab label="Admins" />
+            </Tabs>
           </Grid>
 
-          {/* Table for admin role */}
+          {/* Conditionally render tables based on the selected tab */}
           <Grid item xs={12}>
             <Card>
               <MDBox
@@ -231,7 +208,7 @@ function ManageUser() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="dark">
-                  Manage Admins
+                  {selectedTab === 0 ? "Manage Users" : "Manage Admins"}
                 </MDTypography>
                 <MDButton
                   variant="gradient"
@@ -248,7 +225,10 @@ function ManageUser() {
                   </div>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: adminRoleData }}
+                    table={{
+                      columns,
+                      rows: selectedTab === 0 ? userRoleData : adminRoleData, // Toggle data
+                    }}
                     isSorted={true}
                     entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
                     showTotalEntries={true}

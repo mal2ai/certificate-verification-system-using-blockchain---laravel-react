@@ -9,6 +9,7 @@ import Card from "@mui/material/Card";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import { Tabs, Tab } from "@mui/material";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -38,7 +39,17 @@ function Logs() {
   // Notification state
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarType, setSnackbarType] = useState(""); // "success" or "error"
+  const [snackbarType, setSnackbarType] = useState("");
+
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  // Define tab labels
+  const tabLabels = ["Certificates", "Request", "Manage User", "User/Verify"];
+  const tabModules = ["Certificates", "Request", "Manage User", "User"];
+
+  const handleTabChange = (_, newValue) => {
+    setSelectedTab(newValue);
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false); // Close the snackbar
@@ -126,177 +137,85 @@ function Logs() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={3} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
+            {/* Tabs Section - Centered Tabs */}
+            <Grid item xs={12} display="flex" justifyContent="center">
+              <Tabs
+                value={selectedTab}
+                onChange={handleTabChange}
+                indicatorColor="primary"
+                textColor="primary"
+                variant="fullWidth"
+                sx={{ width: "100%", maxWidth: "1000px" }} // Adjust maxWidth if needed
               >
-                <MDTypography variant="h6" color="dark">
-                  Logs - Certificates
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{
-                      columns: columns.filter((column) => column.accessor !== "user_email"),
-                      rows: logData.filter((log) => log.module === "Certificates"), // Filter logs by module
-                    }}
-                    isSorted={true}
-                    defaultSortColumn="id"
-                    defaultSortDirection="desc"
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
+                {tabLabels.map((label, index) => (
+                  <Tab key={index} label={label} />
+                ))}
+              </Tabs>
+            </Grid>
 
-            <Card sx={{ marginTop: 5 }}>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Logs - Request
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{
-                      columns: columns.filter((column) => column.accessor !== "tx_hash"),
-                      rows: logData.filter((log) => log.module === "Request"), // Filter logs by "Request" module
-                    }}
-                    isSorted={true}
-                    defaultSortColumn="id"
-                    defaultSortDirection="desc"
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
-
-            <Card sx={{ marginTop: 5 }}>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Logs - Manage User
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{
-                      columns: columns.filter(
-                        (column) =>
-                          column.accessor !== "tx_hash" && column.accessor !== "serial_number"
-                      ),
-                      rows: logData.filter((log) => log.module === "Manage User"), // Filter logs by "Request" module
-                    }}
-                    isSorted={true}
-                    defaultSortColumn="id"
-                    defaultSortDirection="desc"
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
-
-            <Card sx={{ marginTop: 5 }}>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="white"
-                borderRadius="lg"
-                coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <MDTypography variant="h6" color="dark">
-                  Logs - User/Verify
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                {loading ? (
-                  <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                    <CircularProgress />
-                  </div>
-                ) : (
-                  <DataTable
-                    table={{
-                      columns: columns.filter((column) => column.accessor !== "admin_email"),
-
-                      rows: logData
-                        .filter((log) => log.module === "User")
-                        .map((log) => ({
-                          ...log,
-                          tx_hash: log.tx_hash ? log.tx_hash : "N/A",
-                        })),
-                    }}
-                    isSorted={true}
-                    defaultSortColumn="id"
-                    defaultSortDirection="desc"
-                    entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
-                    showTotalEntries={true}
-                    canSearch={true}
-                  />
-                )}
-              </MDBox>
-            </Card>
+            {/* Cards & Tables */}
+            {tabModules.map(
+              (module, index) =>
+                selectedTab === index && (
+                  <Card key={module} sx={{ marginTop: 5 }}>
+                    <MDBox
+                      mx={2}
+                      mt={-3}
+                      py={3}
+                      px={2}
+                      variant="gradient"
+                      bgColor="white"
+                      borderRadius="lg"
+                      coloredShadow="info"
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <MDTypography variant="h6" color="dark">
+                        Logs - {tabLabels[index]}
+                      </MDTypography>
+                    </MDBox>
+                    <MDBox pt={3}>
+                      {loading ? (
+                        <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                          <CircularProgress />
+                        </div>
+                      ) : (
+                        <DataTable
+                          table={{
+                            columns: columns.filter((column) => {
+                              if (module === "Certificates")
+                                return column.accessor !== "user_email";
+                              if (module === "Request") return column.accessor !== "tx_hash";
+                              if (module === "Manage User")
+                                return (
+                                  column.accessor !== "tx_hash" &&
+                                  column.accessor !== "serial_number"
+                                );
+                              if (module === "User") return column.accessor !== "admin_email";
+                              return true;
+                            }),
+                            rows: logData
+                              .filter((log) => log.module === module)
+                              .map((log) =>
+                                module === "User" ? { ...log, tx_hash: log.tx_hash || "N/A" } : log
+                              ),
+                          }}
+                          isSorted={true}
+                          defaultSortColumn="id"
+                          defaultSortDirection="desc"
+                          entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+                          showTotalEntries={true}
+                          canSearch={true}
+                        />
+                      )}
+                    </MDBox>
+                  </Card>
+                )
+            )}
           </Grid>
         </Grid>
       </MDBox>
