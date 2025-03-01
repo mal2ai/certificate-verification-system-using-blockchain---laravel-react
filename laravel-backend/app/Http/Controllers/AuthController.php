@@ -12,57 +12,44 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Mail\ActivationEmail;
 use Illuminate\Support\Facades\Mail;
+use PragmaRX\Google2FA\Google2FA;
 
 class AuthController extends Controller
 {
     // Login method
     public function login(Request $request)
     {
-        // Validate incoming request
-        $validated = $request->validate([
+        $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
-        try {
-            // Check if user exists
-            $user = User::where('email', $validated['email'])->first();
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-            if ($user) {
-                // Check if the status is inactive or banned
-                if ($user->status === 'inactive') {
-                    return response()->json(['message' => 'Your account is inactive. Please activate your account first before login again.'], 403);
-                }
-
-                if ($user->status === 'banned') {
-                    return response()->json(['message' => 'Your account is banned. Contact administrator for inquiry.'], 403);
-                }
-
-                // Check if the password is correct
-                if (Hash::check($validated['password'], $user->password)) {
-                    // Revoke previous tokens if any exist
-                    $user->tokens()->delete(); // Delete all existing tokens for the user
-
-                    // Create a new token
-                    $token = $user->createToken('API Token')->plainTextToken;
-
-                    return response()->json([
-                        'message' => 'Login successful',
-                        'token' => $token,
-                        'role' => $user->role,
-                    ], 200);
-                }
-
-                return response()->json(['message' => 'Invalid credentials'], 401);
-            }
-
-            return response()->json(['message' => 'User not found'], 404);
-
-        } catch (\Exception $e) {
-            Log::error('Login Error: ' . $e->getMessage());
-
-            return response()->json(['message' => 'An error occurred during login'], 500);
+        if (!$user || !Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
+
+        if ($user->is_2fa_enabled) {
+            // Generate a temporary token for verification
+            $tempToken = $user->createToken('mfa_token', ['mfa'])->plainTextToken;
+
+            return response()->json([
+                'mfa_required' => true,
+                'email' => $user->email,
+                'role' => $user->role,
+                'temp_token' => $tempToken, // Send temp token for MFA
+            ]);
+        }
+
+        // Issue permanent token if MFA is disabled
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'role' => $user->role,
+            'email' => $user->email,
+        ]);
     }
 
     public function register(Request $request)

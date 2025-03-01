@@ -8,6 +8,7 @@ use App\Http\Controllers\OTPController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\TwoFactorAuthController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -69,4 +70,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //logs management
     Route::post('/logs', [LogController::class, 'store']); // For creating a log
     Route::get('/logs', [LogController::class, 'index']);  // For fetching logs
+
+    // Enable 2FA
+    Route::post('/qr-2fa', [TwoFactorAuthController::class, 'qr2FA']);
+    Route::post('/enable-2fa', [TwoFactorAuthController::class, 'enable2FA']);
+    Route::post('/verify-2fa', [TwoFactorAuthController::class, 'verify2FA']);
+    Route::post('/mfa/disable', [TwoFactorAuthController::class, 'disable2FA']);
+    Route::get('/mfa/status', [TwoFactorAuthController::class, 'getMFAStatus']);
 });

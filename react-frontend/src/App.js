@@ -62,6 +62,7 @@ import Profile from "layouts/profiles/index";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
+import VerifyMFA from "layouts/authentication/Verify-MFA";
 
 //landing page
 import Landing from "layouts/landing/index";
@@ -239,6 +240,7 @@ export default function App() {
           }
         />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/verify-mfa" element={<VerifyMFA />} />
         {/* Protected Routes */}
         <Route
           path="/admin/certificates/add"

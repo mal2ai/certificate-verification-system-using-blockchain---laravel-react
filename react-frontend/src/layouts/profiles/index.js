@@ -29,7 +29,16 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 
 // API functions
-import { getProfileDetails, updateProfileDetails, changePassword, deleteAccount } from "utils/api";
+import {
+  getProfileDetails,
+  updateProfileDetails,
+  changePassword,
+  deleteAccount,
+  QR2FA,
+  enable2FA,
+  disable2FA,
+  getMFAStatus,
+} from "utils/api";
 
 function ProfileForm({ onSave }) {
   const [name, setName] = useState("");
@@ -54,8 +63,19 @@ function ProfileForm({ onSave }) {
   const [token, setToken] = useState(null);
   const [isDeleteClicked, setIsDeleteClicked] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [deleteCurrentPassword, setDeleteCurrentPassword] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  //MFA state
+  const [qrCode, setQrCode] = useState("");
+  const [secret, setSecret] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [google2faSecret, setGoogle2faSecret] = useState("");
+  const [mfaCurrentPassword, setMFACurrentPassword] = useState("");
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [mfaError, setMFAError] = useState("");
 
   // Notification state
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -67,6 +87,122 @@ function ProfileForm({ onSave }) {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  // Fetch MFA status on component mount
+  useEffect(() => {
+    const fetchMFAStatus = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found, skipping MFA status fetch.");
+        return;
+      }
+
+      try {
+        const response = await getMFAStatus(token);
+        setIs2FAEnabled(response.data.is_2fa_enabled);
+        setGoogle2faSecret(response.data.google2fa_secret);
+        console.log("MFA status:", response.data);
+      } catch (error) {
+        console.error("Error fetching MFA status:", error);
+      }
+    };
+
+    // Fetch immediately on mount
+    fetchMFAStatus();
+
+    // Set interval to fetch every 10 seconds
+    const interval = setInterval(() => {
+      fetchMFAStatus();
+    }, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleEnableMFA = async () => {
+    try {
+      const response = await QR2FA();
+      console.log("API Response:", response.data);
+
+      if (response.data.qr_code && typeof response.data.qr_code === "string") {
+        setQrCode(response.data.qr_code);
+        setSecret(response.data.secret);
+      } else {
+        console.error("Invalid response format:", response.data);
+      }
+    } catch (error) {
+      console.error("Error enabling MFA:", error);
+    }
+  };
+
+  const handleVerifyMFA = async () => {
+    try {
+      if (!mfaCode || mfaCode.length !== 6) {
+        alert("Please enter a valid 6-digit code.");
+        return;
+      }
+
+      const response = await enable2FA(mfaCode);
+
+      if (response.data.success) {
+        setSnackbarMessage("MFA enabled successfully!");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+        setIs2FAEnabled(true);
+      } else {
+        alert("Invalid code. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying MFA:", error);
+      alert(error.response?.data?.message || "Failed to verify MFA. Please try again.");
+    }
+  };
+
+  const handleShowPasswordInput = () => {
+    setShowPasswordInput(true);
+  };
+
+  const handleCancelDisableMFA = () => {
+    setShowPasswordInput(false);
+    setMFACurrentPassword("");
+    setMFAError("");
+  };
+
+  const handleDisableMFA = async () => {
+    const token = localStorage.getItem("token"); // Get the token first
+
+    if (!token) {
+      console.error("No token found, cannot disable MFA.");
+      alert("Authentication error. Please log in again.");
+      return;
+    }
+
+    if (!mfaCurrentPassword) {
+      setMFAError("Please enter your current password.");
+      return;
+    }
+
+    try {
+      const response = await disable2FA(token, mfaCurrentPassword); // Pass password
+
+      if (response.data.success) {
+        setSnackbarMessage("MFA has been disabled.");
+        setSnackbarType("success");
+        setOpenSnackbar(true);
+        setIs2FAEnabled(false);
+        setQrCode("");
+        setSecret("");
+        setMFACurrentPassword("");
+        setShowPasswordInput(false);
+      } else {
+        alert(response.data.message); // Show error message from API
+      }
+    } catch (error) {
+      console.error("Error disabling MFA:", error);
+      setMFAError(error.response?.data?.message || "An error occurred while disabling MFA.");
+    }
   };
 
   // Handle success message if present in the location state
@@ -238,7 +374,7 @@ function ProfileForm({ onSave }) {
     setDeleteError("");
 
     // Client-side validation for empty password
-    if (!currentPassword) {
+    if (!deleteCurrentPassword) {
       setDeleteError("Password cannot be empty.");
       setLoadingDelete(false);
       return;
@@ -246,7 +382,7 @@ function ProfileForm({ onSave }) {
 
     try {
       // Data to be sent to the API (e.g., current password)
-      const data = { current_password: currentPassword };
+      const data = { current_password: deleteCurrentPassword };
 
       // Call the deleteAccount function with the data and token
       await deleteAccount(data, token);
@@ -279,8 +415,10 @@ function ProfileForm({ onSave }) {
   };
 
   const cancelDelete = () => {
-    setIsDeleteClicked(false); // Hide input fields and show the "Delete Account" button again
+    setIsDeleteClicked(false);
     setConfirmDelete(false);
+    setDeleteCurrentPassword("");
+    setDeleteError("");
   };
 
   return (
@@ -551,6 +689,195 @@ function ProfileForm({ onSave }) {
                     <Divider sx={{ my: 3 }} />
                   </Grid>
 
+                  {/* MFA Section */}
+                  <Grid item xs={12}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={4}>
+                        <MDBox>
+                          <MDTypography variant="h5" fontWeight="medium">
+                            Multi-Factor Authentication (MFA)
+                          </MDTypography>
+                          <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                            Enable MFA for strong account security.
+                          </MDTypography>
+                        </MDBox>
+                      </Grid>
+
+                      <Grid item xs={12} md={8}>
+                        <Card sx={{ height: "100%" }}>
+                          <MDBox p={3}>
+                            {is2FAEnabled ? (
+                              <>
+                                <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                                  Your MFA is already{" "}
+                                  <span style={{ fontWeight: "bold" }}>enabled</span>. Use this
+                                  secret key for authentication:
+                                </MDTypography>
+
+                                <MDBox mb={2} display="flex" justifyContent="center" width="100%">
+                                  <MDTypography
+                                    variant="body2"
+                                    sx={{
+                                      backgroundColor: "#f5f5f5",
+                                      width: "100%",
+                                      padding: "8px",
+                                      borderRadius: "4px",
+                                      display: "inline-block",
+                                      fontWeight: "bold",
+                                      fontSize: "0.75rem",
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    {google2faSecret}
+                                  </MDTypography>
+                                </MDBox>
+
+                                {/* Show Password Input if the Disable Button is Clicked */}
+                                {showPasswordInput ? (
+                                  <>
+                                    <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                                      Provide your current password to continue disable MFA.
+                                    </MDTypography>
+                                    {mfaError && ( // Conditionally render the error message
+                                      <MDTypography variant="body2" color="error" mb={2}>
+                                        {mfaError}
+                                      </MDTypography>
+                                    )}
+                                    {/* Input for Current Password */}
+                                    <MDBox mt={2}>
+                                      <MDInput
+                                        type="password"
+                                        label="Enter Current Password"
+                                        variant="outlined"
+                                        fullWidth
+                                        value={mfaCurrentPassword}
+                                        onChange={(e) => setMFACurrentPassword(e.target.value)}
+                                      />
+                                    </MDBox>
+
+                                    {/* Buttons for Submit and Cancel */}
+                                    <MDBox display="flex" justifyContent="flex-end" mt={2} gap={2}>
+                                      <MDButton
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={handleCancelDisableMFA}
+                                      >
+                                        Cancel
+                                      </MDButton>
+
+                                      <MDButton
+                                        variant="gradient"
+                                        color="dark"
+                                        onClick={handleDisableMFA}
+                                      >
+                                        Save
+                                      </MDButton>
+                                    </MDBox>
+                                  </>
+                                ) : (
+                                  // Default Disable MFA Button
+                                  <MDButton
+                                    variant="gradient"
+                                    color="error"
+                                    onClick={handleShowPasswordInput}
+                                  >
+                                    Disable MFA
+                                  </MDButton>
+                                )}
+                              </>
+                            ) : qrCode ? (
+                              <>
+                                <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                                  Scan this QR Code with Google Authenticator:
+                                </MDTypography>
+                                <MDBox display="flex" justifyContent="center" width="100%">
+                                  <img
+                                    src={`data:image/svg+xml;base64,${qrCode}`}
+                                    alt="MFA QR Code"
+                                    style={{ maxWidth: "200px", height: "auto" }}
+                                  />
+                                </MDBox>
+
+                                <MDBox mt={2} display="flex" alignItems="center" gap={2}>
+                                  <MDTypography variant="body2" color="text">
+                                    Secret Key:
+                                  </MDTypography>
+                                  <MDTypography
+                                    variant="body2"
+                                    sx={{
+                                      backgroundColor: "#f5f5f5",
+                                      padding: "8px",
+                                      borderRadius: "4px",
+                                      display: "inline-block",
+                                      fontWeight: "bold",
+                                      fontSize: "0.75rem",
+                                      textAlign: "center",
+                                      width: "auto",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {secret}
+                                  </MDTypography>
+                                </MDBox>
+
+                                {/* Input for 6-digit Code */}
+                                <MDInput
+                                  label="Enter 6-digit Code"
+                                  variant="outlined"
+                                  fullWidth
+                                  value={mfaCode}
+                                  onChange={(e) => setMfaCode(e.target.value)}
+                                  sx={{ mt: 2 }}
+                                />
+
+                                {/* Buttons to Verify MFA Code and Cancel */}
+                                <MDBox
+                                  display="flex"
+                                  justifyContent="flex-end"
+                                  gap={2}
+                                  sx={{ mt: 2 }}
+                                >
+                                  <MDButton
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={() => {
+                                      setQrCode("");
+                                      setSecret("");
+                                      setMfaCode("");
+                                    }}
+                                  >
+                                    Cancel
+                                  </MDButton>
+
+                                  <MDButton
+                                    variant="gradient"
+                                    color="success"
+                                    onClick={handleVerifyMFA}
+                                  >
+                                    Enable MFA
+                                  </MDButton>
+                                </MDBox>
+                              </>
+                            ) : (
+                              <>
+                                <MDTypography variant="body2" color="text" mt={1} mb={2}>
+                                  By enabling this, you need to provide a Time-Based One-Time
+                                  Password (TOTP) in the Google Authenticator app whenever you log
+                                  in to your account.
+                                </MDTypography>
+
+                                <MDButton variant="gradient" color="dark" onClick={handleEnableMFA}>
+                                  Enable MFA
+                                </MDButton>
+                              </>
+                            )}
+                          </MDBox>
+                        </Card>
+                      </Grid>
+                    </Grid>
+                    <Divider sx={{ my: 3 }} />
+                  </Grid>
+
                   {/* Delete account Section */}
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
@@ -569,11 +896,12 @@ function ProfileForm({ onSave }) {
                           <MDBox p={3}>
                             <MDTypography variant="body2" color="text" mt={1} mb={2}>
                               Once your account is deleted, all of its resources and data will be
-                              permanently deleted. Before deleting your account, please download any
+                              permanently deleted. Before deleting your account, please save any
                               data or information that you wish to retain.
                             </MDTypography>
                             {!isDeleteClicked ? (
                               // Show the Delete Account button
+
                               <MDButton
                                 variant="gradient"
                                 color="error"
@@ -602,33 +930,35 @@ function ProfileForm({ onSave }) {
                                       <MDBox mb={3}>
                                         <MDInput
                                           type="password"
-                                          label="Current Password"
+                                          label="Enter Current Password"
                                           name="current_password"
-                                          value={currentPassword || ""}
-                                          onChange={(e) => setCurrentPassword(e.target.value)} // Update the currentPassword state
+                                          value={deleteCurrentPassword || ""}
+                                          onChange={(e) => setDeleteCurrentPassword(e.target.value)} // Update the currentPassword state
                                           fullWidth
                                         />
                                       </MDBox>
-                                      <MDBox display="flex" gap={2}>
-                                        <MDButton
-                                          variant="gradient"
-                                          color="secondary"
-                                          onClick={cancelDelete}
-                                        >
-                                          Cancel
-                                        </MDButton>
-                                        <MDButton
-                                          variant="gradient"
-                                          color="error"
-                                          type="submit"
-                                          disabled={loadingDelete}
-                                        >
-                                          {loadingDelete ? (
-                                            <CircularProgress size={20} />
-                                          ) : (
-                                            "Yes, Delete Account"
-                                          )}
-                                        </MDButton>
+                                      <MDBox display="flex" justifyContent="flex-end">
+                                        <MDBox display="flex" gap={2}>
+                                          <MDButton
+                                            variant="outlined"
+                                            color="secondary"
+                                            onClick={cancelDelete}
+                                          >
+                                            Cancel
+                                          </MDButton>
+                                          <MDButton
+                                            variant="gradient"
+                                            color="error"
+                                            type="submit"
+                                            disabled={loadingDelete}
+                                          >
+                                            {loadingDelete ? (
+                                              <CircularProgress size={20} />
+                                            ) : (
+                                              "Yes, Delete Account"
+                                            )}
+                                          </MDButton>
+                                        </MDBox>
                                       </MDBox>
                                     </MDBox>
                                   </form>

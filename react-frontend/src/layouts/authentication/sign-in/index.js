@@ -70,32 +70,27 @@ const Basic = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading spinner
+    setIsLoading(true);
 
     try {
       const response = await login({ email, password });
 
-      if (response.data && response.data.token) {
-        const { token, role } = response.data;
-
-        localStorage.setItem("token", token);
+      if (response.data.mfa_required) {
         localStorage.setItem("email", email);
-        localStorage.setItem("role", role);
-
-        navigate(role === "user" ? "/status" : "/admin/dashboard");
-      } else if (response.data && response.data.message) {
-        setError(response.data.message);
+        localStorage.setItem("temp_token", response.data.temp_token); // Store temporary token
+        navigate("/verify-mfa"); // Redirect to MFA verification page
+      } else if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("role", response.data.role);
+        localStorage.setItem("email", response.data.email);
+        navigate(response.data.role === "user" ? "/status" : "/admin/dashboard");
       } else {
-        setError("Invalid login credentials. Please check your email and password.");
+        setError("Invalid login credentials.");
       }
     } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("An error occurred during login. Please try again.");
-      }
+      setError(err.response?.data?.message || "An error occurred during login.");
     } finally {
-      setIsLoading(false); // Stop loading spinner
+      setIsLoading(false);
     }
   };
 

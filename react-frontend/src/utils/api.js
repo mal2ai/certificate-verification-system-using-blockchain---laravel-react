@@ -291,4 +291,59 @@ export const getLogs = (token) => {
   });
 };
 
+//enable MFA
+export const QR2FA = () => {
+  return api.post(
+    "/qr-2fa",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
+
+export const enable2FA = (code) => {
+  return api.post(
+    "/enable-2fa",
+    { code },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
+
+export const verify2FA = async (code, tempToken) => {
+  return api.post(
+    "/verify-2fa",
+    { code }, // Only send the OTP code
+    { headers: { Authorization: `Bearer ${tempToken}` } } // Attach temp token for user identification
+  );
+};
+
+// Disable MFA
+export const disable2FA = async (token, currentPassword) => {
+  return api.post(
+    "/mfa/disable",
+    { current_password: currentPassword }, // Send current password in the request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+// Get MFA status
+export const getMFAStatus = async (token) => {
+  return api.get("/mfa/status", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default api;
