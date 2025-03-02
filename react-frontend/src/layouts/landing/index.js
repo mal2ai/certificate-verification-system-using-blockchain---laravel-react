@@ -423,9 +423,9 @@ const LandingPage = () => {
               Step 7: Insert OTP Code
             </Typography>
             <Typography variant="body2" sx={{ color: "gray" }}>
-              Click the VIEW button at the request you have been made to insert the OTP code that
-              you received by email. Then click the{" "}
-              <span style={{ color: "#808080", fontWeight: "bold" }}>VERIFY</span> button.
+              Click the <span style={{ color: "#808080", fontWeight: "bold" }}>VIEW</span> button at
+              the request you have been made to insert the OTP code that you received by email. Then
+              click the <span style={{ color: "#808080", fontWeight: "bold" }}>VERIFY</span> button.
             </Typography>
           </Grid>
         </Grid>

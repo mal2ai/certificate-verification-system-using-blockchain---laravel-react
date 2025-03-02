@@ -58,6 +58,7 @@ function Logs() {
   // Columns for the DataTable
   const columns = [
     { Header: "ID", accessor: "id" },
+    { Header: "Request ID", accessor: "req_id" },
     { Header: "User Email", accessor: "user_email" },
     { Header: "Admin Email", accessor: "admin_email" },
     { Header: "Serial Number", accessor: "serial_number" },
@@ -188,14 +189,21 @@ function Logs() {
                           table={{
                             columns: columns.filter((column) => {
                               if (module === "Certificates")
-                                return column.accessor !== "user_email";
-                              if (module === "Request") return column.accessor !== "tx_hash";
+                                return (
+                                  column.accessor !== "user_email" && column.accessor !== "req_id"
+                                );
+                              if (module === "Request")
+                                return column.accessor !== "tx_hash" && column.accessor !== "id";
                               if (module === "Manage User")
                                 return (
                                   column.accessor !== "tx_hash" &&
-                                  column.accessor !== "serial_number"
+                                  column.accessor !== "serial_number" &&
+                                  column.accessor !== "req_id"
                                 );
-                              if (module === "User") return column.accessor !== "admin_email";
+                              if (module === "User")
+                                return (
+                                  column.accessor !== "admin_email" && column.accessor !== "req_id"
+                                );
                               return true;
                             }),
                             rows: logData

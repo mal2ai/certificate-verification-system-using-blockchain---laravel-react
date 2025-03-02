@@ -286,6 +286,7 @@ function Status() {
                     isSorted={true}
                     entriesPerPage={true}
                     showTotalEntries={true}
+                    canSearch={true}
                     noEndBorder
                   />
                 )}

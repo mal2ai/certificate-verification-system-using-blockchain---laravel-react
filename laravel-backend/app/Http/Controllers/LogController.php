@@ -11,6 +11,7 @@ class LogController extends Controller
     {
         // Validate incoming request
         $validated = $request->validate([
+            'req_id' => 'nullable|int',
             'admin_email' => 'nullable|email',
             'user_email' => 'nullable|email',
             'action' => 'required|string',

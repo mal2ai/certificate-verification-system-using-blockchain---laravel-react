@@ -10,6 +10,7 @@ class Log extends Model
     use HasFactory;
 
     protected $fillable = [
+        'req_id',
         'admin_email',
         'user_email',
         'action',

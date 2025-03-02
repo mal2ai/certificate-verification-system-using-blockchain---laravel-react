@@ -241,7 +241,21 @@ function Status() {
     try {
       const response = await updateStatus(rowData.id, rowData.email, updatedStatus, token);
 
-      if (response.data) {
+      if (response?.data) {
+        // Create a log after successful rejection
+        const userEmail = localStorage.getItem("email");
+        const logData = {
+          req_id: rowData.id,
+          admin_email: userEmail,
+          user_email: rowData.email,
+          action: "Rejecting",
+          module: "Request",
+          serial_number: rowData.serial_number || "N/A", // Use serial_number if available
+          tx_hash: rowData.tx_hash || "N/A", // Use tx_hash if available
+          status: "Success",
+        };
+        await createLog(logData, token);
+
         setStatusData((prevData) =>
           prevData.map((item) =>
             item.id === rowData.id
@@ -255,6 +269,7 @@ function Status() {
         throw new Error("Invalid response data");
       }
     } catch (error) {
+      console.error("Error in handleReject:", error);
       setSnackbarMessage("Failed to reject the request.");
       setSnackbarType("error");
     } finally {
@@ -286,6 +301,20 @@ function Status() {
         const otpResponse = await sendOTP(rowData.email, rowData.id, token);
 
         if (otpResponse?.data) {
+          // Create a log after successful approval
+          const userEmail = localStorage.getItem("email");
+          const logData = {
+            req_id: rowData.id,
+            admin_email: userEmail,
+            user_email: rowData.email,
+            action: "Approving",
+            module: "Request",
+            serial_number: rowData.serial_number || "N/A", // Use serial_number if available
+            tx_hash: rowData.tx_hash || "N/A", // Use tx_hash if available
+            status: "Success",
+          };
+          await createLog(logData, token);
+
           setSnackbarMessage("Request approved and OTP sent successfully.");
           setSnackbarType("success");
           setOpenSnackbar(true);

@@ -346,7 +346,7 @@ function VerifyCertificate() {
                   coloredShadow="info"
                 >
                   <MDTypography variant="h6" color="dark">
-                    Upload File
+                    Upload Certificate PDF File (original copy)
                   </MDTypography>
                 </MDBox>
                 <MDBox p={3}>
