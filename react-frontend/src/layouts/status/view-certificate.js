@@ -142,6 +142,7 @@ function VerifyCertificate() {
       const token = localStorage.getItem("token");
       const userEmail = localStorage.getItem("email");
       const logData = {
+        req_id: id,
         user_email: userEmail,
         action: "Verify",
         module: "User",

@@ -121,11 +121,13 @@ function VerifyCertificate() {
 
       const adminEmail = localStorage.getItem("email");
       const logData = {
+        req_id: certificateDetails?.id,
         user_email: certificateDetails?.email,
         admin_email: adminEmail,
         action: "Delete",
         module: "Request",
         status_id: certificateDetails?.id,
+        serial_number: certificateDetails?.serial_number || serialNumber,
         status: "Success",
       };
       await createLog(logData, token);
@@ -155,6 +157,7 @@ function VerifyCertificate() {
       // Log and Snackbar message
       const adminEmail = localStorage.getItem("email");
       const logData = {
+        req_id: certificateDetails?.id,
         user_email: certificateDetails?.email,
         admin_email: adminEmail,
         action: "Resend OTP",
@@ -601,7 +604,8 @@ function VerifyCertificate() {
             disabled={
               isResendingOTP ||
               certificateDetails?.status === "pending" ||
-              certificateDetails?.status === "rejected"
+              certificateDetails?.status === "rejected" ||
+              certificateDetails?.status === "not found"
             }
           >
             {isResendingOTP ? <CircularProgress size={24} color="inherit" /> : "Resend OTP"}
@@ -624,7 +628,10 @@ function VerifyCertificate() {
             color="info"
             sx={{ maxWidth: 200 }}
             onClick={handleViewCertificate}
-            disabled={!(certificateDetails?.serial_number || serialNumber)}
+            disabled={
+              !(certificateDetails?.serial_number || serialNumber) ||
+              certificateDetails?.status === "not found"
+            }
           >
             View Certificate
           </MDButton>

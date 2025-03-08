@@ -21,6 +21,8 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
+import { getBlockchain } from "utils/blockchain";
+
 function VerifyCertificate() {
   const navigate = useNavigate();
   const [serialNumber, setSerialNumber] = useState(""); // State for serial number
@@ -67,28 +69,54 @@ function VerifyCertificate() {
     if (!name || !serialNumber || !icNumber) {
       setStatusMessage("Please fill in all required fields and upload a file.");
       setIsLoading(false);
-      return; // Stop the function if required fields or file is empty
+      return;
     }
 
     try {
+      const { userAccount, contract } = await getBlockchain();
+      let status = "pending"; // Default status
+
+      // Check if the certificate exists in the blockchain
+      try {
+        await contract.methods.verifyCertificate(serialNumber).send({
+          from: userAccount,
+          gas: 3000000,
+        });
+        console.log("Method Call: verifyCertificate - Serial Number Found");
+      } catch (error) {
+        console.error("Certificate not found in blockchain.");
+        setErrorMessage("Certificate not found.");
+        setIsLoading(false);
+        status = "not found"; // Update status if certificate doesn't exist
+      }
+
       // Prepare data to send in the API request
       const data = {
         name,
         email,
         serial_number: serialNumber,
         ic_number: icNumber,
-        status: "pending", // Default status as pending
+        status: status, // Set the status based on verification result
       };
 
-      const token = localStorage.getItem("token"); // Get token from localStorage
+      const token = localStorage.getItem("token");
 
-      // Call storeStatus API function to store the status and file hash
-      await storeBySerialNumber(data, token);
+      // Call storeBySerialNumber API function and get the response
+      const response = await storeBySerialNumber(data, token);
+
+      // Extract the ID from the response
+      const requestId = response.data.data.id; // Ensure response contains the new request ID
+
+      if (!requestId) {
+        throw new Error("Request ID not found in response.");
+      }
+
       setStatusMessage("Status stored successfully.");
 
-      // Create a log after successful registration
+      // Create a log after successful request
       const userEmail = localStorage.getItem("email");
       const logData = {
+        req_id: requestId, // Use the retrieved request ID
         user_email: userEmail,
         action: "New Request",
         module: "User",
@@ -97,22 +125,20 @@ function VerifyCertificate() {
       };
       await createLog(logData, token);
 
-      // Check the role from localStorage
-      const role = localStorage.getItem("role"); // Get the role from localStorage
-
-      // Conditionally navigate based on the role
+      // Navigate based on role
+      const role = localStorage.getItem("role");
       if (role === "admin") {
         navigate("/admin/request", { state: { successMessage: "Request Sent Successfully!" } });
       } else if (role === "user") {
         navigate("/status", { state: { successMessage: "Request Sent Successfully!" } });
       } else {
-        // Optional: handle if role is not found (e.g., redirect to login)
         navigate("/login");
       }
     } catch (error) {
       setStatusMessage("Failed to store status.");
+      console.error("Failed to store status:", error);
     } finally {
-      setIsLoading(false); // Stop loading state
+      setIsLoading(false);
     }
   };
 
@@ -152,54 +178,72 @@ function VerifyCertificate() {
     if (!file) {
       setStatusMessage("Please fill in all required fields and upload a file.");
       setIsLoading(false);
-      return; // Stop the function if required fields or file is empty
+      return;
     }
 
     try {
       // Hash the file before sending the request
       const fileHash = await hashFile(file);
+      const { userAccount, contract } = await getBlockchain();
+      let status = "pending"; // Default status
+
+      // Check if the certificate exists in the blockchain using file hash
+      try {
+        await contract.methods.verifyCertificateByHash(fileHash).send({
+          from: userAccount,
+          gas: 3000000,
+        });
+        console.log("Method Call: verifyCertificateByHash - File Hash Found");
+      } catch (error) {
+        console.error("Certificate not found in blockchain.");
+        setErrorMessage("Certificate not found.");
+        setIsLoading(false);
+        status = "not found"; // Update status if certificate doesn't exist
+      }
 
       // Prepare data to send in the API request
       const data = {
         name,
         email,
         file_hash: fileHash, // Add the file hash
-        status: "pending", // Default status as pending
+        status: status, // Set the status based on verification result
       };
 
-      const token = localStorage.getItem("token"); // Get token from localStorage
+      const token = localStorage.getItem("token");
 
-      // Call storeStatus API function to store the status and file hash
-      await storeByFileHash(data, token);
+      // Call storeByFileHash API function
+      const response = await storeByFileHash(data, token);
+
+      const requestId = response.data.data.id;
+
       setStatusMessage("Status stored successfully.");
 
-      // Create a log after successful registration
+      // Create a log after successful request
       const userEmail = localStorage.getItem("email");
       const logData = {
+        req_id: requestId,
         user_email: userEmail,
         action: "New Request",
         module: "User",
-        serial_number: serialNumber,
+        file_hash: fileHash,
         status: "Success",
       };
       await createLog(logData, token);
 
-      // Check the role from localStorage
-      const role = localStorage.getItem("role"); // Get the role from localStorage
-
-      // Conditionally navigate based on the role
+      // Navigate based on role
+      const role = localStorage.getItem("role");
       if (role === "admin") {
         navigate("/admin/request", { state: { successMessage: "Request Sent Successfully!" } });
       } else if (role === "user") {
         navigate("/status", { state: { successMessage: "Request Sent Successfully!" } });
       } else {
-        // Optional: handle if role is not found (e.g., redirect to login)
         navigate("/login");
       }
     } catch (error) {
       setStatusMessage("Failed to store status.");
+      console.error("Failed to store status:", error);
     } finally {
-      setIsLoading(false); // Stop loading state
+      setIsLoading(false);
     }
   };
 

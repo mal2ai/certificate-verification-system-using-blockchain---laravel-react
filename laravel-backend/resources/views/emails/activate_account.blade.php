@@ -73,7 +73,7 @@
     <div class="email-container">
         <!-- Header -->
         <div class="header">
-        <img src="https://www.kpbkl.edu.my/2025/wp-content/uploads/2024/08/kpbkl-logo-horizontal.webp" alt="Kolej Professional Baitumal Logo" style="max-width: 200px; width: 100%; height: auto;" />
+        <img src="https://i.imgur.com/SF9k5qz.png" alt="Kolej Professional Baitumal Logo" style="height: 70px;width: 70px;">
             <h1>
                 <span style="color: red;">Kolej Professional Baitumal</span>
                 <span style="color: black;">Kuala Lumpur</span>

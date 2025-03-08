@@ -62,6 +62,7 @@ class StatusController extends Controller
                 'email' => 'required|email',
                 'serial_number' => 'required|string|max:255',
                 'ic_number' => 'required|string|max:20',
+                'status' => 'required|string|max:20',
             ]);
 
             \Log::info('Validation passed for serial number', $validated);
@@ -72,14 +73,14 @@ class StatusController extends Controller
                 'email' => $validated['email'],
                 'serial_number' => $validated['serial_number'],
                 'ic_number' => $validated['ic_number'],
-                'status' => 'pending',
+                'status' => $validated['status'],
             ]);
 
             \Log::info('Status created successfully by serial number', $status->toArray());
 
             return response()->json([
                 'message' => 'Verification request created successfully (Serial Number)',
-                'status' => 'pending',
+                'status' => $validated['status'],
                 'data' => $status,
             ], 201);
         } catch (\Throwable $e) {
@@ -101,6 +102,7 @@ class StatusController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email',
                 'file_hash' => 'required|string|max:64', // Hash must be 64 characters for SHA-256
+                'status' => 'required|string|max:20',
             ]);
 
             \Log::info('Validation passed for file hash', $validated);
@@ -110,14 +112,14 @@ class StatusController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'file_hash' => $validated['file_hash'],
-                'status' => 'pending',
+                'status' => $validated['status'],
             ]);
 
             \Log::info('Status created successfully by file hash', $status->toArray());
 
             return response()->json([
                 'message' => 'Verification request created successfully (File Hash)',
-                'status' => 'pending',
+                'status' => $validated['status'],
                 'data' => $status,
             ], 201);
         } catch (\Throwable $e) {

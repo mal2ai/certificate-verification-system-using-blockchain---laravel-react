@@ -28,7 +28,8 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import { login } from "utils/api";
 
 // Images
-import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+const bgImage =
+  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 const Basic = () => {
   const location = useLocation();

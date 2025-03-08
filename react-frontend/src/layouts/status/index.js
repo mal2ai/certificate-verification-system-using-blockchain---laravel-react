@@ -196,35 +196,42 @@ function Status() {
     {
       Header: "Actions",
       accessor: "actions",
-      Cell: ({ row }) => (
-        <div>
-          {/* Edit button */}
-          <MDButton
-            variant="outlined"
-            color="info"
-            onClick={() => handleEdit(row.original)}
-            style={{ marginRight: "10px" }}
-            size="small"
-            disabled={row.original.status === "approved" || row.original.status === "rejected"}
-          >
-            Edit
-          </MDButton>
+      Cell: ({ row }) => {
+        // Hide buttons if status is "not found"
+        if (row.original.status === "not found") {
+          return <span style={{ color: "red", fontWeight: "bold" }}>Certificate Not Found</span>;
+        }
 
-          {/* View button */}
-          <MDButton
-            variant="outlined"
-            color="success"
-            onClick={() => {
-              setSelectedRow(row.original); // Store row data
-              setIsOtpModalOpen(true); // Open OTP modal
-            }}
-            size="small"
-            disabled={row.original.status === "pending" || row.original.status === "rejected"}
-          >
-            View
-          </MDButton>
-        </div>
-      ),
+        return (
+          <div>
+            {/* Edit button */}
+            <MDButton
+              variant="outlined"
+              color="info"
+              onClick={() => handleEdit(row.original)}
+              style={{ marginRight: "10px" }}
+              size="small"
+              disabled={row.original.status === "approved" || row.original.status === "rejected"}
+            >
+              Edit
+            </MDButton>
+
+            {/* View button */}
+            <MDButton
+              variant="outlined"
+              color="success"
+              onClick={() => {
+                setSelectedRow(row.original); // Store row data
+                setIsOtpModalOpen(true); // Open OTP modal
+              }}
+              size="small"
+              disabled={row.original.status === "pending" || row.original.status === "rejected"}
+            >
+              View
+            </MDButton>
+          </div>
+        );
+      },
     },
   ];
 

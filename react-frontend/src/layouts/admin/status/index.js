@@ -47,13 +47,16 @@ function Status() {
   const pendingStatusData = statusData.filter((item) => item.status === "pending");
   const approvedStatusData = statusData.filter((item) => item.status === "approved");
   const rejectedStatusData = statusData.filter((item) => item.status === "rejected");
+  const notFoundStatusData = statusData.filter((item) => item.status === "not found");
 
   const selectedRows =
     selectedTab === 0
       ? pendingStatusData
       : selectedTab === 1
       ? approvedStatusData
-      : rejectedStatusData;
+      : selectedTab === 2
+      ? rejectedStatusData
+      : notFoundStatusData;
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -106,6 +109,7 @@ function Status() {
             disabled={
               row.original.status === "approved" ||
               row.original.status === "rejected" ||
+              row.original.status === "not found" ||
               row.original.rejectLoading
             }
           >
@@ -122,6 +126,7 @@ function Status() {
             disabled={
               row.original.status === "approved" ||
               row.original.status === "rejected" ||
+              row.original.status === "not found" ||
               row.original.approveLoading
             }
           >
@@ -362,6 +367,7 @@ function Status() {
               <Tab label="Pending Requests" />
               <Tab label="Approved Requests" />
               <Tab label="Rejected Requests" />
+              <Tab label="Not Found Requests" />
             </Tabs>
           </Grid>
 

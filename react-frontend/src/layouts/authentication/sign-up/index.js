@@ -26,9 +26,11 @@ import MDButton from "components/MDButton";
 
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
+import TermsAndConditions from "components/TermsAndConditions";
 
 // Images
-import bgImage from "assets/images/bg-sign-up-cover.jpeg";
+const bgImage =
+  "https://images.unsplash.com/photo-1435575653489-b0873ec954e2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 function Cover() {
   const [name, setName] = useState("");
@@ -45,6 +47,8 @@ function Cover() {
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
   const navigate = useNavigate();
+
+  const [openModal, setOpenModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -273,10 +277,13 @@ function Cover() {
               </MDTypography>
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
+              {/* Checkbox */}
               <Checkbox
                 checked={termsChecked}
                 onChange={(e) => setTermsChecked(e.target.checked)}
               />
+
+              {/* Text "I agree to the" */}
               <MDTypography
                 variant="button"
                 fontWeight="regular"
@@ -286,28 +293,22 @@ function Cover() {
               >
                 &nbsp;&nbsp;I agree to the&nbsp;
               </MDTypography>
+
+              {/* Terms and Conditions Link (Now Opens Modal) */}
               <MDTypography
-                component="a"
-                href="#"
                 variant="button"
                 fontWeight="bold"
                 color="dark"
                 textGradient
+                sx={{ cursor: "pointer", textDecoration: "none" }}
+                onClick={() => setOpenModal(true)} // Open modal on click
               >
                 Terms and Conditions
               </MDTypography>
             </MDBox>
-            <MDBox mt={4} mb={1}>
-              <MDButton
-                variant="gradient"
-                color="dark"
-                fullWidth
-                type="submit"
-                disabled={loading} // Disable button during loading
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : "Sign up"}
-              </MDButton>
-            </MDBox>
+
+            {/* Terms and Conditions Modal */}
+            <TermsAndConditions open={openModal} onClose={() => setOpenModal(false)} />
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
                 Already have an account?{" "}

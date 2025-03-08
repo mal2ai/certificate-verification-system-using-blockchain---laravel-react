@@ -64,6 +64,10 @@ import SignUp from "layouts/authentication/sign-up";
 import Status from "layouts/status";
 import VerifyMFA from "layouts/authentication/Verify-MFA";
 
+//reminder import
+import DataPolicyReminder from "components/Reminder/reminder";
+import TermsAndConditions from "components/TermsAndConditions/index";
+
 //landing page
 import Landing from "layouts/landing/index";
 
@@ -178,6 +182,7 @@ export default function App() {
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
+        <DataPolicyReminder />
 
         {layout === "dashboard" && isAuthenticated && pathname !== "/" && (
           <>
@@ -207,6 +212,7 @@ export default function App() {
   ) : (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
+      <DataPolicyReminder />
       {layout === "dashboard" && isAuthenticated && pathname !== "/" && (
         <>
           <Sidenav
@@ -230,6 +236,7 @@ export default function App() {
         {getRoutes(filteredRoutes)} {/* Use filtered routes */}
         <Route path="*" element={<Navigate to="/sign-in" />} />
         <Route path="/" element={<Landing />} />
+        <Route path="/termsandconditons" element={<TermsAndConditions />} />
         <Route
           path="/sign-in"
           element={

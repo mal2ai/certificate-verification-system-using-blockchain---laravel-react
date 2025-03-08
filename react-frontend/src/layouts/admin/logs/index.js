@@ -202,15 +202,20 @@ function Logs() {
                                 );
                               if (module === "User")
                                 return (
-                                  column.accessor !== "admin_email" && column.accessor !== "req_id"
+                                  column.accessor !== "admin_email" &&
+                                  column.accessor !== "id" &&
+                                  column.accessor !== "tx_hash"
                                 );
                               return true;
                             }),
                             rows: logData
                               .filter((log) => log.module === module)
-                              .map((log) =>
-                                module === "User" ? { ...log, tx_hash: log.tx_hash || "N/A" } : log
-                              ),
+                              .map((log) => {
+                                if (module === "User" || module === "Request") {
+                                  return { ...log, serial_number: log.serial_number || "N/A" };
+                                }
+                                return log;
+                              }),
                           }}
                           isSorted={true}
                           defaultSortColumn="id"

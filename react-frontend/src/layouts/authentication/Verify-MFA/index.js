@@ -10,40 +10,58 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Stack,
 } from "@mui/material";
 
 const VerifyMFA = () => {
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Handle OTP input change
+  const handleChange = (index, value) => {
+    if (!/^\d*$/.test(value)) return; // Allow only numbers
+
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1); // Only allow one character per input
+    setOtp(newOtp);
+
+    // Move focus to the next input field if a number is entered
+    if (value && index < otp.length - 1) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
+  };
+
+  // Cancel and clear session
   const handleCancel = () => {
     localStorage.removeItem("temp_token");
     localStorage.removeItem("email");
     navigate("/");
   };
 
+  // Handle OTP verification
   const handleVerifyMFA = async () => {
     setError("");
     setLoading(true);
 
-    const tempToken = localStorage.getItem("temp_token"); // Retrieve temporary token
+    const tempToken = localStorage.getItem("temp_token");
+    const enteredOtp = otp.join(""); // Convert array to string
 
-    if (!otp || otp.length !== 6) {
+    if (enteredOtp.length !== 6) {
       setError("Please enter a valid 6-digit code.");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await verify2FA(otp, tempToken); // Call the API function
+      const response = await verify2FA(enteredOtp, tempToken);
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("email", response.data.email);
-        localStorage.removeItem("temp_token"); // Remove temp token
+        localStorage.removeItem("temp_token");
 
         navigate(response.data.role === "user" ? "/status" : "/admin/dashboard");
       } else {
@@ -64,13 +82,16 @@ const VerifyMFA = () => {
       minHeight="100vh"
       bgcolor="#f4f4f4"
     >
-      <Card sx={{ width: 400, p: 3, borderRadius: 2, boxShadow: 3 }}>
+      <Card sx={{ width: 400, p: 3, borderRadius: 2, boxShadow: 3, textAlign: "center" }}>
         <CardContent>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Enter MFA Code
+          <Box mb={2}>
+            <img src="/logo.png" alt="Logo" style={{ height: 60 }} />
+          </Box>
+          <Typography variant="h6" fontWeight="bold">
+            Two Step Verification
           </Typography>
-          <Typography variant="body2" color="textSecondary" gutterBottom sx={{ mb: 2 }}>
-            Check your authenticator app and enter the 6-digit code.
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            Enter the OTP code from your google authenticator app.
           </Typography>
 
           {error && (
@@ -79,30 +100,36 @@ const VerifyMFA = () => {
             </Alert>
           )}
 
-          <TextField
-            fullWidth
-            type="text"
-            label="6-digit Code"
-            variant="outlined"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            inputProps={{ maxLength: 6 }}
-            sx={{ mb: 2 }}
-          />
+          <Stack direction="row" justifyContent="center" spacing={1} sx={{ mb: 2 }}>
+            {otp.map((digit, index) => (
+              <TextField
+                key={index}
+                id={`otp-${index}`}
+                type="text"
+                variant="outlined"
+                value={digit}
+                onChange={(e) => handleChange(index, e.target.value)}
+                inputProps={{
+                  maxLength: 1,
+                  style: { textAlign: "center", fontSize: 20, width: 50, height: 30 },
+                }}
+              />
+            ))}
+          </Stack>
 
           {/* Buttons: Cancel & Verify */}
-          <Box display="flex" justifyContent="space-between" gap={2} mt={2}>
+          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             <Button
               variant="outlined"
               color="secondary"
               fullWidth
               onClick={handleCancel}
               sx={{
-                borderColor: "secondary.main", // Ensures visible border
-                color: "secondary.main", // Ensures visible text
+                borderColor: "secondary.main",
+                color: "secondary.main",
                 "&:hover": {
-                  bgcolor: "secondary.light", // Light background on hover
-                  borderColor: "secondary.dark", // Darker border on hover
+                  bgcolor: "secondary.light",
+                  borderColor: "secondary.dark",
                 },
               }}
             >
@@ -114,16 +141,22 @@ const VerifyMFA = () => {
               fullWidth
               sx={{
                 bgcolor: loading ? "primary.light" : "primary.main",
-                color: "#ffffff !important",
+                color: "#ffffff",
                 "&:hover": { bgcolor: "primary.dark" },
-                "&.Mui-disabled": { bgcolor: "primary.light", opacity: 0.7 },
               }}
               onClick={handleVerifyMFA}
               disabled={loading}
             >
               {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Verify"}
             </Button>
-          </Box>
+          </Stack>
+
+          {/* <Typography variant="body2" sx={{ mt: 2 }}>
+            Didn&apos;t get the code?{" "}
+            <Button variant="text" sx={{ textTransform: "none", fontWeight: "bold" }}>
+              Resend
+            </Button>
+          </Typography> */}
         </CardContent>
       </Card>
     </Box>
