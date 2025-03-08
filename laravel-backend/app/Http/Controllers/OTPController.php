@@ -118,6 +118,7 @@ class OTPController extends Controller
             // Clear the OTP and status_id after successful verification
             $user->otp_code = null;
             $user->status_id = null;
+            $user->otp_sent_at = null;
             $user->save();
 
             return response()->json(['message' => 'OTP verified successfully!'], 200);

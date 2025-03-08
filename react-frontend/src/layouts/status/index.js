@@ -71,11 +71,17 @@ function Status() {
           const response = await getStatusByEmail(email, localStorage.getItem("token"));
 
           if (response && response.data) {
-            if (response.data.length === 0) {
-              setStatusData([{ status: "No request", name: "", email: "", serial_number: "" }]);
+            let sortedData = response.data;
+
+            if (sortedData.length > 0) {
+              sortedData = sortedData.sort((a, b) => {
+                return new Date(b.created_at) - new Date(a.created_at); // Sorting by timestamp in descending order
+              });
             } else {
-              setStatusData(response.data);
+              sortedData = [{ status: "No request", name: "", email: "", serial_number: "" }];
             }
+
+            setStatusData(sortedData);
           }
         } catch (error) {
           setSnackbarMessage("Failed to fetch status data!");

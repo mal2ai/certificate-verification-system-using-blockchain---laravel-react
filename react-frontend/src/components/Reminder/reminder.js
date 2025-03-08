@@ -20,7 +20,7 @@ const DataPolicyReminder = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/admin/dashboard") {
+    if (location.pathname === "/admin/dashboard" || location.pathname === "/status") {
       const hasSeenReminder = sessionStorage.getItem("hasSeenReminder");
       if (!hasSeenReminder) {
         setIsOpen(true);

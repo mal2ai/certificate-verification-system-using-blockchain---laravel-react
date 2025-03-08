@@ -163,7 +163,11 @@ function Status() {
           if (response.data.message === "No statuses found") {
             setStatusData([]);
           } else {
-            const dataWithLoading = response.data.map((item) => ({
+            let sortedData = response.data.sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at) // Sort by created_at in descending order
+            );
+
+            const dataWithLoading = sortedData.map((item) => ({
               ...item,
               rejectLoading: false,
               approveLoading: false,
