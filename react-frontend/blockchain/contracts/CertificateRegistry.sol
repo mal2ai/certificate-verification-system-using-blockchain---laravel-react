@@ -162,8 +162,14 @@ contract CertificateRegistry {
     function deleteCertificate(string memory serialNumber) public onlyAdmin {
         require(bytes(certificates[serialNumber].serialNumber).length > 0, "Certificate not found");
 
+        // Delete from certHashToSerial mapping
+        string memory storedHash = certHashToSerial[serialNumber];
+        delete certHashToSerial[storedHash];
+
+        // Delete from certificates mapping
         delete certificates[serialNumber];
 
+        // Remove from certificateSerialNumbers array
         for (uint256 i = 0; i < certificateSerialNumbers.length; i++) {
             if (keccak256(abi.encodePacked(certificateSerialNumbers[i])) == keccak256(abi.encodePacked(serialNumber))) {
                 certificateSerialNumbers[i] = certificateSerialNumbers[certificateSerialNumbers.length - 1];

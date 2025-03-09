@@ -75,7 +75,45 @@ function Status() {
       Header: "Serial Number",
       accessor: (row) => (row.serial_number ? row.serial_number : "N/A"),
     },
-    { Header: "Status", accessor: "status" },
+    {
+      Header: "Status",
+      accessor: "status",
+      Cell: ({ value }) => {
+        let bgColor = "";
+
+        switch (value.toLowerCase()) {
+          case "pending":
+            bgColor = "#ffa700";
+            break;
+          case "approved":
+            bgColor = "green";
+            break;
+          case "rejected":
+            bgColor = "red";
+            break;
+          case "not found":
+            bgColor = "gray";
+            break;
+          default:
+            bgColor = "white";
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: "#f2f2f2",
+              color: bgColor,
+              padding: "2px 10px",
+              borderRadius: "5px",
+              display: "inline-block",
+              fontWeight: "bold",
+            }}
+          >
+            {value}
+          </span>
+        );
+      },
+    },
     {
       Header: "Timestamp",
       accessor: "updated_at",
@@ -441,10 +479,11 @@ Status.propTypes = {
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired,
-      rejectLoading: PropTypes.bool, // Add rejectLoading as a boolean
-      approveLoading: PropTypes.bool, // Add approveLoading as a boolean
+      rejectLoading: PropTypes.bool, // Boolean for loading state
+      approveLoading: PropTypes.bool, // Boolean for loading state
     }).isRequired,
   }).isRequired,
+  value: PropTypes.string.isRequired, // Ensure value is validated
 };
 
 export default Status;

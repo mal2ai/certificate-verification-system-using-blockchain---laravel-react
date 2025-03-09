@@ -307,6 +307,18 @@ function Cover() {
               </MDTypography>
             </MDBox>
 
+            <MDBox mt={4} mb={1}>
+              <MDButton
+                variant="gradient"
+                color="dark"
+                fullWidth
+                type="submit"
+                disabled={loading} // Disable button during loading
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Sign up"}
+              </MDButton>
+            </MDBox>
+
             {/* Terms and Conditions Modal */}
             <TermsAndConditions open={openModal} onClose={() => setOpenModal(false)} />
             <MDBox mt={3} mb={1} textAlign="center">

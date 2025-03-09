@@ -208,11 +208,23 @@ function VerifyCertificate() {
                     )}
                     {certificateDetails?.certCID && (
                       <MDInput
-                        label="CID"
+                        label="Cert CID"
                         variant="outlined"
                         fullWidth
                         sx={{ mb: 2 }}
                         value={certificateDetails?.certCID || ""}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    )}
+                    {certificateDetails?.transCID && (
+                      <MDInput
+                        label="Trans CID"
+                        variant="outlined"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        value={certificateDetails?.transCID || ""}
                         InputProps={{
                           readOnly: true,
                         }}
