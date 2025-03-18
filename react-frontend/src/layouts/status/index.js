@@ -192,7 +192,27 @@ function Status() {
   const columns = [
     { Header: "Name", accessor: "name" },
     { Header: "Email", accessor: "email" },
-    { Header: "Serial Number", accessor: "serial_number" },
+    {
+      Header: "Serial Number / File Hash",
+      accessor: "serial_number",
+      Cell: ({ row }) => {
+        const serialNumber = row.original.serial_number;
+        const fileHash = row.original.file_hash;
+
+        // Truncate fileHash if serialNumber is empty
+        const truncatedHash = fileHash
+          ? `${fileHash.substring(0, 6)}...${fileHash.substring(fileHash.length - 6)}`
+          : "";
+
+        return (
+          serialNumber || (
+            <span title={fileHash} style={{ cursor: "pointer", color: "#94849d" }}>
+              {truncatedHash}
+            </span>
+          )
+        );
+      },
+    },
     { Header: "Status", accessor: "status" },
     {
       Header: "Timestamp",
@@ -387,9 +407,13 @@ Status.propTypes = {
       name: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
+      file_hash: PropTypes.string, // Added file_hash validation
       status: PropTypes.string.isRequired,
-    }),
-  }),
+      rejectLoading: PropTypes.bool, // Boolean for loading state
+      approveLoading: PropTypes.bool, // Boolean for loading state
+    }).isRequired,
+  }).isRequired,
+  value: PropTypes.string.isRequired, // Ensure value is validated
 };
 
 export default Status;

@@ -17,6 +17,7 @@ class LogController extends Controller
             'action' => 'required|string',
             'module' => 'required|string',
             'serial_number' => 'nullable|string',
+            'file_hash' => 'nullable|string',
             'tx_hash' => 'nullable|string',
             'status' => 'nullable|string',
             'additional_info' => 'nullable|string',

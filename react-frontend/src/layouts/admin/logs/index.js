@@ -61,7 +61,27 @@ function Logs() {
     { Header: "Request ID", accessor: "req_id" },
     { Header: "User Email", accessor: "user_email" },
     { Header: "Admin Email", accessor: "admin_email" },
-    { Header: "Serial Number", accessor: "serial_number" },
+    {
+      Header: "Serial Number / File Hash",
+      accessor: "serial_number",
+      Cell: ({ row }) => {
+        const serialNumber = row.original.serial_number;
+        const fileHash = row.original.file_hash;
+
+        // Truncate fileHash if serialNumber is empty
+        const truncatedHash = fileHash
+          ? `${fileHash.substring(0, 6)}...${fileHash.substring(fileHash.length - 6)}`
+          : "";
+
+        return (
+          serialNumber || (
+            <span title={fileHash} style={{ cursor: "pointer", color: "#94849d" }}>
+              {truncatedHash}
+            </span>
+          )
+        );
+      },
+    },
     { Header: "Action", accessor: "action" },
     { Header: "Module", accessor: "module" },
     { Header: "TX Hash", accessor: "tx_hash" },
@@ -208,14 +228,7 @@ function Logs() {
                                 );
                               return true;
                             }),
-                            rows: logData
-                              .filter((log) => log.module === module)
-                              .map((log) => {
-                                if (module === "User" || module === "Request") {
-                                  return { ...log, serial_number: log.serial_number || "N/A" };
-                                }
-                                return log;
-                              }),
+                            rows: logData.filter((log) => log.module === module),
                           }}
                           isSorted={true}
                           defaultSortColumn="id"
@@ -255,6 +268,7 @@ Logs.propTypes = {
       name: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
+      file_hash: PropTypes.string, // Added file_hash validation
       status: PropTypes.string.isRequired,
     }),
   }),

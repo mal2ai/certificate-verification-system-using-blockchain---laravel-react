@@ -72,8 +72,25 @@ function Status() {
     { Header: "Name", accessor: "name" },
     { Header: "Email", accessor: "email" },
     {
-      Header: "Serial Number",
-      accessor: (row) => (row.serial_number ? row.serial_number : "N/A"),
+      Header: "Serial Number / File Hash",
+      accessor: "serial_number",
+      Cell: ({ row }) => {
+        const serialNumber = row.original.serial_number;
+        const fileHash = row.original.file_hash;
+
+        // Truncate fileHash if serialNumber is empty
+        const truncatedHash = fileHash
+          ? `${fileHash.substring(0, 6)}...${fileHash.substring(fileHash.length - 6)}`
+          : "";
+
+        return (
+          serialNumber || (
+            <span title={fileHash} style={{ cursor: "pointer", color: "#94849d" }}>
+              {truncatedHash}
+            </span>
+          )
+        );
+      },
     },
     {
       Header: "Status",
@@ -297,7 +314,8 @@ function Status() {
           user_email: rowData.email,
           action: "Rejecting",
           module: "Request",
-          serial_number: rowData.serial_number || "N/A", // Use serial_number if available
+          serial_number: rowData.serial_number, // Use serial_number if available
+          file_hash: rowData.file_hash, // Use file_hash if available
           tx_hash: rowData.tx_hash || "N/A", // Use tx_hash if available
           status: "Success",
         };
@@ -356,7 +374,8 @@ function Status() {
             user_email: rowData.email,
             action: "Approving",
             module: "Request",
-            serial_number: rowData.serial_number || "N/A", // Use serial_number if available
+            serial_number: rowData.serial_number, // Use serial_number if available
+            file_hash: rowData.file_hash, // Use file_hash if available
             tx_hash: rowData.tx_hash || "N/A", // Use tx_hash if available
             status: "Success",
           };
@@ -478,6 +497,7 @@ Status.propTypes = {
       name: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
+      file_hash: PropTypes.string, // Added file_hash validation
       status: PropTypes.string.isRequired,
       rejectLoading: PropTypes.bool, // Boolean for loading state
       approveLoading: PropTypes.bool, // Boolean for loading state

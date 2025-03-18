@@ -128,8 +128,10 @@ function VerifyCertificate() {
         module: "Request",
         status_id: certificateDetails?.id,
         serial_number: certificateDetails?.serial_number || serialNumber,
+        file_hash: certificateDetails?.file_hash,
         status: "Success",
       };
+      console.log("Log Data:", logData);
       await createLog(logData, token);
 
       navigate("/admin/request", {
@@ -163,6 +165,7 @@ function VerifyCertificate() {
         action: "Resend OTP",
         module: "Request",
         serial_number: certificateDetails?.serial_number || serialNumber,
+        file_hash: certificateDetails?.file_hash,
         status: "Success",
       };
       await createLog(logData, token);

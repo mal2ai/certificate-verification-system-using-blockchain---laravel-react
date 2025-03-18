@@ -121,6 +121,7 @@ function VerifyCertificate() {
         action: "New Request",
         module: "User",
         serial_number: serialNumber,
+        file_hash: fileHash,
         status: "Success",
       };
       await createLog(logData, token);

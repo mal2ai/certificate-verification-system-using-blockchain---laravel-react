@@ -16,6 +16,7 @@ class Log extends Model
         'action',
         'module',
         'serial_number',
+        'file_hash',
         'tx_hash',
         'status',
         'additional_info',

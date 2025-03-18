@@ -129,6 +129,7 @@ function VerifyCertificate() {
         action: formType === "uploadFile" ? "Upload Certificate" : "Update Request",
         module: "User",
         serial_number: serialNumber,
+        file_hash: fileHash,
         status: "Success",
       };
       await createLog(logData, token);
