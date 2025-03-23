@@ -113,6 +113,8 @@ function VerifyCertificate() {
 
       setStatusMessage("Status stored successfully.");
 
+      const fileHash = null; // if no file hash for this request
+
       // Create a log after successful request
       const userEmail = localStorage.getItem("email");
       const logData = {

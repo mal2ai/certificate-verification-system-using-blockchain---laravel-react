@@ -223,14 +223,12 @@ function Status() {
       Header: "Actions",
       accessor: "actions",
       Cell: ({ row }) => {
-        // Hide buttons if status is "not found"
-        if (row.original.status === "not found") {
-          return <span style={{ color: "red", fontWeight: "bold" }}>Certificate Not Found</span>;
+        if (!row.original.email || row.original.isPlaceholder) {
+          return null; // Hide buttons for empty rows
         }
 
         return (
           <div>
-            {/* Edit button */}
             <MDButton
               variant="outlined"
               color="info"
@@ -242,13 +240,12 @@ function Status() {
               Edit
             </MDButton>
 
-            {/* View button */}
             <MDButton
               variant="outlined"
               color="success"
               onClick={() => {
-                setSelectedRow(row.original); // Store row data
-                setIsOtpModalOpen(true); // Open OTP modal
+                setSelectedRow(row.original);
+                setIsOtpModalOpen(true);
               }}
               size="small"
               disabled={row.original.status === "pending" || row.original.status === "rejected"}
@@ -263,22 +260,21 @@ function Status() {
 
   // Function to format the date
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
+    if (!dateString) return "-"; // Return "-" if no date exists
 
-    // Options for formatting the date and time
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-"; // Return "-" if the date is invalid
+
     const options = {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true, // 12-hour format (AM/PM)
+      hour12: true,
     };
 
-    // Format the date into "dd/mm/yyyy, h:mm AM/PM"
-    const formattedDate = date.toLocaleString("en-GB", options);
-
-    return formattedDate;
+    return date.toLocaleString("en-GB", options);
   };
 
   return (
@@ -315,12 +311,46 @@ function Status() {
                   </div>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: statusData }}
+                    table={{
+                      columns,
+                      rows:
+                        statusData.length > 0
+                          ? statusData
+                          : [
+                              {
+                                name: "No Request Yet",
+                                email: "-",
+                                serial_number: "-",
+                                status: "-",
+                                updated_at: "-",
+                                actions: "-",
+                                isPlaceholder: true, // Custom flag for placeholder row
+                              },
+                            ],
+                    }}
                     isSorted={true}
                     entriesPerPage={true}
                     showTotalEntries={true}
                     canSearch={true}
                     noEndBorder
+                    customRenderRow={(row) =>
+                      row.isPlaceholder ? (
+                        <tr>
+                          <td
+                            colSpan={columns.length}
+                            style={{
+                              textAlign: "center",
+                              padding: "20px",
+                              fontSize: "16px",
+                              fontWeight: "bold",
+                              color: "#888",
+                            }}
+                          >
+                            No Request Yet
+                          </td>
+                        </tr>
+                      ) : null
+                    }
                   />
                 )}
               </MDBox>
@@ -411,6 +441,7 @@ Status.propTypes = {
       status: PropTypes.string.isRequired,
       rejectLoading: PropTypes.bool, // Boolean for loading state
       approveLoading: PropTypes.bool, // Boolean for loading state
+      isPlaceholder: PropTypes.bool, // Added validation for placeholder row
     }).isRequired,
   }).isRequired,
   value: PropTypes.string.isRequired, // Ensure value is validated
