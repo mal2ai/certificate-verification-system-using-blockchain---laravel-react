@@ -104,23 +104,39 @@ This is an example of how to list things you need to use the software and how to
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+Configure the `.env` file first
+
+1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   https://github.com/mal2ai/laravel-react-blockchain.git
    ```
-3. Install NPM packages
+2. Redirect to laravel-backend
+   ```sh
+   cd laravel-backend
+   ```
+3. Install dependencies for backend API
+   ```sh
+   composer install
+   ```
+4. Migrate database
+   ```sh
+   php artisan migrate
+   ```
+5. Run Backend API
+   ```sh
+   php artisan serve
+   ```
+6. Redirect to react-frontend (in new terminal)
+   ```sh
+   cd react-frontend
+   ```
+7. Install Package 
    ```sh
    npm install
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-5. Change git remote url to avoid accidental pushes to base project
+7. Run Frontend (React)
    ```sh
-   git remote set-url origin github_username/repo_name
-   git remote -v # confirm the changes
+   npm start
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
