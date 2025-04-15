@@ -12,9 +12,7 @@
   <h3 align="center">React & Laravel</h3>
 
   <p align="center">
-    An awesome README template to jumpstart your projects!
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
+    Certificate Verification System using Blockchain
     <br />
     <br />
     <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
