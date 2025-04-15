@@ -108,7 +108,7 @@ Configure the `.env` file first
 
 1. Clone the repo
    ```sh
-   https://github.com/mal2ai/laravel-react-blockchain.git
+   git clone https://github.com/mal2ai/laravel-react-blockchain.git
    ```
 2. Redirect to laravel-backend
    ```sh
