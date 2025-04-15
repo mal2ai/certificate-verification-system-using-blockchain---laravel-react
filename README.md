@@ -122,7 +122,7 @@ Configure the `.env` file first
    ```sh
    php artisan migrate
    ```
-5. Run Backend API
+5. Run Backend API (Laravel)
    ```sh
    php artisan serve
    ```
