@@ -26,7 +26,19 @@ class AuthController extends Controller
 
         $user = \App\Models\User::where('email', $request->email)->first();
 
-        if (!$user || !Auth::attempt($request->only('email', 'password'))) {
+        if (!$user) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        // Check account status
+        if ($user->status !== 'active') {
+            return response()->json([
+                'message' => "Your account is {$user->status}. Please contact the administrator."
+            ], 403);
+        }
+
+        // Attempt authentication
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
@@ -38,7 +50,8 @@ class AuthController extends Controller
                 'mfa_required' => true,
                 'email' => $user->email,
                 'role' => $user->role,
-                'temp_token' => $tempToken, // Send temp token for MFA
+                'temp_token' => $tempToken,
+                'status' => $user->status, // Optional: send status info if needed on frontend
             ]);
         }
 
@@ -49,6 +62,7 @@ class AuthController extends Controller
             'token' => $token,
             'role' => $user->role,
             'email' => $user->email,
+            'status' => $user->status, // Optional
         ]);
     }
 
