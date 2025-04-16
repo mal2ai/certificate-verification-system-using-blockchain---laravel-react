@@ -238,3 +238,8 @@ To everyone who contributed, directly or indirectly, thank you for making this p
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com 
+[IPFS-logo]: https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white
+[IPFS-url]: https://ipfs.io/
+[Ganache-logo]: https://img.shields.io/badge/Ganache-FF6A00?style=for-the-badge&logo=ethereum&logoColor=white
+[Ganache-url]: https://www.trufflesuite.com/ganache
+
