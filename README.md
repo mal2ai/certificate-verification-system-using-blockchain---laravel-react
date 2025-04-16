@@ -100,9 +100,18 @@ Before running this project locally, ensure the following dependencies are insta
   ```sh
   npm install -g truffle
 
-- - **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
+- **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
   👉 [Download Ganache](https://trufflesuite.com/ganache/)
 
+- **[IPFS Kubo](https://docs.ipfs.tech/install/command-line/)** – IPFS daemon for decentralized file storage
+  👉 [Install IPFS Kubo](https://docs.ipfs.tech/install/command-line/)
+
+- **[Node.js & npm](https://nodejs.org/en)** – JavaScript runtime and package manager
+  ```sh
+  npm install npm@latest -g
+
+- **[Composer](https://getcomposer.org/)** – PHP dependency manager
+  👉 [Install Composer](https://getcomposer.org/)
 
 ### Installation
 
