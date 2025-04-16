@@ -84,7 +84,23 @@ function Logs() {
     },
     { Header: "Action", accessor: "action" },
     { Header: "Module", accessor: "module" },
-    { Header: "TX Hash", accessor: "tx_hash" },
+    {
+      Header: "TX Hash",
+      accessor: "tx_hash",
+      Cell: ({ value }) => {
+        const txHash = value;
+
+        const truncatedTxHash = txHash
+          ? `${txHash.substring(0, 6)}...${txHash.substring(txHash.length - 6)}`
+          : "";
+
+        return (
+          <span title={txHash} style={{ cursor: "pointer", color: "#94849d" }}>
+            {truncatedTxHash}
+          </span>
+        );
+      },
+    },
     { Header: "Status", accessor: "status" },
     {
       Header: "Timestamp",
@@ -262,13 +278,14 @@ function Logs() {
 }
 
 Logs.propTypes = {
+  value: PropTypes.string, // Add this if Logs directly uses 'value' prop
   row: PropTypes.shape({
     original: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       serial_number: PropTypes.string.isRequired,
-      file_hash: PropTypes.string, // Added file_hash validation
+      file_hash: PropTypes.string,
       status: PropTypes.string.isRequired,
     }),
   }),

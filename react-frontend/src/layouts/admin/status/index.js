@@ -80,7 +80,7 @@ function Status() {
 
         // Truncate fileHash if serialNumber is empty
         const truncatedHash = fileHash
-          ? `${fileHash.substring(0, 6)}...${fileHash.substring(fileHash.length - 6)}`
+          ? `${fileHash.substring(0, 4)}...${fileHash.substring(fileHash.length - 4)}`
           : "";
 
         return (
