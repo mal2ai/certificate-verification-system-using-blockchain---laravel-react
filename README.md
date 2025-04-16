@@ -100,6 +100,10 @@ Before running this project locally, ensure the following dependencies are insta
   ```sh
   npm install -g truffle
 
+- - **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
+  👉 [Download Ganache](https://trufflesuite.com/ganache/)
+
+
 ### Installation
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
