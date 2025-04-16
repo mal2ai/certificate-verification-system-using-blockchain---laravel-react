@@ -88,7 +88,7 @@ To get a local copy up and running follow these simple example steps.
 ### Prerequisites
 
 Before running this project locally, ensure the following dependencies are installed on your system:
-- **[Composer](https://getcomposer.org/)** – PHP dependency manager
+- **[Composer](https://getcomposer.org/)** – PHP dependency manager  
   👉 [Install Composer](https://getcomposer.org/)
 
 - **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
