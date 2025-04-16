@@ -82,8 +82,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Follow the steps below to set up the project on your local machine and ensure all necessary dependencies are installed for smooth operation.
 
 ### Prerequisites
 
@@ -115,7 +114,7 @@ Before running this project locally, ensure the following dependencies are insta
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+_Below is an example of how you can install and set up the app._
 
 Configure the `.env` file first
 
