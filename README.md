@@ -76,6 +76,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 * [![JQuery][JQuery.com]][JQuery-url]
 * [![IPFS][IPFS-logo]][IPFS-url]
 * [![Ganache][Ganache-logo]][Ganache-url]
+* [![Truffle][Truffle-logo]][Truffle-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -242,4 +243,5 @@ To everyone who contributed, directly or indirectly, thank you for making this p
 [IPFS-url]: https://ipfs.io/
 [Ganache-logo]: https://img.shields.io/badge/Ganache-FF6A00?style=for-the-badge&logo=ethereum&logoColor=white
 [Ganache-url]: https://www.trufflesuite.com/ganache
-
+[Truffle-logo]: https://img.shields.io/badge/Truffle-FF6A00?style=for-the-badge&logo=truffle&logoColor=white
+[Truffle-url]: https://www.trufflesuite.com/truffle
