@@ -88,6 +88,19 @@ To get a local copy up and running follow these simple example steps.
 ### Prerequisites
 
 Before running this project locally, ensure the following dependencies are installed on your system:
+- **[Composer](https://getcomposer.org/)** – PHP dependency manager
+  👉 [Install Composer](https://getcomposer.org/)
+
+- **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
+  👉 [Download Ganache](https://trufflesuite.com/ganache/)
+
+- **[IPFS Kubo](https://docs.ipfs.tech/install/command-line/)** – IPFS daemon for decentralized file storage
+  👉 [Install IPFS Kubo](https://docs.ipfs.tech/install/command-line/)
+
+- **[Node.js & npm](https://nodejs.org/en)** – JavaScript runtime and package manager
+  ```sh
+  npm install npm@latest -g
+  
 - **[Laravel](https://laravel.com/)** – Backend framework  
   ```sh
   composer global require laravel/installer
@@ -99,19 +112,6 @@ Before running this project locally, ensure the following dependencies are insta
 - **[Truffle](https://www.npmjs.com/package/truffle)** – Ethereum smart contract development framework
   ```sh
   npm install -g truffle
-
-- **[Ganache](https://trufflesuite.com/ganache/)** – Personal Ethereum blockchain for development  
-  👉 [Download Ganache](https://trufflesuite.com/ganache/)
-
-- **[IPFS Kubo](https://docs.ipfs.tech/install/command-line/)** – IPFS daemon for decentralized file storage
-  👉 [Install IPFS Kubo](https://docs.ipfs.tech/install/command-line/)
-
-- **[Node.js & npm](https://nodejs.org/en)** – JavaScript runtime and package manager
-  ```sh
-  npm install npm@latest -g
-
-- **[Composer](https://getcomposer.org/)** – PHP dependency manager
-  👉 [Install Composer](https://getcomposer.org/)
 
 ### Installation
 
