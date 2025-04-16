@@ -87,11 +87,10 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
+Before running this project locally, ensure the following dependencies are installed on your system:
+- **[Laravel](https://laravel.com/)** – Backend framework  
   ```sh
-  npm install npm@latest -g
-  ```
+  composer global require laravel/installer
 
 ### Installation
 
