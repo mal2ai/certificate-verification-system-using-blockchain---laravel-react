@@ -92,6 +92,14 @@ Before running this project locally, ensure the following dependencies are insta
   ```sh
   composer global require laravel/installer
 
+- **[React](https://react.dev/)** – Frontend framework  
+  ```sh
+  npm install
+
+- **[Truffle](https://www.npmjs.com/package/truffle)** – Ethereum smart contract development framework
+  ```sh
+  npm install -g truffle
+
 ### Installation
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
