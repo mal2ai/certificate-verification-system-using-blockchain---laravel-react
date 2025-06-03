@@ -63,6 +63,8 @@ Key Features:
 
 This project was developed as part of my Final Year Project and serves as a practical solution for digital credential validation using cutting-edge web and blockchain technologies.
 
+> ⚠️ **For Your Attention:** This system is not the final release. There are known vulnerabilities that still need to be fixed.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
